@@ -3,7 +3,7 @@
 
 #include<vector>
 
-enum class Zone{
+enum Zone{
     LIGHT_BLUE,
     DARK_BLUE,
     BROWN,
@@ -14,18 +14,32 @@ enum class Zone{
 };
 
 class Hero;//will remove
+class Comrades;//will remove
 
 class Space
 {
     private:
-        std :: vector<Space *> neighbor = {};
-        Zone zone ;
-        std :: vector<Space *> Hidden_way = {};
+        std :: vector<Zone> zone ;
+        std :: vector<Space *> neighbor ;
+        std :: vector<Space *> Hidden_way;
         Hero * hero = nullptr;
+        Comrades * comrade = nullptr;
 
     public:
-        Space(Zone , std :: vector<Space*> , std :: vector<Space *>) ;
+        // Space(Zone , std :: vector<Space*> , std :: vector<Space *>) ;
+        void reset_hero();
+
+        //set and get
+        void set_zone(std :: vector<Zone>);
         void set_hero(Hero *);
+        void set_comrades(Comrades *);
+        void set_neighbor(std :: vector<Space*>);
+        void set_hidden_way(std :: vector<Space*>);
+        std :: vector<Space*> get_neighbor() const;
+        std :: vector<Space*> get_Hidden_way() const;
+        std :: vector<Zone> get_zone() const;
+        Hero* get_Hero() const;
+        Comrades* get_comrade() const;
 
     
 };
