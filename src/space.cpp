@@ -1,14 +1,16 @@
 #include "space.h"
 using namespace std;
 
-// Space :: Space(Zone z , vector<Space*> v , vector<Space *> h) : zone(z) , neighbor(v) , Hidden_way(h) {}
+Space :: Space(std :: vector<int> n, std :: vector<int> h , std :: vector<Zone> z ) {
+
+}
 
 vector <Space *> Space :: get_neighbor() const{
     return neighbor;
 }
 
 vector <Space *> Space :: get_Hidden_way() const{
-    return neighbor;
+    return Hidden_way;
 }
 
 Hero* Space :: get_Hero() const {
@@ -19,16 +21,16 @@ vector<Zone> Space :: get_zone() const{
     return zone;
 }
 
-void Space :: reset_hero(){
+void Space :: reset(){
     hero = nullptr;
     comrade = nullptr;
 }
 
-void Space :: set_neighbor(vector<Space*> n){
+void Space :: set_neighbor(vector<Space*> & n){
     neighbor = n;
 }
 
-void Space :: set_hidden_way(vector<Space*> h){
+void Space :: set_hidden_way(vector<Space*> & h){
     Hidden_way = h;
 }
 
@@ -40,12 +42,28 @@ void Space :: set_comrades(Comrades * comrade){
     this->comrade = comrade;
 }
 
-void Space :: set_zone(vector<Zone> zone){
+void Space :: set_zone(vector<Zone> & zone){
     this->zone = zone;
 }
 
 Comrades* Space :: get_comrade() const{
     return comrade;
+}
+
+bool Space :: operator == (const Space & s) const{
+    if(s.get_zone() != zone)
+        return false;
+    if(s.get_comrade() != comrade)
+        return false;
+    if(s.get_Hero() != hero)
+        return false;
+    if(s.get_Hidden_way() != Hidden_way)
+        return false;
+    if(s.get_neighbor() != neighbor)
+        return false;
+
+
+    return true;
 }
 
 

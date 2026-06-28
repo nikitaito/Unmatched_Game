@@ -26,20 +26,22 @@ class Space
         Comrades * comrade = nullptr;
 
     public:
-        // Space(Zone , std :: vector<Space*> , std :: vector<Space *>) ;
-        void reset_hero();
+        Space(std :: vector<int> , std :: vector<int> , std :: vector<Zone> ) ;
+        void reset();
 
         //set and get
-        void set_zone(std :: vector<Zone>);
+        void set_zone(std :: vector<Zone> &);
         void set_hero(Hero *);
         void set_comrades(Comrades *);
-        void set_neighbor(std :: vector<Space*>);
-        void set_hidden_way(std :: vector<Space*>);
+        void set_neighbor(std :: vector<Space*> & );
+        void set_hidden_way(std :: vector<Space*> & );
         std :: vector<Space*> get_neighbor() const;
         std :: vector<Space*> get_Hidden_way() const;
         std :: vector<Zone> get_zone() const;
         Hero* get_Hero() const;
         Comrades* get_comrade() const;
+        bool operator == (const Space &) const;
+
 
     
 };

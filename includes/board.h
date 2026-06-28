@@ -4,15 +4,21 @@
 #include "space.h"
 class Hero;
 
+enum class WayType
+{
+    None,
+    Normal,
+    Hidden
+};
+
 class Board
 {
     private:
+        static constexpr int SPACE_COUNT = 32;
         std :: vector<Space> spaces;
-        Hero * hero;
-        
+        void initial_space(Space & , std :: vector<int> , std :: vector<int> , std :: vector<Zone>);
 
     public:
-        void intial_space(Space & , std :: vector<int> , std :: vector<int> , std :: vector<Zone>);
         Board();
 
         std :: vector<Space> get_spaces() const;
@@ -21,6 +27,7 @@ class Board
         void reset_space(int);
         Space * search_hero(Hero *);
         Space * search_comrades(Comrades *);
+        WayType way(int , int) const;
 
 
         
