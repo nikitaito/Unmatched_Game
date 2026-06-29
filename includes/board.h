@@ -30,6 +30,8 @@ class Board
         WayType way(int , int) const;
 
 
+
+
         
 };
 

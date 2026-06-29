@@ -1,4 +1,5 @@
 #include "space.h"
+#include "exption_control.h"
 using namespace std;
 
 Space :: Space(std :: vector<int> n, std :: vector<int> h , std :: vector<Zone> z ) {
@@ -21,11 +22,6 @@ vector<Zone> Space :: get_zone() const{
     return zone;
 }
 
-void Space :: reset(){
-    hero = nullptr;
-    comrade = nullptr;
-}
-
 void Space :: set_neighbor(vector<Space*> & n){
     neighbor = n;
 }
@@ -35,11 +31,17 @@ void Space :: set_hidden_way(vector<Space*> & h){
 }
 
 void Space :: set_hero(Hero * hero){
-    this->hero = hero;
+    if(hero == nullptr && comrade == nullptr)
+        this->hero = hero;
+    else
+        throw  NoSpaceException(); 
 }
 
 void Space :: set_comrades(Comrades * comrade){
-    this->comrade = comrade;
+    if(hero == nullptr && comrade == nullptr)
+        this->comrade = comrade;
+    else
+        throw NoSpaceException();
 }
 
 void Space :: set_zone(vector<Zone> & zone){
@@ -48,6 +50,11 @@ void Space :: set_zone(vector<Zone> & zone){
 
 Comrades* Space :: get_comrade() const{
     return comrade;
+}
+
+void Space :: reset(){
+    hero = nullptr;
+    comrade = nullptr;
 }
 
 bool Space :: operator == (const Space & s) const{

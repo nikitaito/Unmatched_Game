@@ -1,0 +1,15 @@
+
+#ifndef exption_conrol
+#define exption_conrol
+
+#include<exception>
+
+class NoSpaceException : public std::runtime_error {
+    public:
+        NoSpaceException(const std :: string & message = "There is no available space.")
+            : std::runtime_error(message) {}
+};
+
+
+
+#endif 
