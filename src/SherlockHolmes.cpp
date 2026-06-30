@@ -1,5 +1,6 @@
 
 #include "SherlockHolmes.h"
+#include <random>
 using namespace std;
 
 SherlockHolmes::SherlockHolmes()
@@ -47,4 +48,21 @@ SherlockHolmes::SherlockHolmes()
 
     deck.push_back(Card(CardType::Study_Methods, CardTiming::After, "Both", 3, 3, 2));
     deck.push_back(Card(CardType::Study_Methods, CardTiming::After, "Both", 3, 3, 2));
+}
+
+int SherlockHolmes::discard_hand()
+{
+    int Boost;
+
+    std::mt19937 rng(std::random_device{}());
+    std::uniform_int_distribution<int> dist(0, 4); // 0 - 4
+    int randomIndex = dist(rng);
+
+    Boost = hand[randomIndex].get_Boost();
+    
+    discard.push_back(hand[randomIndex]);
+
+    hand.erase(hand.begin() + randomIndex);
+
+    return Boost;
 }

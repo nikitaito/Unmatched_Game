@@ -8,7 +8,7 @@ Heroes::Heroes(std::string name, std::string Attacktype, int Health, int Movemen
 string Heroes::get_name()
 {
     return name;
-;
+    ;
 }
 string Heroes::get_Attacktype()
 {
@@ -17,4 +17,11 @@ string Heroes::get_Attacktype()
 int Heroes::get_Movement()
 {
     return Movement;
+}
+void Heroes::set_Health(int amount)
+{
+    if (Health + 2 > 13)
+        Health = 13;
+    else
+        this->Health += amount;
 }

@@ -2,9 +2,9 @@
 
 #include "Heroes.h"
 #include "Dr_Watson.h"
-#include"Card.h"
+#include "Card.h"
 
-#include<vector>
+#include <vector>
 
 class SherlockHolmes : public Heroes
 {
@@ -14,6 +14,10 @@ private:
     Dr_Watson Watson;
 
     std::vector<Card> deck;
+    std::vector<Card> hand;
+    std::vector<Card> discard;
+
 public:
     SherlockHolmes();
+    int discard_hand();
 };

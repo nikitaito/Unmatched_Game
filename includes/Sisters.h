@@ -9,5 +9,4 @@ private:
 public:
     Sisters();
 
-    virtual void Damage(int);
 };

@@ -1,5 +1,6 @@
 
 #include "Dracula.h"
+#include <random>
 using namespace std;
 
 Dracula::Dracula()
@@ -46,5 +47,15 @@ Dracula::Dracula()
   deck.push_back(Card(CardType::Feint, CardTiming::Before, "Both", 2, 2, 2));
   deck.push_back(Card(CardType::Feint, CardTiming::Before, "Both", 2, 2, 2));
   deck.push_back(Card(CardType::Feint, CardTiming::Before, "Both", 2, 2, 2));
- 
+}
+
+vector<Sisters *> Dracula::get_sisters()
+{
+  return sisters;
+}
+
+void Dracula::DrawnCard()
+{
+  hand.push_back(deck.front());
+  hand.erase(hand.begin());
 }

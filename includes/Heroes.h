@@ -18,5 +18,6 @@ public:
     std::string get_Attacktype();
     int get_Movement();
 
-    virtual void Damage(int) = 0;
+    void set_Health(int);
+
 };

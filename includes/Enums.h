@@ -33,7 +33,6 @@ enum class CardType
 
 enum class CardTiming
 {
-
     During,
     Before,
     After,

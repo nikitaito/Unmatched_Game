@@ -23,8 +23,6 @@ class Comrades
 
     int get_Movement() const;    
     int get_Health() const;
-    
-    virtual void Damage(int) = 0;
 
 
 };
