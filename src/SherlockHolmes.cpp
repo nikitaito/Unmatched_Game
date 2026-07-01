@@ -4,50 +4,9 @@
 using namespace std;
 
 SherlockHolmes::SherlockHolmes()
-    : Heroes("SHERLOCKHOLMES", "MELEE", 16, 2)
+    : Heroes("SHERLOCKHOLMES", Attacktype :: MELEE , Style :: INTEL , 16, 2)
 {
-    deck.push_back(Card(CardType::Administer_Aid, CardTiming::Immediate, "Event", 0, 0, 2));
-    deck.push_back(Card(CardType::Administer_Aid, CardTiming::Immediate, "Event", 0, 0, 2));
-
-    deck.push_back(Card(CardType::Confirm_Suspicion, CardTiming::Immediate, "Event", 0, 0, 1));
-    deck.push_back(Card(CardType::Confirm_Suspicion, CardTiming::Immediate, "Event", 0, 0, 1));
-    deck.push_back(Card(CardType::Confirm_Suspicion, CardTiming::Immediate, "Event", 0, 0, 1));
-
-    deck.push_back(Card(CardType::Counterpunch, CardTiming::After, "Both", 3, 3, 1));
-    deck.push_back(Card(CardType::Counterpunch, CardTiming::After, "Both", 3, 3, 1));
-    deck.push_back(Card(CardType::Counterpunch, CardTiming::After, "Both", 3, 3, 1));
-
-    deck.push_back(Card(CardType::Deduce_Strategy, CardTiming::During, "Both", 3, 3, 1));
-    deck.push_back(Card(CardType::Deduce_Strategy, CardTiming::During, "Both", 3, 3, 1));
-    deck.push_back(Card(CardType::Deduce_Strategy, CardTiming::During, "Both", 3, 3, 1));
-
-    deck.push_back(Card(CardType::Education_Never_Ends, CardTiming::After, "Both", 3, 3, 1));
-    deck.push_back(Card(CardType::Education_Never_Ends, CardTiming::After, "Both", 3, 3, 1));
-
-    deck.push_back(Card(CardType::Elementary, CardTiming::During, "Defense", 3, 0, 3));
-    deck.push_back(Card(CardType::Elementary, CardTiming::During, "Defense", 3, 0, 3));
-
-    deck.push_back(Card(CardType::Eliminate_The_Impossible, CardTiming::Immediate, "Event", 0, 0, 2));
-    deck.push_back(Card(CardType::Eliminate_The_Impossible, CardTiming::Immediate, "Event", 0, 0, 2));
-
-    deck.push_back(Card(CardType::Feint, CardTiming::Before, "Both", 2, 2, 1));
-    deck.push_back(Card(CardType::Feint, CardTiming::Before, "Both", 2, 2, 1));
-    deck.push_back(Card(CardType::Feint, CardTiming::Before, "Both", 2, 2, 1));
-
-    deck.push_back(Card(CardType::Fixed_Point_in_a_Changing_Age, CardTiming::After, "Both", 3, 3, 1));
-    deck.push_back(Card(CardType::Fixed_Point_in_a_Changing_Age, CardTiming::After, "Both", 3, 3, 1));
-
-    deck.push_back(Card(CardType::Master_of_Disguise, CardTiming::Immediate, "Event", 0, 0, 2));
-    deck.push_back(Card(CardType::Master_of_Disguise, CardTiming::Immediate, "Event", 0, 0, 2));
-
-    deck.push_back(Card(CardType::The_Game_Is_Afoot, CardTiming::After, "Attack", 0, 5, 2));
-    deck.push_back(Card(CardType::The_Game_Is_Afoot, CardTiming::After, "Attack", 0, 5, 2));
-
-    deck.push_back(Card(CardType::Service_Revolver, CardTiming::Immediate, "Attack", 0, 5, 2));
-    deck.push_back(Card(CardType::Service_Revolver, CardTiming::Immediate, "Attack", 0, 5, 2));
-
-    deck.push_back(Card(CardType::Study_Methods, CardTiming::After, "Both", 3, 3, 2));
-    deck.push_back(Card(CardType::Study_Methods, CardTiming::After, "Both", 3, 3, 2));
+    initial_deck();
 }
 
 int SherlockHolmes::discard_hand()
@@ -58,11 +17,61 @@ int SherlockHolmes::discard_hand()
     std::uniform_int_distribution<int> dist(0, 4); // 0 - 4
     int randomIndex = dist(rng);
 
-    Boost = hand[randomIndex].get_Boost();
+    Boost = cards.hand[randomIndex].get_Boost();
     
-    discard.push_back(hand[randomIndex]);
+    cards.discard.push_back(cards.hand[randomIndex]);
 
-    hand.erase(hand.begin() + randomIndex);
+    cards.hand.erase(cards.hand.begin() + randomIndex);
 
     return Boost;
 }
+
+void SherlockHolmes :: initial_deck(){
+    cards.deck.push_back(Card(CardName::Administer_Aid, CardTiming::Immediate, CardType :: EVENT , Usertype :: DR_WATSON , 0, 0, 2));
+    cards.deck.push_back(Card(CardName::Administer_Aid, CardTiming::Immediate, CardType :: EVENT , Usertype :: DR_WATSON , 0, 0, 2));
+
+    cards.deck.push_back(Card(CardName::Confirm_Suspicion, CardTiming::Immediate, CardType :: EVENT , Usertype :: HOLMES , 0, 0, 1));
+    cards.deck.push_back(Card(CardName::Confirm_Suspicion, CardTiming::Immediate, CardType :: EVENT , Usertype :: HOLMES , 0, 0, 1));
+    cards.deck.push_back(Card(CardName::Confirm_Suspicion, CardTiming::Immediate, CardType :: EVENT , Usertype :: HOLMES , 0, 0, 1));
+
+    cards.deck.push_back(Card(CardName::Counterpunch, CardTiming::After, CardType :: BOTH , Usertype :: HOLMES , 3, 3, 1));
+    cards.deck.push_back(Card(CardName::Counterpunch, CardTiming::After, CardType :: BOTH , Usertype :: HOLMES , 3, 3, 1));
+    cards.deck.push_back(Card(CardName::Counterpunch, CardTiming::After, CardType :: BOTH , Usertype :: HOLMES , 3, 3, 1));
+
+    cards.deck.push_back(Card(CardName::Deduce_Strategy, CardTiming::During, CardType :: BOTH , Usertype :: HOLMES , 3, 3, 1));
+    cards.deck.push_back(Card(CardName::Deduce_Strategy, CardTiming::During, CardType :: BOTH , Usertype :: HOLMES , 3, 3, 1));
+    cards.deck.push_back(Card(CardName::Deduce_Strategy, CardTiming::During, CardType :: BOTH , Usertype :: HOLMES , 3, 3, 1));
+
+    cards.deck.push_back(Card(CardName::Education_Never_Ends, CardTiming::After, CardType :: BOTH, Usertype :: ANY , 3, 3, 1));
+    cards.deck.push_back(Card(CardName::Education_Never_Ends, CardTiming::After, CardType :: BOTH, Usertype :: ANY , 3, 3, 1));
+
+    cards.deck.push_back(Card(CardName::Elementary, CardTiming::During, CardType :: DEFENSE, Usertype :: HOLMES , 3, 0, 3));
+    cards.deck.push_back(Card(CardName::Elementary, CardTiming::During, CardType :: DEFENSE, Usertype :: HOLMES , 3, 0, 3));
+
+    cards.deck.push_back(Card(CardName::Eliminate_The_Impossible, CardTiming::Immediate, CardType :: EVENT , Usertype :: HOLMES , 0 , 0, 2));
+    cards.deck.push_back(Card(CardName::Eliminate_The_Impossible, CardTiming::Immediate, CardType :: EVENT , Usertype :: HOLMES , 0 , 0, 2));
+
+    cards.deck.push_back(Card(CardName::Feint, CardTiming::Before, CardType :: BOTH, Usertype :: ANY , 2, 2, 1));
+    cards.deck.push_back(Card(CardName::Feint, CardTiming::Before, CardType :: BOTH, Usertype :: ANY , 2, 2, 1));
+    cards.deck.push_back(Card(CardName::Feint, CardTiming::Before, CardType :: BOTH, Usertype :: ANY , 2, 2, 1));
+
+    cards.deck.push_back(Card(CardName::Fixed_Point_in_a_Changing_Age, CardTiming::After, CardType :: BOTH , Usertype :: DR_WATSON , 3, 3, 1));
+    cards.deck.push_back(Card(CardName::Fixed_Point_in_a_Changing_Age, CardTiming::After, CardType :: BOTH , Usertype :: DR_WATSON , 3, 3, 1));
+
+    cards.deck.push_back(Card(CardName::Master_of_Disguise, CardTiming::Immediate, CardType :: EVENT , Usertype :: HOLMES , 0, 0, 2));
+    cards.deck.push_back(Card(CardName::Master_of_Disguise, CardTiming::Immediate, CardType :: EVENT , Usertype :: HOLMES , 0, 0, 2));
+
+    cards.deck.push_back(Card(CardName::The_Game_Is_Afoot, CardTiming::After, CardType :: ATTACK, Usertype :: HOLMES , 0, 5, 2));
+    cards.deck.push_back(Card(CardName::The_Game_Is_Afoot, CardTiming::After, CardType :: ATTACK, Usertype :: HOLMES , 0, 5, 2));
+
+    cards.deck.push_back(Card(CardName::Service_Revolver, CardTiming::Immediate, CardType :: ATTACK, Usertype :: DR_WATSON , 0 , 5, 2));
+    cards.deck.push_back(Card(CardName::Service_Revolver, CardTiming::Immediate, CardType :: ATTACK, Usertype :: DR_WATSON , 0 , 5, 2));
+
+    cards.deck.push_back(Card(CardName::Study_Methods, CardTiming::After, CardType :: BOTH, Usertype :: ANY , 3, 3, 2));
+    cards.deck.push_back(Card(CardName::Study_Methods, CardTiming::After, CardType :: BOTH, Usertype :: ANY , 3, 3, 2));
+}
+
+void SherlockHolmes :: initial_sidekicks(){
+    sidekick.push_back(Sidekick("Dr_Watson", Attacktype :: RANGED , 8, 2));
+}
+

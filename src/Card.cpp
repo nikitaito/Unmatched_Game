@@ -1,15 +1,24 @@
 #include "Card.h"
 
-Card::Card(CardType name, CardTiming timing, std::string typeAttack, int Attack, int Defense, int Boost)
-    : name(name), timing(timing), typeAttack(typeAttack), Attack(Attack), Defense(Defense), Boost(Boost) {}
+Card::Card(CardName name, CardTiming timing, CardType cardtype , Usertype usertype, int Attack, int Defense, int Boost)
+    : name(name), timing(timing), cardtype(cardtype) , usertype(usertype) , Attack(Attack) , Defense(Defense), Boost(Boost) {}
 
-CardType Card::get_CardType() const
+CardName Card::get_CardName() const
 {
     return this->name;
 }
 CardTiming Card::get_CardTiming() const
 {
     return this->timing;
+}
+
+CardType Card :: get_CardType() const
+{
+    return this->cardtype;
+}
+
+Usertype Card :: get_usertype() const{
+    return this->usertype;
 }
 
 int Card::get_Boost() const

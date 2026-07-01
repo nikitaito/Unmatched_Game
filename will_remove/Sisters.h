@@ -5,8 +5,8 @@
 class Sisters : public Comrades
 {
 
-private:
-public:
-    Sisters();
+    private:
+    public:
+        Sisters();
 
 };

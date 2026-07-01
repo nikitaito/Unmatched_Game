@@ -1,7 +1,7 @@
 #pragma once
 
 
-enum class CardType
+enum class CardName
 {
     Feedingfrenzy,
     Mistform,
@@ -37,4 +37,30 @@ enum class CardTiming
     Before,
     After,
     Immediate,
+};
+
+enum class Style
+{
+    ARRGD,
+    INTEL
+};
+
+enum class Attacktype{
+    MELEE,
+    RANGED
+};
+
+enum class Usertype{
+    DR_WATSON,
+    HOLMES,
+    SISTER,
+    DRACULA,
+    ANY
+ };
+
+enum class CardType{
+    ATTACK,
+    DEFENSE,
+    EVENT,
+    BOTH
 };

@@ -7,32 +7,35 @@
 class Card
 {
 
-private:
-    CardType name;
-    CardTiming timing;      // "DURING" , "AFTER" , "BEFORE", "IMMEDIATE"
-    std::string typeAttack; // "ATTACK" , "DEFENSE" , "EVENT", "BOTH"
-    int Attack;
-    int Defense;
-    int Boost;
+    private:
+        CardName name;
+        CardTiming timing;      // "DURING" , "AFTER" , "BEFORE", "IMMEDIATE"
+        CardType cardtype; // "ATTACK" , "DEFENSE" , "EVENT", "BOTH"
+        Usertype usertype;
+        int Attack;
+        int Defense;
+        int Boost;
 
-    bool ApplyEffects{true};
+        bool ApplyEffects{true};
 
-public:
-    Card() = default;
-    Card(CardType, CardTiming, std::string, int, int, int);
+    public:
+        Card() = default;
+        Card(CardName, CardTiming, CardType, Usertype , int, int, int);
 
-    CardType get_CardType() const;
-    CardTiming get_CardTiming() const;
+        CardName get_CardName() const;
+        CardTiming get_CardTiming() const;
+        CardType get_CardType() const;
+        Usertype get_usertype() const;
 
-    int get_Boost() const;
-    void set_Boost(int);
+        int get_Boost() const;
+        void set_Boost(int);
 
-    int get_Attack() const;
-    void set_Attack(int);
+        int get_Attack() const;
+        void set_Attack(int);
 
-    int get_Defense() const;
-    void set_Defence(int);
+        int get_Defense() const;
+        void set_Defence(int);
 
-    bool get_ApplyEffects();
-    void set_ApplyEffects(bool);
+        bool get_ApplyEffects();
+        void set_ApplyEffects(bool);
 };
