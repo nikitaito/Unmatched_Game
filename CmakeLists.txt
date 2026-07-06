@@ -1,0 +1,23 @@
+cmake_minimum_required(VERSION 3.16)
+
+project(MyProject)
+
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+
+
+find_package(ftxui REQUIRED)
+
+add_executable(MyProject
+    src/front.cpp
+    src/ftxuimain.cpp
+)
+
+target_include_directories(MyProject PRIVATE include)
+
+target_link_libraries(MyProject PRIVATE
+    ftxui::screen
+    ftxui::dom
+    ftxui::component
+)
