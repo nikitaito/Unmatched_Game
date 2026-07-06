@@ -1,7 +1,7 @@
 #include "Player.h"
 using namespace std;
 
-Player :: Player(string name , int age) : age(age) , name(name) {}
+// Player :: Player(string name , int age) : age(age) , name(name) {}
 
 int Player :: get_age() const{
     return age;
@@ -16,5 +16,13 @@ void Player :: assign_Characters(int x){
         current_hero = &sherlock;
     else
         current_hero = &dracula;
+}
+
+void Player :: set_age(int x){
+    age = x;
+}
+
+void Player :: set_name (string name){
+    this->name = name;
 }
 

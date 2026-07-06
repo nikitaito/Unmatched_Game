@@ -20,9 +20,11 @@ class Player
         int age;
 
     public:
-        Player(std :: string , int);
+        // Player(std :: string , int);
         
         //set and get
+        void set_name(std :: string);
+        void set_age(int);
         int get_age()const;
         std :: string get_name() const;
         void assign_Characters(int x) ;
