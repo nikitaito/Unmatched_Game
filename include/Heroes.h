@@ -4,7 +4,8 @@
 #include <vector>
 #include "Card.h"
 #include "Enums.h"
-#include "Sidekick.h"
+#include "Sisters.h"
+#include "Dr_Watson.h"
 
 struct Cards
 {
@@ -26,7 +27,7 @@ class Heroes
 
     protected :
         Cards cards;
-        std :: vector<Sidekick> sidekick;
+        std :: vector<Sidekick *> sidekick;
 
     public:
         Heroes(std::string, Attacktype, Style , int, int);
@@ -42,6 +43,6 @@ class Heroes
 
         //virtual
         virtual void initial_deck() = 0;
-        virtual void initial_sidekicks() = 0;
+        virtual void assign_sidekicks() = 0;
 
 };

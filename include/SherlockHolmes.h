@@ -8,9 +8,11 @@
 
 class SherlockHolmes : public Heroes
 {
+    private:
+        Dr_Watson dr_watson;
     public:
         SherlockHolmes();
         int discard_hand();
         virtual void initial_deck() override;
-        virtual void initial_sidekicks() override;
+        virtual void assign_sidekicks() override;
 };

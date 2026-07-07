@@ -24,6 +24,6 @@ class Sidekick
         void Damage(int);
 
         //virtual
-
+        virtual ~Sidekick() = 0;
 
 };

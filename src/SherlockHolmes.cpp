@@ -71,7 +71,7 @@ void SherlockHolmes :: initial_deck(){
     cards.deck.push_back(Card(CardName::Study_Methods, CardTiming::After, CardType :: BOTH, Usertype :: ANY , 3, 3, 2));
 }
 
-void SherlockHolmes :: initial_sidekicks(){
-    sidekick.push_back(Sidekick("Dr_Watson", Attacktype :: RANGED , 8, 2));
+void SherlockHolmes :: assign_sidekicks(){
+    sidekick.push_back(&dr_watson);
 }
 

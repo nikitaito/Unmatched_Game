@@ -9,7 +9,7 @@ Dracula::Dracula()
     initial_deck();
 }
 
-vector<Sidekick> Dracula::get_sisters()
+vector<Sidekick *> Dracula::get_sisters()
 {
   return sidekick;
 }
@@ -64,8 +64,8 @@ void Dracula :: initial_deck() {
   cards.deck.push_back(Card(CardName::Feint, CardTiming::Before, CardType :: BOTH , Usertype :: ANY ,2, 2, 2));
 }
 
-void Dracula :: initial_sidekicks() {
-    sidekick.push_back(Sidekick("SISTER1", Attacktype :: MELEE, 1, 2));
-    sidekick.push_back(Sidekick("SISTER2", Attacktype :: MELEE, 1, 2));
-    sidekick.push_back(Sidekick("SISTER3", Attacktype :: MELEE, 1, 2));
+void Dracula :: assign_sidekicks() {
+    sidekick.push_back(&sister1);
+    sidekick.push_back(&sister1);
+    sidekick.push_back(&sister1);
 }

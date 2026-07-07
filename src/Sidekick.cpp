@@ -37,3 +37,5 @@ void Sidekick :: Damage(int x)
     else
         Health -= x; 
 }
+
+inline Sidekick::~Sidekick() {}
