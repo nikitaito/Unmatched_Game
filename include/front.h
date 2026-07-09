@@ -7,14 +7,8 @@
 #include <ftxui/dom/elements.hpp>
 #include <ftxui/dom/canvas.hpp>
 #include <vector>
-
-enum class Page {
-    Menu,
-    Help,
-    Age,
-    Game,
-    End
-};
+#include "game.h"
+#include "Enums.h"
 
 class Main_menu
 {
@@ -44,9 +38,37 @@ class Age_page
 
 class Game_page
 {
+    private:
+        ftxui :: Element Node(std::string , ftxui :: Color );
+        void ExecuteCommand(const std::string );
+        void AddActionLog(const std :: string& , const std :: string&);
+        ftxui :: Component left;
+        ftxui :: Component right;
+        ftxui :: Component map;
+        ftxui :: Component bottom;
+        ftxui :: Component middle;
+        std :: string command;
+        std :: vector<std ::string> action_log;
     public:
-        ftxui :: Component Make_page(Page&);
+        ftxui :: Component Make_Dashboard_dracula(int , int , int ,int);
+        ftxui :: Component Make_Dashboard_sherlock(int , int , int ,int);
+        ftxui :: Component Make_card(Card);
+        ftxui :: Component Make_hand_cards(std :: vector<Card>);
+        ftxui :: Component Make_map(std :: vector <Space>);
+        ftxui :: Component Make_command_input();
+        ftxui :: Component Make_location_info(Space);
+        ftxui :: Component Make_game_command();
+        ftxui :: Component Make_action_log();
+        ftxui :: Component Make_page(Page& , std :: vector<Card> c);
 
+};
+
+class end_page
+{
+    private:
+
+    public:
+        ftxui :: Component Make_page(const std :: string  , const std :: string );
 };
 
 

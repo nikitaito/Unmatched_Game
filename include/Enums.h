@@ -19,7 +19,7 @@ enum class CardName
     Confirm_Suspicion,
     Counterpunch,
     Deduce_Strategy,
-    Education_Never_Ends,Feint,
+    Education_Never_Ends,
     Elementary,
     Eliminate_The_Impossible,
     Feint,
@@ -63,4 +63,22 @@ enum class CardType{
     DEFENSE,
     EVENT,
     BOTH
+};
+
+enum Zone{
+    LIGHT_BLUE,
+    DARK_BLUE,
+    BROWN,
+    YELLOW,
+    GREEN,
+    PURPULE,
+    GRAY
+};
+
+enum class Page {
+    Menu,
+    Help,
+    Age,
+    Game,
+    End
 };

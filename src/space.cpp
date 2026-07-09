@@ -4,6 +4,10 @@ using namespace std;
 
 Space :: Space(int id , std :: vector<int> neighbor, std :: vector<int> hidden_way , std :: vector<Zone> zone ) : id(id) , neighbor(neighbor) , Hidden_way(hidden_way) , zone(zone){}
 
+int Space :: get_id() const{
+    return id;
+}
+
 vector <int> Space :: get_neighbor() const{
     return neighbor;
 }
