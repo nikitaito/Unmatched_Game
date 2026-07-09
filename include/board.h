@@ -16,17 +16,15 @@ class Board
     private:
         static constexpr int SPACE_COUNT = 32;
         std :: vector<Space> spaces;
-        void initial_space(Space & , std :: vector<int> , std :: vector<int> , std :: vector<Zone>);
-
     public:
         Board();
 
         std :: vector<Space> get_spaces() const;
-        void set_Hero(Hero * , int) ;
-        void set_Comrade(Comrades * , int);
+        void set_Hero(Heroes * , int) ;
+        void set_Comrade(Sidekick * , int);
         void reset_space(int);
-        Space * search_hero(Hero *);
-        Space * search_comrades(Comrades *);
+        Space * search_hero(Heroes *);
+        Space * search_comrades(Sidekick *);
         WayType way(int , int) const;
 
 
