@@ -16,6 +16,9 @@ class Player
         SherlockHolmes sherlock;
         Dracula dracula;
 
+        std::vector<Card> handcard;
+        std::vector<Card> discard;
+
         std :: string name;
         int age;
 
@@ -25,9 +28,14 @@ class Player
         //set and get
         void set_name(std :: string);
         void set_age(int);
+        void add_card(Card card);
+        void remove_card(Card card);
+        std :: vector<Card> get_hand_cards() const;
+        std :: vector<Card> get_dis_cards() const;
         int get_age()const;
         std :: string get_name() const;
-        void assign_Characters(int x) ;
+        Heroes * get_hero();
+        void assign_Characters(herotype) ;
         
 };
 
