@@ -10,8 +10,6 @@
 struct Cards
 {
     std::vector<Card> deck;
-    std::vector<Card> hand;
-    std::vector<Card> discard;
 };
 
 
@@ -40,6 +38,7 @@ class Heroes
 
         void Damage(int);
         void set_Health(int);
+        std :: vector<Card> & get_deck_cards() ;
 
         //virtual
         virtual void initial_deck() = 0;

@@ -39,3 +39,7 @@ void Heroes::set_Health(int amount)
     else
         this->Health += amount;
 }
+
+vector<Card>& Heroes :: get_deck_cards() {
+    return cards.deck;
+}
