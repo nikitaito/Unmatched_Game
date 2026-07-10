@@ -59,3 +59,10 @@ bool Card::get_ApplyEffects()
 {
     return ApplyEffects;
 }
+
+bool Card :: operator==(const Card & card){
+    if(this->get_CardName() == card.get_CardName())
+        return true;
+    else
+        return false;
+}

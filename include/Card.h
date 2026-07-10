@@ -38,4 +38,6 @@ class Card
 
         bool get_ApplyEffects();
         void set_ApplyEffects(bool);
+        
+        bool operator==(const Card & );
 };
