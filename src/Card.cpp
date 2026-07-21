@@ -1,7 +1,7 @@
 #include "Card.h"
-
-Card::Card(CardName name, CardTiming timing, CardType cardtype , Usertype usertype, int Attack, int Defense, int Boost)
-    : name(name), timing(timing), cardtype(cardtype) , usertype(usertype) , Attack(Attack) , Defense(Defense), Boost(Boost) {}
+using namespace std;
+Card::Card(CardName name, CardTiming timing, CardType cardtype , Usertype usertype, int Attack, int Defense, int Boost , vector<unique_ptr<Effect>> Effects )
+    : name(name), timing(timing), cardtype(cardtype) , usertype(usertype) , Attack(Attack) , Defense(Defense), Boost(Boost) , Effects(std :: move(Effects)){}
 
 CardName Card::get_CardName() const
 {
@@ -60,9 +60,18 @@ bool Card::get_ApplyEffects()
     return ApplyEffects;
 }
 
+vector<unique_ptr<Effect>>& Card :: get_effects() {
+    return Effects;
+}
+
 bool Card :: operator==(const Card & card){
     if(this->get_CardName() == card.get_CardName())
         return true;
     else
         return false;
 }
+
+// Card :: ~Card(){
+//     for(auto & it : Effects)
+//         delete it;
+// }

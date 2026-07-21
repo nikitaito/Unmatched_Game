@@ -3,6 +3,7 @@
 #include <string>
 #include <functional>
 #include "Enums.h"
+#include "Effect.h"
 
 class Card
 {
@@ -17,10 +18,16 @@ class Card
         int Boost;
 
         bool ApplyEffects{true};
-
+        std :: vector<std :: unique_ptr<Effect>> Effects;
     public:
         Card() = default;
-        Card(CardName, CardTiming, CardType, Usertype , int, int, int);
+        Card(CardName, CardTiming, CardType, Usertype , int, int, int , std :: vector<std :: unique_ptr<Effect>>);
+
+        //  Card(const Card&) = delete;
+        // Card& operator=(const Card&) = delete;
+
+        // Card(Card&&) noexcept = default;
+        // Card& operator=(Card&&) noexcept = default;
 
         CardName get_CardName() const;
         CardTiming get_CardTiming() const;
@@ -38,6 +45,10 @@ class Card
 
         bool get_ApplyEffects();
         void set_ApplyEffects(bool);
+
+        std :: vector<std :: unique_ptr<Effect>>& get_effects() ;
         
         bool operator==(const Card & );
+
+        // ~Card();
 };
