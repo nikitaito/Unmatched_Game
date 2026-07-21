@@ -32,15 +32,15 @@ void Space :: set_hidden_way(vector<int> & h){
     Hidden_way = h;
 }
 
-void Space :: set_hero(Heroes * hero){
-    if(hero == nullptr && comrade == nullptr)
+void Space::set_hero(Heroes* hero){
+    if (this->hero == nullptr && this->comrade == nullptr)
         this->hero = hero;
     else
-        throw  NoSpaceException(); 
+        throw NoSpaceException();
 }
 
-void Space :: set_comrades(Sidekick * comrade){
-    if(hero == nullptr && comrade == nullptr)
+void Space::set_comrades(Sidekick* comrade){
+    if (this->hero == nullptr && this->comrade == nullptr)
         this->comrade = comrade;
     else
         throw NoSpaceException();
@@ -73,6 +73,10 @@ bool Space :: operator == (const Space & s) const{
 
 
     return true;
+}
+
+bool Space :: empty() const{
+    return hero == nullptr && comrade == nullptr;
 }
 
 

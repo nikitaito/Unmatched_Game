@@ -74,20 +74,118 @@ Space * Board :: search_comrades(Sidekick * comrade){
     return search_comrade;
 }
 
-WayType Board :: way(int a , int b) const{
-    if((spaces[a].get_neighbor()).empty() == false)
-        for(auto it :spaces[a].get_neighbor()){
-            if(it == b)
-                return WayType :: Normal; 
-        }
-    else{
-        for(auto it :spaces[a].get_Hidden_way()){
-            if(it == a)
-                return WayType :: Hidden; 
+int Board :: number_of_sisters_in_this_zone(Space * space){
+    int i = 0;
+    for(const auto & it : spaces){
+        if(it.get_zone() == space->get_zone() && it.get_id() != space->get_id() && dynamic_cast<Sister *>(it.get_comrade()) != nullptr){
+            i++;
         }
     }
-    return WayType :: None;
+    return i;
 }
 
+bool Board :: dfs(int current , int target , std::vector<bool>& visited , CharacterType forbidden , bool allowhiddenway , int cost ) const{
+    if (current == target)
+        return true;
+    
+    if(cost <= 0)
+        return false;
 
+    visited[current] = true;
+    const Space & space = spaces[current];
 
+    for(int next : space.get_neighbor()){
+        if(visited[next] == true)
+            continue;
+        
+        if(spaces[next].get_Hero() && spaces[next].get_Hero()->get_name() == forbidden)
+            continue;
+        else if(spaces[next].get_comrade() && spaces[next].get_comrade()->get_name() == forbidden)
+            continue;
+
+        if(dfs(next , target , visited , forbidden , allowhiddenway , cost - 1))
+            return true;
+    }
+
+    if (allowhiddenway)
+    {
+        for (int next : space.get_Hidden_way())
+        {
+            if (visited[next] == true)
+                continue;
+
+            if(spaces[next].get_Hero() && spaces[next].get_Hero()->get_name() == forbidden)
+                continue;
+            else if(spaces[next].get_comrade() && spaces[next].get_comrade()->get_name() == forbidden)
+                continue;
+
+            if (dfs(next, target, visited, forbidden, allowhiddenway , cost - 1))
+                return true;
+        }
+    }
+    visited[current] = false;
+    return false;
+}
+
+bool Board :: is_way(int current , int target , CharacterType forbidden , bool allowhiddenway, int cost) const{
+    if(!(spaces[target].empty()))
+        return false;
+    
+    std :: vector<bool> visited (SPACE_COUNT , false);
+    return dfs(current , target , visited , forbidden , allowhiddenway , cost);
+
+}
+
+void Board :: Move(int current , int target){
+    if(spaces[current].get_Hero()){
+        Heroes * hero = spaces[current].get_Hero();
+        spaces[current].reset();
+        spaces[target].set_hero(hero);
+    }
+    else if(spaces[current].get_comrade()){
+        Sidekick * sidekick = spaces[current].get_comrade();
+        spaces[current].reset();
+        spaces[target].set_comrades(sidekick);
+    }
+}
+
+bool Board :: Adjacency(CharacterType ch1 , CharacterType ch2){
+    for(auto & sp : spaces){
+        if((sp.get_Hero() && sp.get_Hero()->get_name() == ch1) || (sp.get_comrade() && sp.get_comrade()->get_name() == ch1)){
+            for(auto & ng : sp.get_neighbor()){
+                if(spaces[ng].get_Hero() && spaces[ng].get_Hero()->get_name() == ch2)
+                    return true;
+                else if(spaces[ng].get_comrade() && spaces[ng].get_comrade()->get_name() == ch2)
+                    return true;
+            }
+        }
+    }
+    return false;
+}
+
+void Board :: Swap(int a , int b){
+    Sidekick * sidekick_C = spaces[a].get_comrade();
+    Heroes * Hero_C = spaces[a].get_Hero();
+
+    spaces[a].set_comrades(spaces[b].get_comrade());
+    spaces[a].set_hero(spaces[b].get_Hero());
+
+    spaces[b].set_comrades(sidekick_C);
+    spaces[b].set_hero(Hero_C);
+}
+
+std :: vector<int> Board :: get_empty_spaces_in_zone(std :: vector<Zone> zones) const{
+    std :: vector<int> result;
+    for(const auto & sp : spaces){
+        if(!sp.empty())
+            continue;
+
+        for(auto z : sp.get_zone()){
+            if(std :: find(zones.begin() , zones.end() , z) != zones.end()){
+                result.push_back(sp.get_id());
+                break;
+            }
+        }
+    }
+    return result;
+}
