@@ -11,8 +11,8 @@ string Player :: get_name() const{
     return name;
 }
 
-void Player :: assign_Characters(herotype ht){
-    if(ht == herotype :: SherlockHolmes)
+void Player :: assign_Characters(CharacterType ht){
+    if(ht == CharacterType :: SherlockHolmes)
         current_hero = &sherlock;
     else
         current_hero = &dracula;
@@ -26,29 +26,49 @@ void Player :: set_name (string name){
     this->name = name;
 }
 
-void Player :: add_card(Card card){
-    handcard.push_back(card);
+void Player :: add_card(Card&& card){
+    handcard.push_back(std :: move(card));
 }
 
-void Player :: remove_card(Card card){
-    CardName name = card.get_CardName();
+int Player :: remove_card(CardName name){
+    // CardName name = card.get_CardName();
+    int boost = 0;
     auto it = std::find_if(handcard.begin(), handcard.end(),[name](const Card& c) { return c.get_CardName() == name;});
 
     if (it != handcard.end()) {
-        discard.push_back(*it);
+        discard.push_back(std :: move(*it));
+        boost = it->get_Boost();
         handcard.erase(it);
     }
+    return boost;
+
 }
 
-vector<Card> Player :: get_hand_cards() const{
+vector<Card>& Player :: get_hand_cards() {
     return handcard;
 }
 
-vector<Card> Player :: get_dis_cards() const{
+vector<Card>& Player :: get_dis_cards() {
     return discard;
 }
 
 Heroes * Player :: get_hero(){
     return current_hero;
+}
+
+int Player :: get_aciton() const{
+    return action;
+}
+
+void Player :: increase_action(int x){
+    action += x;
+}
+
+void Player :: decrease_action(int x){
+    action -= x;
+}
+
+void Player :: reset_action(){
+    action = 2;
 }
 

@@ -22,20 +22,26 @@ class Player
         std :: string name;
         int age;
 
+        int action = 2;
+
     public:
         // Player(std :: string , int);
         
         //set and get
         void set_name(std :: string);
         void set_age(int);
-        void add_card(Card card);
-        void remove_card(Card card);
-        std :: vector<Card> get_hand_cards() const;
-        std :: vector<Card> get_dis_cards() const;
+        void add_card(Card&& card);
+        int remove_card(CardName);
+        std :: vector<Card>& get_hand_cards() ;
+        std :: vector<Card>& get_dis_cards() ;
         int get_age()const;
         std :: string get_name() const;
         Heroes * get_hero();
-        void assign_Characters(herotype) ;
+        void assign_Characters(CharacterType) ;
+        int get_aciton()const;
+        void increase_action(int x);
+        void decrease_action(int x);
+        void reset_action();
         
 };
 

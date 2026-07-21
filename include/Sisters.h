@@ -6,5 +6,6 @@ class Sister : public Sidekick
 {
     public:
         Sister();
+        ~Sister() override = default;
 
 };
