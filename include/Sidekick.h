@@ -7,21 +7,23 @@ class Sidekick
 {
 
     private:
-        std::string name;
+        CharacterType name;
         Attacktype attacktype;
         int Health;
         int Movement;
 
     public:
-        Sidekick(std::string, Attacktype, int, int);
+        Sidekick(CharacterType, Attacktype, int, int);
 
         //get and set
         bool get_islive() const;
         Attacktype get_Attacktype() const;
         int get_Movement() const;    
         int get_Health() const;
+        CharacterType get_name() const;
 
         void Damage(int);
+        void Heal(int);
 
         //virtual
         virtual ~Sidekick() = 0;

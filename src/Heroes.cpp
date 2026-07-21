@@ -2,10 +2,10 @@
 #include "Heroes.h"
 using namespace std;
 
-Heroes::Heroes(std::string name, Attacktype attacktype, Style style , int Health, int Movement)
-    : name(name), attacktype(attacktype), style(style) , Health(Health), Movement(Movement) {}
+Heroes::Heroes(CharacterType name, Attacktype attacktype, Style style , int Health, int Movement)
+    : name(name), attacktype(attacktype), style(style) , Health(Health), Movement(Movement) , Health_max(Health) {}
 
-string Heroes::get_name() const
+CharacterType Heroes::get_name() const
 {
     return name;
     ;
@@ -25,11 +25,23 @@ int Heroes::get_Movement() const
     return Movement;
 }
 
+int Heroes :: get_HP() const{
+    return Health;
+}
+
+int Heroes :: get_HP_max() const{
+    return Health_max;
+}
+
 void Heroes :: Damage(int x){
     if(Health <= x)
         Health = 0;
     else
         Health -= x; 
+}
+
+void Heroes :: Heal(int x){
+    Health += x;
 }
 
 void Heroes::set_Health(int amount)

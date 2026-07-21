@@ -2,16 +2,17 @@
 
 using namespace std;
 
-Sidekick::Sidekick(string name, Attacktype attacktype, int Health, int Movement)
+Sidekick::Sidekick(CharacterType name, Attacktype attacktype, int Health, int Movement)
     : name(name), attacktype(attacktype), Health(Health), Movement(Movement) {}
 
 bool Sidekick::get_islive() const
 {
-    if(Health == 0)
-        return 0;
+    if(Health <= 0)
+        return false;
     
-    else if(Health > 0)
-        return 1;
+    else 
+        return true;
+
     
 }
 
@@ -30,6 +31,10 @@ int Sidekick::get_Movement() const
     return Movement;
 }
 
+CharacterType Sidekick :: get_name() const{
+    return name;
+}
+
 void Sidekick :: Damage(int x)
 {
     if(Health <= x)
@@ -38,4 +43,8 @@ void Sidekick :: Damage(int x)
         Health -= x; 
 }
 
-inline Sidekick::~Sidekick() {}
+void Sidekick :: Heal(int x){
+    Health += x;
+}
+
+Sidekick::~Sidekick() = default;

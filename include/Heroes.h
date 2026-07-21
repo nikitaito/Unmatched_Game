@@ -16,11 +16,12 @@ struct Cards
 class Heroes
 {
     private:
-        std::string name;
+        CharacterType name;
         Attacktype attacktype;
         Style style;
 
         int Health;
+        int Health_max;
         int Movement;
 
     protected :
@@ -28,20 +29,24 @@ class Heroes
         std :: vector<Sidekick *> sidekick;
 
     public:
-        Heroes(std::string, Attacktype, Style , int, int);
+        Heroes(CharacterType, Attacktype, Style , int, int);
 
         //set and get
-        std::string get_name() const;
+        CharacterType get_name() const;
         Attacktype get_Attacktype() const;
         Style get_style() const;
         int get_Movement() const;
+        int get_HP() const;
+        int get_HP_max()const;
 
         void Damage(int);
+        void Heal(int);
         void set_Health(int);
-        std :: vector<Card> & get_deck_cards() ;
+        std :: vector<Card> & get_deck_cards();
 
         //virtual
         virtual void initial_deck() = 0;
         virtual void assign_sidekicks() = 0;
+        virtual std :: vector<Sidekick *> get_sidekick() = 0;
 
 };

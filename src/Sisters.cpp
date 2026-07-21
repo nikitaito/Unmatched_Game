@@ -1,5 +1,5 @@
 #include "Sisters.h"
 
 Sister::Sister()
-    : Sidekick("SISTERS", Attacktype :: MELEE, 1, 2) {}
+    : Sidekick(CharacterType :: Sister, Attacktype :: MELEE, 1, 2) {}
 

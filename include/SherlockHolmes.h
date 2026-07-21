@@ -12,7 +12,7 @@ class SherlockHolmes : public Heroes
         Dr_Watson dr_watson;
     public:
         SherlockHolmes();
-        int discard_hand();
         virtual void initial_deck() override;
         virtual void assign_sidekicks() override;
+        virtual std :: vector<Sidekick *> get_sidekick() override;
 };

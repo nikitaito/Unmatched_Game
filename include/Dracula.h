@@ -16,11 +16,9 @@ class Dracula : public Heroes
     public:
         Dracula();
 
-        std::vector<Sidekick *> get_sisters();
-        void DrawnCard();
         virtual void initial_deck() override ;
         virtual void assign_sidekicks() override;
-
+        virtual std :: vector<Sidekick *> get_sidekick() override;
     
 
 };
