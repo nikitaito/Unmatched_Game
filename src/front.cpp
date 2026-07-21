@@ -1,5 +1,7 @@
 #include "front.h"
 #include <string>
+#include <regex>
+#include<iostream>
 using namespace ftxui;
 
 
@@ -77,43 +79,67 @@ bool Age_page :: ParseAge(const std::string& str, int& age) {
     }
 }
 
-Component Age_page::Make_page(Page& current_page, int& age1, int& age2) {
-    
+Component Age_page::Make_page(Page& current_page, Game* game) {
     error_message.clear();
 
     auto input1 = Input(&st_age1, "Please Enter the age of player one : ");
     auto input2 = Input(&st_age2, "Please Enter the age of player two : ");
 
-    auto exit = Button("Exit", [&] { current_page = Page::Menu; });
+    auto exit = Button("Exit", [&current_page] {
+        current_page = Page::Menu;
+    });
 
-    auto next = Button("Next", [this, &current_page, &age1, &age2] {
+    auto next = Button("Next", [this, &current_page, game] {
+        int age1;
+        int age2;
+
         if (!ParseAge(st_age1, age1) || !ParseAge(st_age2, age2)) {
             error_message = "Age must be a positive number and cannot be empty.";
             return;
         }
+
         error_message.clear();
+
+        std::pair<int, CharacterType> p1{ age1 , CharacterType::SherlockHolmes};
+
+        std::pair<int, CharacterType> p2{ age2 , CharacterType::Dracula};
+
+        game->choose(p1, p2);
+        game->Place_sidekicks_in_hero_zone(game->get_player(1)->get_hero());
+        game->Place_sidekicks_in_hero_zone(game->get_player(2)->get_hero());
+        game->inital_hand_cards();
+
         current_page = Page::Game;
     });
 
-    auto container = Container::Vertical({input1, input2, next, exit});
+    auto container = Container::Vertical({
+        input1,
+        input2,
+        next,
+        exit
+    });
 
     return Renderer(container, [this, input1, input2, exit, next] {
         Elements elements = {
             text("UNMATCHED") | bold | color(Color::Yellow) | center,
             separator(),
-            input1->Render() ,
+            input1->Render(),
             separator(),
-            input2->Render() ,
+            input2->Render(),
             separator(),
             next->Render() | color(Color::Green),
-            exit->Render() | color(Color::Red) 
+            exit->Render() | color(Color::Red)
         };
 
         if (!error_message.empty()) {
-            elements.push_back(text(error_message) | bold | color(Color::Red));
+            elements.push_back(
+                text(error_message) | bold | color(Color::Red)
+            );
         }
 
-        return vbox(elements) | border | size(HEIGHT, EQUAL, 15);
+        return vbox(elements)
+             | border
+             | size(HEIGHT, EQUAL, 15);
     });
 }
 
@@ -123,33 +149,33 @@ Element Game_page :: Node(std::string character, Color col) {
 
 Component Game_page::Make_map(std :: vector<Space> Graph) {
     std :: vector<Element> Nodes;
-    for (int i = 0 ; i < 32 ; i++){
+    for (auto & it : Graph){
         Color col;
         std :: string character;
-        // if(SherlockHolmes * s = dynamic_cast<SherlockHolmes*>(it.get_Hero())){
-        //     character = "S";
-        //     col = Color :: Blue; 
-        // }
-        // else if(Dracula * d = dynamic_cast<Dracula *> (it.get_Hero())){
-        //     character = "D";
-        //     col = Color :: Red; 
-        // }
-        // else if(Dr_Watson * d = dynamic_cast<Dr_Watson *> (it.get_comrade())){
-        //     character = "d";
-        //     col = Color :: Blue; 
-        // }
-        // else if(Sister * s = dynamic_cast<Sister *> (it.get_comrade())){
-        //     character = "s";
-        //     col = Color :: Red; 
-        // }
-        // else if(!(it.get_Hidden_way().empty())){
-        //     character = "~";
-        //     col = Color :: Green;
-        // }
-        // else{
-            character = "-";
+        if(it.get_Hero() && it.get_Hero()->get_name() == CharacterType :: SherlockHolmes){
+            character = "S";
+            col = Color :: Blue; 
+        }
+        else if(it.get_Hero() && it.get_Hero()->get_name() == CharacterType :: Dracula){
+            character = "D";
+            col = Color :: Red; 
+        }
+        else if(it.get_comrade() && it.get_comrade()->get_name() == CharacterType :: Dr_Watson){
+            character = "d";
+            col = Color :: Blue; 
+        }
+        else if(it.get_comrade() && it.get_comrade()->get_name() == CharacterType :: Sister){
+            character = "s";
+            col = Color :: Red; 
+        }
+        else if(!(it.get_Hidden_way().empty())){
+            character = "~";
             col = Color :: Green;
-        // }
+        }
+        else{
+            character = "-";
+            col = Color :: White;
+        }
         Nodes.push_back(Node(character , col));
 
     }
@@ -182,7 +208,23 @@ Component Game_page::Make_map(std :: vector<Space> Graph) {
     });
 }
 
-Component Game_page :: Make_Dashboard_dracula(int Hp , int Hp_max , int Deck , int dis){
+Component Game_page :: Make_Dashboard_dracula(Heroes * hero, int dis){
+    int Hp = hero->get_HP();
+    int Hp_max = hero->get_HP_max();
+    int Deck = hero->get_deck_cards().size();
+    int Move = hero->get_Movement();
+    std :: string attack ;
+    switch (hero->get_Attacktype())
+    {
+        case Attacktype :: MELEE:
+            attack = "MELEE";
+            break;
+        
+        case Attacktype :: RANGED:
+            attack = "RANGED";
+            break;
+    }
+
     std :: string HP = "[";
     for(int i = 1 ; i <= Hp_max ; i++){
         if(i <= Hp)
@@ -191,13 +233,13 @@ Component Game_page :: Make_Dashboard_dracula(int Hp , int Hp_max , int Deck , i
             HP += " ";
     }
     HP += ']';
-    return Renderer([Hp, Hp_max, Deck, dis , HP]{
+    return Renderer([Hp, Hp_max, Deck, dis , HP , attack , Move]{
         return vbox({
             text("DRACULA") | color(Color :: Red) | center,
             hbox({text("Health: "),text(std::to_string(Hp)) | color(Color::Red),text(" / " + std::to_string(Hp_max))})|center,
             text(HP) | color(Color :: Red) | center,
-            text("Rang : 1") | center,
-            text("Move : 3") | center,
+            hbox({text("Range : ") , text(attack)}) | center,
+            hbox({text("Move : ") , text(std :: to_string(Move))})| center,
             text("-------------------------------------------------------") | color(Color :: Red) | center | bold,
             hbox({text("Deck : ") , text(std :: to_string(Deck))}) | center ,
             text("-------------------------------------------------------") | color(Color :: Red) | center | bold,
@@ -206,7 +248,23 @@ Component Game_page :: Make_Dashboard_dracula(int Hp , int Hp_max , int Deck , i
     });
 }
 
-Component Game_page :: Make_Dashboard_sherlock(int Hp , int Hp_max , int Deck , int dis){
+Component Game_page :: Make_Dashboard_sherlock(Heroes * hero, int dis){
+    int Hp = hero->get_HP();
+    int Hp_max = hero->get_HP_max();
+    int Deck = hero->get_deck_cards().size();
+    int Move = hero->get_Movement();
+    std :: string attack ;
+    switch (hero->get_Attacktype())
+    {
+        case Attacktype :: MELEE:
+            attack = "MELEE";
+            break;
+        
+        case Attacktype :: RANGED:
+            attack = "RANGED";
+            break;
+    }
+
     std :: string HP = "[";
     for(int i = 1 ; i <= Hp_max ; i++){
         if(i <= Hp)
@@ -215,13 +273,13 @@ Component Game_page :: Make_Dashboard_sherlock(int Hp , int Hp_max , int Deck , 
             HP += " ";
     }
     HP += ']';
-    return Renderer([Hp, Hp_max, Deck, dis , HP]{
+    return Renderer([Hp, Hp_max, Deck, dis , HP , attack , Move]{
         return vbox({
             text("SHERLOCK HOLMES") | color(Color :: Blue) | center,
             hbox({text("Health: "),text(std::to_string(Hp)) | color(Color::Blue),text(" / " + std::to_string(Hp_max))})|center,
             text(HP) | color(Color :: Blue) | center,
-            text("Rang : 1") | center,
-            text("Move : 3") | center,
+            hbox({text("Range : ") , text(attack)}) | center,
+            hbox({text("Move : ") , text(std :: to_string(Move))})| center,
             text("-------------------------------------------------------") | color(Color :: Blue) | center | bold,
             hbox({text("Deck : ") , text(std :: to_string(Deck))}) | center ,
             text("-------------------------------------------------------") | color(Color :: Blue) | center | bold,
@@ -230,7 +288,7 @@ Component Game_page :: Make_Dashboard_sherlock(int Hp , int Hp_max , int Deck , 
     });
 }
 
-Component Game_page :: Make_card(Card card){
+Component Game_page :: Make_card(const Card & card){
 
     Color col ;
     std :: string type;
@@ -418,7 +476,7 @@ Component Game_page :: Make_card(Card card){
     }); 
 }
 
-Component Game_page :: Make_hand_cards (std::vector<Card> cards) {
+Component Game_page :: Make_hand_cards (const std::vector<Card> & cards) {
     std::vector<Component> components;
 
     for (auto& card : cards)
@@ -442,21 +500,161 @@ Component Game_page :: Make_hand_cards (std::vector<Card> cards) {
     });
 }
 
-void Game_page :: ExecuteCommand(const std :: string com){
-    AddActionLog("Deracula" , command);
+void Game_page :: ExecuteCommand(Game * game){;
+    switch (AcSt)
+    {
+        case Action_State :: None:{
+            // if(!action_log.empty() && action_log.back().find("Choose one Action") == std :: string::npos)
+            if(game->get_turn()->get_aciton() == 0)
+                game->ChangeTurn();
+
+            if(command == "Action<Maneuver>"){
+                AddActionLog(game->get_turn()->get_hero()->get_name() , "Please Choose a station");
+                AcSt = Action_State :: Maneuver;
+            }
+
+            else if(command == "Action<Attack>"){
+                if(game->All_Adjacency(game->get_turn()->get_hero()->get_name())){
+                    AddActionLog(game->get_turn()->get_hero()->get_name() , "Please Choose a one hero to attack");
+                    AcSt = Action_State :: Attack;
+                }
+                else
+                    AddActionLog(game->get_turn()->get_hero()->get_name() , "There is not enemy !!!");
+            }
+
+            else if(command == "Action<Schame>")
+                AcSt = Action_State :: Schame;
+
+            else 
+                AddActionLog(game->get_turn()->get_hero()->get_name() , "Use Action<...> function !!!");
+            break;
+        }
+        case Action_State :: Maneuver:{
+            std :: regex pattern(R"(Move<(\d{1,2})>)");
+            std :: smatch match;
+            
+            if(std :: regex_match(command, match, pattern)){
+                int number = std :: stoi(match[1].str());
+
+                if(number >= 0 && number < 32){
+                    movestaion = number;
+                    AcSt = Action_State :: Move;
+                }
+                else
+                    AddActionLog(game->get_turn()->get_hero()->get_name() , "use integer number between 0 to 31");
+            }
+            
+            else 
+                AddActionLog(game->get_turn()->get_hero()->get_name() , "Use Move<int> function !!!");
+            break;
+        }
+        case Action_State :: Attack:{
+            AddActionLog(game->get_turn()->get_hero()->get_name() , "Please Choose a one hero to attack");
+            
+            std :: regex pattern(R"(play<(.*?)>)");
+            std :: smatch match;
+            
+            if(std :: regex_match(command, match, pattern))
+                cardname = match[1].str();
+                
+            
+            break;
+        }
+        case Action_State :: Schame:
+            /* code */
+            break;
+
+        case Action_State :: Move:{
+            int current_situation = game->get_Board()->search_hero(game->get_turn()->get_hero())->get_id();
+            try
+            {
+                game->Move_characters(current_situation , movestaion , game->get_turn()->get_hero()->get_name() , true , game->get_turn()->get_hero()->get_Movement());
+                game->Rand_Discard(game->get_turn());
+                game->DecreaseAction(game->get_turn());
+                AddActionLog(game->get_turn()->get_hero()->get_name() , "Choose one Action");
+                AcSt = Action_State :: None;
+            }
+            catch(const No_Way& e)
+            {
+                AddActionLog(game->get_turn()->get_hero()->get_name() , "Cant move on this way");
+                AcSt = Action_State :: None;
+            }
+            break;
+        }
+
+    }
 }
 
-Component Game_page :: Make_command_input(){
+Component Game_page :: Make_command_input(Game * game){
+
     return Input(&command, "Enter Command...")
         | bgcolor(Color::Black) 
-        | CatchEvent([&](Event event) {
+        | CatchEvent([& , game](Event event) {
             if (event == Event::Return) {
-                ExecuteCommand(command);
+                ExecuteCommand(game);
                 command.clear();
                 return true;
             }
             return false;
         });
+}
+
+Component Game_page :: Make_game_command(){
+    return Renderer([] {
+        return vbox({
+            text("GAME COMMANDS ") | color(Color::Yellow),
+            text(""),
+            text("Action<....> - Choose your action from {Attack , Maneuver , Schem}") | color(Color :: Yellow1),
+            text("move <location> - Move your hero") | color(Color :: Yellow1),
+            text("play <card_index> - Play a card from hand (1-based index)") | color(Color :: Yellow1),
+            text("end - End your turn") | color(Color :: Yellow1),
+            text("hand - Show your hand") | color(Color :: Yellow1),
+            text("deck - Show deck info") | color(Color :: Yellow1),
+            text("help - Show this help") | color(Color :: Yellow1),
+            text("quit - Quit game") | color(Color :: Yellow1),
+        }) | borderStyled(Color :: Yellow) | size(WIDTH, EQUAL, 60) | size(HEIGHT, EQUAL, 10);
+    });
+}
+
+Component Game_page::Make_action_log() {
+    return Renderer([this] {
+        std::vector<Element> row;
+
+        for (auto& e : action_log)
+            row.push_back(text(e));
+
+        return vbox({
+            text("ACTION LOG :") | color(Color::Yellow),
+            text(""),
+            vbox(std::move(row)),
+            text("...")
+        }) | borderStyled(Color::Yellow)
+          | size(WIDTH, EQUAL, 55) | size(HEIGHT, EQUAL, 11);
+    });
+}
+
+void Game_page::AddActionLog(const CharacterType & chtype, const std :: string& command) {
+    std :: string name;
+    switch (chtype)
+    {
+    case CharacterType ::Dracula :
+        name = "Dracula";
+        break;
+    
+    case CharacterType ::SherlockHolmes :
+        name = "Sherlock";
+        break;
+    case CharacterType ::Sister :
+        name = "Sister";
+        break;
+    case CharacterType ::Dr_Watson :
+        name = "Dr_Watson";
+        break;
+    }
+    action_log.push_back(">" + name + " : " + command);
+
+    if (action_log.size() > 6)
+        action_log.erase(action_log.begin());
 }
 
 Component Game_page::Make_location_info(Space space) {
@@ -525,87 +723,46 @@ Component Game_page::Make_location_info(Space space) {
     });
 }
 
-Component Game_page :: Make_game_command(){
-    return Renderer([] {
-        return vbox({
-            text("GAME COMMANDS ") | color(Color::Yellow),
-            text(""),
-            text("move <location> - Move your hero") | color(Color :: Yellow1),
-            text("play <card_index> - Play a card from hand (1-based index)") | color(Color :: Yellow1),
-            text("end - End your turn") | color(Color :: Yellow1),
-            text("hand - Show your hand") | color(Color :: Yellow1),
-            text("deck - Show deck info") | color(Color :: Yellow1),
-            text("help - Show this help") | color(Color :: Yellow1),
-            text("quit - Quit game") | color(Color :: Yellow1),
-        }) | borderStyled(Color :: Yellow) | size(WIDTH, EQUAL, 60) | size(HEIGHT, EQUAL, 10);
-    });
-}
-
-Component Game_page::Make_action_log() {
-    return Renderer([this] {
-        std::vector<Element> row;
-
-        for (auto& e : action_log)
-            row.push_back(text(e));
-
-        return vbox({
-            text("ACTION LOG :") | color(Color::Yellow),
-            text(""),
-            vbox(std::move(row)),
-            text("...")
-        }) | borderStyled(Color::Yellow)
-          | size(WIDTH, EQUAL, 55) | size(HEIGHT, EQUAL, 11);
-    });
-}
-
-void Game_page::AddActionLog(const std :: string& name, const std :: string& command) {
-    action_log.push_back(">" + name + " : " + command);
-
-    if (action_log.size() > 6)
-        action_log.erase(action_log.begin());
-}
-
-Component Game_page :: Make_page(Page& current_page , std :: vector<Card> c){
-    ///wil remove
-    std :: vector<Space> s;
-    Space space(2 , {5,6,7} , {10,31} , {LIGHT_BLUE , BROWN ,DARK_BLUE , YELLOW});
+Component Game_page :: Make_page(Page& current_page , Game* game , Space * space){
+    // const std :: vector<Card> & c1 = game->get_player_of_hero(CharacterType :: Dracula)->get_hand_cards();
+    // const std :: vector<Card> & c2 = game->get_player_of_hero(CharacterType ::SherlockHolmes)->get_hand_cards();
     ////////////////////////////
-
-
-    left = Renderer([& ,c]{
+    left = Renderer([this , game]{
         return vbox({
-            Make_Dashboard_dracula(9 , 12 , 18 , 6)->Render(),
-            Make_hand_cards(c)->Render(),
+            Make_Dashboard_dracula(game->get_player_of_hero(CharacterType :: Dracula)->get_hero(), game->get_player_of_hero(CharacterType :: Dracula)->get_dis_cards().size())->Render(),
+            Make_hand_cards(game->get_player_of_hero(CharacterType :: Dracula)->get_hand_cards())->Render(),
             Make_action_log()->Render()
         });
     });
 
-    map = Renderer([& , s]{
+    map = Renderer([this , game]{
         return vbox({
-            Make_map(s)->Render(),
+            Make_map(game->get_Board()->get_spaces())->Render(),
             Make_game_command()->Render()
         });
     });
 
-    right = Renderer([& , c ,space]{
+    right = Renderer([this  ,space , game ]{
         return vbox({
-            Make_Dashboard_sherlock(9 , 12 , 18 , 6)->Render(),
-            Make_hand_cards(c)->Render(),
-            Make_location_info(space)->Render()
+            Make_Dashboard_sherlock(game->get_player_of_hero(CharacterType :: SherlockHolmes)->get_hero(), game->get_player_of_hero(CharacterType :: SherlockHolmes)->get_dis_cards().size())->Render(),
+            Make_hand_cards(game->get_player_of_hero(CharacterType ::SherlockHolmes)->get_hand_cards())->Render(),
+            Make_location_info(*space)->Render()
         });
     });
     
-    auto input = Make_command_input();
+    auto input = Make_command_input(game);
 
     bottom = Container::Vertical({
         input,
     });
 
-    return Renderer(bottom , [&] {
+    return Renderer(bottom , [this , game] {
         return vbox({
             text("UNMATCHED") | bold | color(Color::Yellow) | center,
             separator() | color(Color::Cyan1),
-            text("Turn : ") | center,
+            hbox({ text("Turn : ")  , text(game->get_turn()->get_name())}) | center | bold,
+            separator() | color(Color::Cyan1),
+            hbox({ text("Action : ")  , text(std :: to_string(game->get_turn()->get_aciton()))}) | center | bold,
             separator() | color(Color::Cyan1),
             hbox({ left->Render()   | flex, map->Render() | flex, right->Render()  | flex}),
             separator() | color(Color::Cyan1),

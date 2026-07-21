@@ -8,6 +8,7 @@
 #include <ftxui/dom/canvas.hpp>
 #include <vector>
 #include "game.h"
+#include "Card.h"
 #include "Enums.h"
 
 class Main_menu
@@ -33,15 +34,15 @@ class Age_page
 
         bool ParseAge(const std::string& , int&);   
     public:
-        ftxui :: Component Make_page(Page& , int & , int &);
+        ftxui :: Component Make_page(Page& , Game *);
 };
 
 class Game_page
 {
     private:
         ftxui :: Element Node(std::string , ftxui :: Color );
-        void ExecuteCommand(const std::string );
-        void AddActionLog(const std :: string& , const std :: string&);
+        void ExecuteCommand(Game * );
+        void AddActionLog(const CharacterType & , const std :: string&);
         ftxui :: Component left;
         ftxui :: Component right;
         ftxui :: Component map;
@@ -49,17 +50,21 @@ class Game_page
         ftxui :: Component middle;
         std :: string command;
         std :: vector<std ::string> action_log;
+
+        Action_State AcSt = Action_State :: None;
+        int movestaion;
+        std :: string cardname;
     public:
-        ftxui :: Component Make_Dashboard_dracula(int , int , int ,int);
-        ftxui :: Component Make_Dashboard_sherlock(int , int , int ,int);
-        ftxui :: Component Make_card(Card);
-        ftxui :: Component Make_hand_cards(std :: vector<Card>);
+        ftxui :: Component Make_Dashboard_dracula(Heroes*,int);
+        ftxui :: Component Make_Dashboard_sherlock(Heroes*,int);
+        ftxui :: Component Make_card(const Card &);
+        ftxui :: Component Make_hand_cards(const std :: vector<Card> &);
         ftxui :: Component Make_map(std :: vector <Space>);
-        ftxui :: Component Make_command_input();
+        ftxui :: Component Make_command_input(Game *);
         ftxui :: Component Make_location_info(Space);
         ftxui :: Component Make_game_command();
         ftxui :: Component Make_action_log();
-        ftxui :: Component Make_page(Page& , std :: vector<Card> c);
+        ftxui :: Component Make_page(Page& , Game* , Space *);
 
 };
 
@@ -71,6 +76,11 @@ class end_page
         ftxui :: Component Make_page(const std :: string  , const std :: string );
 };
 
+class Front
+{
+    private:
+    public:
+};
 
 
 
