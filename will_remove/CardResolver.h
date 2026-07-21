@@ -1,14 +1,13 @@
 #pragma once
 
 #include"Card.h"
-#include"Controller.h"
+#include"game.h"
 
 #include<string>
 
 
 class CardResolver
 {
-private:
-public:
-    void excute(Card *, Controller *);
+    public:
+        void excute(Card *, Game *);
 };

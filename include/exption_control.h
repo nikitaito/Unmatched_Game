@@ -10,6 +10,12 @@ class NoSpaceException : public std::runtime_error {
             : std::runtime_error(message) {}
 };
 
+class No_Way : public std :: runtime_error {
+    public:
+        No_Way(const std :: string & message = "There is not way")
+            : std::runtime_error(message) {}
+};
+
 
 
 #endif 

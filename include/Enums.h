@@ -58,6 +58,20 @@ enum class Usertype{
     ANY
  };
 
+enum class CharacterType{
+    SherlockHolmes,
+    Dracula,
+    Dr_Watson,
+    Sister
+};
+
+
+enum class CombatResult
+{
+    Win,
+    Lose,
+    Tie
+};
 enum class CardType{
     ATTACK,
     DEFENSE,
@@ -81,4 +95,13 @@ enum class Page {
     Age,
     Game,
     End
+};
+
+enum class Action_State{
+    None,
+    Maneuver,
+    Attack,
+    Schame,
+    Move,
+    
 };
