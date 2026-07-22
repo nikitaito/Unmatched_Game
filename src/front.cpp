@@ -39,7 +39,7 @@ Component Help_page :: Make_page(Page& current_page) {
         "battle tells a different story.";
 
     auto paragraph_element = paragraph(help_text)
-                           | size(WIDTH, LESS_THAN, 60)  // حداکثر عرض ۶۰ کاراکتر
+                           | size(WIDTH, LESS_THAN, 60)  
                            | border
                            | center;
 

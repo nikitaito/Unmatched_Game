@@ -55,7 +55,6 @@ Discard :: Discard(bool mode) : justremove(mode){}
 
 void Discard :: execute(Context & ctx){
     if(justremove){
-        // Eliminate the Impossible: discard a chosen card from the OPPONENT's hand.
         for (auto & it  : ctx.remove)
             ctx.targetplayer->remove_card(it);
     }

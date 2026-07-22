@@ -182,8 +182,6 @@ void Board :: Move(int current , int target){
 }
 
 void Board :: Teleport(int current , int target){
-    // Unrestricted placement used by cards such as Mistform ("place on any space").
-    // The only requirement is that the destination is unoccupied.
     if(!spaces[target].empty())
         throw NoSpaceException();
 

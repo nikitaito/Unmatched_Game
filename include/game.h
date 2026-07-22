@@ -15,7 +15,6 @@ class Game
 
         Player * turn;
 
-        // -- combat engine state (only one combat can be in progress at a time) --
         CombatStage combatStage = CombatStage::None;
         Player * combatAttackerPlayer = nullptr;
         Player * combatDefenderPlayer = nullptr;
@@ -55,18 +54,17 @@ class Game
         void IncreaseAction(Player *);
         void ChangeTurn();
 
-        // -- fighter / ownership resolution used by Scheme + Attack + Blood Harvest --
+        
         bool ResolveActingFighter(Player * , Usertype , Heroes *& , Sidekick *& , std :: string &);
 
-        // -- Maneuver action --
+       
         bool Maneuver(Player * , std :: string &);
         bool MoveFighter(Player * , int from , int to , std :: string &);
 
-        // -- Scheme action --
-        bool PlayScheme(Player * , int handIndex , int current_space , int target_space ,
-                         int guessedValue , bool guessAttack , std :: string & err , std :: vector<std :: string> & log);
+       
+        bool PlayScheme(Player * , int handIndex , int current_space , int target_space , int guessedValue , bool guessAttack , std :: string & err , std :: vector<std :: string> & log);
 
-        // -- Attack action / combat engine --
+       
         bool DeclareAttack(Player * attacker , int attackerSpace , int targetSpace , std :: string & err);
         bool PlayAttackCard(int handIndex , std :: string & err);
         bool PlayDefenseCard(int handIndex , std :: string & err);
@@ -74,10 +72,10 @@ class Game
         std :: vector<std :: string> ResolveCombat();
         CombatStage get_CombatStage() const;
 
-        // -- Dracula's Blood Harvest (start-of-turn optional ability) --
+
         bool BloodHarvest(Player * , int targetSpace , std :: string & err);
 
-        // -- End of turn --
+
         bool CanEndTurn(Player *) const;
         bool DiscardExcess(Player * , int handIndex , std :: string & err);
         void EndTurn();

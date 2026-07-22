@@ -12,8 +12,8 @@ class Card
 
     private:
         CardName name;
-        CardTiming timing;      // "DURING" , "AFTER" , "BEFORE", "IMMEDIATE"
-        CardType cardtype; // "ATTACK" , "DEFENSE" , "EVENT", "BOTH"
+        CardTiming timing;      
+        CardType cardtype; 
         Usertype usertype;
         int Attack;
         int Defense;

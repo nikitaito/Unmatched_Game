@@ -182,7 +182,6 @@ void Game :: PlaceStartingSidekicks(Player * p , int heroSpace){
             board.set_Comrade(sidekicks[i] , spots[i]);
     }
     else{
-        // Dr. Watson begins in Sherlock Holmes' starting Zone.
         int spot = (heroSpace == 4) ? 1 : 21;
         if(!sidekicks.empty())
             board.set_Comrade(sidekicks[0] , spot);
@@ -190,10 +189,6 @@ void Game :: PlaceStartingSidekicks(Player * p , int heroSpace){
 }
 
 Player* Game :: get_owner(CharacterType chtype){
-    // Only Dracula/Sherlock Holmes are playable Heroes in this implementation,
-    // so a fighter's owner is always determined by which Hero they belong to:
-    // Sisters belong to whichever player is Dracula, Dr. Watson to whichever
-    // player is Sherlock Holmes.
     CharacterType heroType = (chtype == CharacterType :: Sister || chtype == CharacterType :: Dracula)
                                 ? CharacterType :: Dracula
                                 : CharacterType :: SherlockHolmes;
@@ -587,7 +582,6 @@ std :: vector<std :: string> Game :: ResolveCombat(){
     };
 
     auto resolveWindow = [&](CardTiming timing){
-        // Golden Rule: the defender always resolves their effects first.
         if(combatHasDefense && combatDefenseCard.get_CardTiming() == timing && combatDefenseCard.get_ApplyEffects()){
             setPerspectiveDefender();
             ctx.effectCard = &combatDefenseCard;
@@ -602,10 +596,9 @@ std :: vector<std :: string> Game :: ResolveCombat(){
         }
     };
 
-    resolveWindow(CardTiming :: Before);   // "Immediately"
-    resolveWindow(CardTiming :: During);   // "During Combat"
+    resolveWindow(CardTiming :: Before);   
+    resolveWindow(CardTiming :: During);   
 
-    // -- Damage Calculation --
     int atk = combatAttackCard.get_Attack();
     if(ctx.ignoreAttack)
         atk = 0;
@@ -626,7 +619,6 @@ std :: vector<std :: string> Game :: ResolveCombat(){
     }
     log.push_back(attackerWon ? "The attacker wins the combat." : "The defender wins the combat.");
 
-    // -- After Combat (per-card win/lose perspective) --
     if(combatHasDefense && combatDefenseCard.get_CardTiming() == CardTiming :: After && combatDefenseCard.get_ApplyEffects()){
         setPerspectiveDefender();
         ctx.effectCard = &combatDefenseCard;
@@ -645,7 +637,6 @@ std :: vector<std :: string> Game :: ResolveCombat(){
     for(auto & s : ctx.log)
         log.push_back(s);
 
-    // -- discard played cards --
     combatAttackerPlayer->discard_card(std :: move(combatAttackCard));
     if(combatHasDefense)
         combatDefenderPlayer->discard_card(std :: move(combatDefenseCard));
