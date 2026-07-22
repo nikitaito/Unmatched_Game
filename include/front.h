@@ -53,7 +53,6 @@ class Game_page
 
         Action_State AcSt = Action_State :: None;
         int movestaion;
-        std :: string cardname;
     public:
         ftxui :: Component Make_Dashboard_dracula(Heroes*,int);
         ftxui :: Component Make_Dashboard_sherlock(Heroes*,int);

@@ -1,7 +1,7 @@
 #include "front.h"
 #include <string>
+#include <sstream>
 #include <regex>
-#include<iostream>
 using namespace ftxui;
 
 
@@ -105,8 +105,6 @@ Component Age_page::Make_page(Page& current_page, Game* game) {
         std::pair<int, CharacterType> p2{ age2 , CharacterType::Dracula};
 
         game->choose(p1, p2);
-        game->Place_sidekicks_in_hero_zone(game->get_player(1)->get_hero());
-        game->Place_sidekicks_in_hero_zone(game->get_player(2)->get_hero());
         game->inital_hand_cards();
 
         current_page = Page::Game;
@@ -500,93 +498,201 @@ Component Game_page :: Make_hand_cards (const std::vector<Card> & cards) {
     });
 }
 
-void Game_page :: ExecuteCommand(Game * game){;
-    switch (AcSt)
-    {
-        case Action_State :: None:{
-            // if(!action_log.empty() && action_log.back().find("Choose one Action") == std :: string::npos)
-            if(game->get_turn()->get_aciton() == 0)
-                game->ChangeTurn();
+void Game_page :: ExecuteCommand(Game * game){
+    std :: istringstream iss(command);
+    std :: string cmd;
+    iss >> cmd;
 
-            if(command == "Action<Maneuver>"){
-                AddActionLog(game->get_turn()->get_hero()->get_name() , "Please Choose a station");
-                AcSt = Action_State :: Maneuver;
-            }
+    Player * turnPlayer = game->get_turn();
+    CharacterType actorType = turnPlayer->get_hero()->get_name();
+    std :: string err;
 
-            else if(command == "Action<Attack>"){
-                if(game->All_Adjacency(game->get_turn()->get_hero()->get_name())){
-                    AddActionLog(game->get_turn()->get_hero()->get_name() , "Please Choose a one hero to attack");
-                    AcSt = Action_State :: Attack;
-                }
-                else
-                    AddActionLog(game->get_turn()->get_hero()->get_name() , "There is not enemy !!!");
-            }
+    if(cmd.empty())
+        return;
 
-            else if(command == "Action<Schame>")
-                AcSt = Action_State :: Schame;
-
-            else 
-                AddActionLog(game->get_turn()->get_hero()->get_name() , "Use Action<...> function !!!");
-            break;
-        }
-        case Action_State :: Maneuver:{
-            std :: regex pattern(R"(Move<(\d{1,2})>)");
-            std :: smatch match;
-            
-            if(std :: regex_match(command, match, pattern)){
-                int number = std :: stoi(match[1].str());
-
-                if(number >= 0 && number < 32){
-                    movestaion = number;
-                    AcSt = Action_State :: Move;
-                }
-                else
-                    AddActionLog(game->get_turn()->get_hero()->get_name() , "use integer number between 0 to 31");
-            }
-            
-            else 
-                AddActionLog(game->get_turn()->get_hero()->get_name() , "Use Move<int> function !!!");
-            break;
-        }
-        case Action_State :: Attack:{
-            AddActionLog(game->get_turn()->get_hero()->get_name() , "Please Choose a one hero to attack");
-            
-            std :: regex pattern(R"(play<(.*?)>)");
-            std :: smatch match;
-            
-            if(std :: regex_match(command, match, pattern))
-                cardname = match[1].str();
-                
-            
-            break;
-        }
-        case Action_State :: Schame:
-            /* code */
-            break;
-
-        case Action_State :: Move:{
-            int current_situation = game->get_Board()->search_hero(game->get_turn()->get_hero())->get_id();
-            try
-            {
-                game->Move_characters(current_situation , movestaion , game->get_turn()->get_hero()->get_name() , true , game->get_turn()->get_hero()->get_Movement());
-                game->Rand_Discard(game->get_turn());
-                game->DecreaseAction(game->get_turn());
-                AddActionLog(game->get_turn()->get_hero()->get_name() , "Choose one Action");
-                AcSt = Action_State :: None;
-            }
-            catch(const No_Way& e)
-            {
-                AddActionLog(game->get_turn()->get_hero()->get_name() , "Cant move on this way");
-                AcSt = Action_State :: None;
-            }
-            break;
-        }
-
+    if(cmd == "help" || cmd == "quit"){
+        AddActionLog(actorType , cmd);
+        return;
     }
+
+    if(cmd == "hand"){
+        std :: string summary = "Hand size: " + std :: to_string(turnPlayer->get_hand_cards().size());
+        AddActionLog(actorType , summary);
+        return;
+    }
+
+    if(cmd == "deck"){
+        std :: string summary = "Deck size: " + std :: to_string(turnPlayer->get_hero()->get_deck_cards().size());
+        AddActionLog(actorType , summary);
+        return;
+    }
+
+    if(cmd == "Action<Maneuver>"){
+        AcSt = Action_State :: Maneuver;
+        if(game->Maneuver(turnPlayer , err))
+            AddActionLog(actorType , "Maneuver: drew a card.");
+        else
+            AddActionLog(actorType , "Maneuver failed: " + err);
+        return;
+    }
+
+    if(cmd == "Action<Attack>"){
+        AcSt = Action_State :: Attack;
+        AddActionLog(actorType , "Attack: use 'attack <from> <to>' to declare.");
+        return;
+    }
+
+    if(cmd == "Action<Scheme>"){
+        AcSt = Action_State :: Scheme;
+        AddActionLog(actorType , "Scheme: use 'scheme <index> <current> <target> [value] [A|D]'.");
+        return;
+    }
+
+    if(cmd == "move"){
+        int from , to;
+        if(!(iss >> from >> to)){
+            AddActionLog(actorType , "Usage: move <from> <to>");
+            return;
+        }
+        if(game->MoveFighter(turnPlayer , from , to , err))
+            AddActionLog(actorType , "Moved from " + std :: to_string(from) + " to " + std :: to_string(to));
+        else
+            AddActionLog(actorType , "Move failed: " + err);
+        return;
+    }
+
+    if(cmd == "attack"){
+        int from , to;
+        if(!(iss >> from >> to)){
+            AddActionLog(actorType , "Usage: attack <from> <to>");
+            return;
+        }
+        if(game->DeclareAttack(turnPlayer , from , to , err))
+            AddActionLog(actorType , "Attack declared. Use 'play <index>' to choose your Attack card.");
+        else
+            AddActionLog(actorType , "Attack failed: " + err);
+        return;
+    }
+
+    if(cmd == "play"){
+        int index;
+        if(!(iss >> index)){
+            AddActionLog(actorType , "Usage: play <card_index>");
+            return;
+        }
+        index -= 1; // hand indices are shown 1-based to the player
+
+        CombatStage stage = game->get_CombatStage();
+        if(stage == CombatStage :: AwaitAttackCard){
+            if(game->PlayAttackCard(index , err))
+                AddActionLog(actorType , "Attack card played. Defender may 'play <index>' a Defense card or 'skip'.");
+            else
+                AddActionLog(actorType , "Could not play card: " + err);
+        }
+        else if(stage == CombatStage :: AwaitDefenseCard){
+            if(game->PlayDefenseCard(index , err))
+                AddActionLog(actorType , "Defense card played. Use 'resolve' to resolve combat.");
+            else
+                AddActionLog(actorType , "Could not play card: " + err);
+        }
+        else{
+            AddActionLog(actorType , "There is no pending combat card to play.");
+        }
+        return;
+    }
+
+    if(cmd == "skip"){
+        if(game->get_CombatStage() == CombatStage :: AwaitDefenseCard){
+            game->SkipDefense();
+            AddActionLog(actorType , "Defense skipped. Use 'resolve' to resolve combat.");
+        }
+        else{
+            AddActionLog(actorType , "There is nothing to skip right now.");
+        }
+        return;
+    }
+
+    if(cmd == "resolve"){
+        if(game->get_CombatStage() != CombatStage :: Ready){
+            AddActionLog(actorType , "Combat is not ready to resolve yet.");
+            return;
+        }
+        auto log = game->ResolveCombat();
+        for(auto & line : log)
+            AddActionLog(actorType , line);
+        AcSt = Action_State :: None;
+        return;
+    }
+
+    if(cmd == "scheme"){
+        int index , current_space , target_space;
+        int guessedValue = 0;
+        std :: string valueKind;
+        if(!(iss >> index >> current_space >> target_space)){
+            AddActionLog(actorType , "Usage: scheme <index> <current> <target> [value] [A|D]");
+            return;
+        }
+        iss >> guessedValue;
+        bool guessAttack = true;
+        if(iss >> valueKind && !valueKind.empty() && (valueKind[0] == 'D' || valueKind[0] == 'd'))
+            guessAttack = false;
+
+        index -= 1;
+        std :: vector<std :: string> log;
+        if(game->PlayScheme(turnPlayer , index , current_space , target_space , guessedValue , guessAttack , err , log)){
+            AddActionLog(actorType , "Scheme resolved.");
+            for(auto & line : log)
+                AddActionLog(actorType , line);
+        }
+        else{
+            AddActionLog(actorType , "Scheme failed: " + err);
+        }
+        return;
+    }
+
+    if(cmd == "bloodharvest"){
+        int target_space;
+        if(!(iss >> target_space)){
+            AddActionLog(actorType , "Usage: bloodharvest <target_space>");
+            return;
+        }
+        if(game->BloodHarvest(turnPlayer , target_space , err))
+            AddActionLog(actorType , "Blood Harvest: dealt 1 damage and drew a card.");
+        else
+            AddActionLog(actorType , "Blood Harvest failed: " + err);
+        return;
+    }
+
+    if(cmd == "discard"){
+        int index;
+        if(!(iss >> index)){
+            AddActionLog(actorType , "Usage: discard <card_index>");
+            return;
+        }
+        index -= 1;
+        if(game->DiscardExcess(turnPlayer , index , err))
+            AddActionLog(actorType , "Discarded a card.");
+        else
+            AddActionLog(actorType , "Discard failed: " + err);
+        return;
+    }
+
+    if(cmd == "end"){
+        if(game->CanEndTurn(turnPlayer)){
+            game->EndTurn();
+            AcSt = Action_State :: None;
+            AddActionLog(actorType , "Turn ended.");
+        }
+        else{
+            AddActionLog(actorType , "Cannot end turn yet: use both actions and discard down to 7 cards.");
+        }
+        return;
+    }
+
+    AddActionLog(actorType , "Unknown command: " + command);
 }
 
 Component Game_page :: Make_command_input(Game * game){
-
     return Input(&command, "Enter Command...")
         | bgcolor(Color::Black) 
         | CatchEvent([& , game](Event event) {
@@ -604,10 +710,18 @@ Component Game_page :: Make_game_command(){
         return vbox({
             text("GAME COMMANDS ") | color(Color::Yellow),
             text(""),
-            text("Action<....> - Choose your action from {Attack , Maneuver , Schem}") | color(Color :: Yellow1),
-            text("move <location> - Move your hero") | color(Color :: Yellow1),
-            text("play <card_index> - Play a card from hand (1-based index)") | color(Color :: Yellow1),
-            text("end - End your turn") | color(Color :: Yellow1),
+            text("Action<Maneuver> - draw a card (start of Maneuver)") | color(Color :: Yellow1),
+            text("move <from> <to> - move a fighter between spaces") | color(Color :: Yellow1),
+            text("Action<Attack> - begin the Attack action") | color(Color :: Yellow1),
+            text("attack <from> <to> - declare attacker/target") | color(Color :: Yellow1),
+            text("play <card_index> - play the pending Attack/Defense card (1-based)") | color(Color :: Yellow1),
+            text("skip - skip playing a Defense card") | color(Color :: Yellow1),
+            text("resolve - resolve the declared combat") | color(Color :: Yellow1),
+            text("Action<Scheme> - begin the Scheme action") | color(Color :: Yellow1),
+            text("scheme <index> <current> <target> [value] [A|D] - play a Scheme card") | color(Color :: Yellow1),
+            text("bloodharvest <target_space> - Dracula's start-of-turn ability") | color(Color :: Yellow1),
+            text("discard <card_index> - discard down to 7 cards") | color(Color :: Yellow1),
+            text("end - end your turn") | color(Color :: Yellow1),
             text("hand - Show your hand") | color(Color :: Yellow1),
             text("deck - Show deck info") | color(Color :: Yellow1),
             text("help - Show this help") | color(Color :: Yellow1),
@@ -760,9 +874,7 @@ Component Game_page :: Make_page(Page& current_page , Game* game , Space * space
         return vbox({
             text("UNMATCHED") | bold | color(Color::Yellow) | center,
             separator() | color(Color::Cyan1),
-            hbox({ text("Turn : ")  , text(game->get_turn()->get_name())}) | center | bold,
-            separator() | color(Color::Cyan1),
-            hbox({ text("Action : ")  , text(std :: to_string(game->get_turn()->get_aciton()))}) | center | bold,
+            hbox({ text("Turn : ")  , text(game->get_turn()->get_name())}) | center,
             separator() | color(Color::Cyan1),
             hbox({ left->Render()   | flex, map->Render() | flex, right->Render()  | flex}),
             separator() | color(Color::Cyan1),

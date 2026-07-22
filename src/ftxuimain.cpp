@@ -8,38 +8,11 @@ using namespace ftxui;
 int main() {
     srand(time(nullptr));
     auto screen = ScreenInteractive::FitComponent();
-    // Card card1(CardName::Feint, CardTiming::Before, CardType :: BOTH , Usertype :: ANY ,2, 2, 2 , Make_Effect({new Disable_effects()}));
-    // Card card2(CardName::Feint, CardTiming::Before, CardType :: BOTH , Usertype :: ANY ,2, 2, 2 , Make_Effect({new Disable_effects()}));
-    // Card card3(CardName::Feint, CardTiming::Before, CardType :: BOTH , Usertype :: ANY ,2, 2, 2 , Make_Effect({new Disable_effects()}));
-    // Card card4(CardName::Feint, CardTiming::Before, CardType :: BOTH , Usertype :: ANY ,2, 2, 2 , Make_Effect({new Disable_effects()}));
-    // Card card5(CardName::Feint, CardTiming::Before, CardType :: BOTH , Usertype :: ANY ,2, 2, 2 , Make_Effect({new Disable_effects()}));
-    // Card card6(CardName::Feint, CardTiming::Before, CardType :: BOTH , Usertype :: ANY ,2, 2, 2 , Make_Effect({new Disable_effects()}));
-    // Card card7(CardName::Feint, CardTiming::Before, CardType :: BOTH , Usertype :: ANY ,2, 2, 2 , Make_Effect({new Disable_effects()}));
 
-
-    // std :: vector<Card> cards ;
-    // cards.push_back(std :: move(card1));
-    // cards.push_back(std :: move(card2));
-    // cards.push_back(std :: move(card3));
-    // cards.push_back(std :: move(card4));
-    // cards.push_back(std :: move(card5));
-    // cards.push_back(std :: move(card6));
-    // cards.push_back(std :: move(card7));
-
-    ///wil remove
     Space space(2 , {5,6,7} , {10,31} , {LIGHT_BLUE , BROWN ,DARK_BLUE , YELLOW});
 
     Game  gamect;
-    
-    // SherlockHolmes sh;
-    // Dracula dr;
-    // Sister st;
-    // Dr_Watson dw;
-    // set_Hero(&sh , 5);
-    // set_Hero(&dr , 6);
-    // set_Comrade(&dw , 10);
-    // set_Comrade(&st , 11);
-    
+
     Page current_page = Page::Menu;
 
     Main_menu menu;
