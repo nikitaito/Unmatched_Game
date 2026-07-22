@@ -12,18 +12,25 @@ class Board
     public:
         Board();
 
-        std :: vector<Space> get_spaces() const;
+        const std :: vector<Space> & get_spaces() const;
+        std :: vector<Space> & get_spaces_mut();
+        int get_space_count() const;
         void set_Hero(Heroes * , int) ;
         void set_Comrade(Sidekick * , int);
         void reset_space(int);
         Space * search_hero(Heroes *);
         Space * search_comrades(Sidekick *);
+        int find_space_of_hero(Heroes *) const;
+        int find_space_of_comrade(Sidekick *) const;
         int number_of_sisters_in_this_zone(Space *);
         bool is_way(int , int , CharacterType , bool , int) const;
         void Move(int , int);
+        void Teleport(int , int);
         bool Adjacency(CharacterType , CharacterType);
+        bool AdjacentSpaces(int , int) const;
+        bool SameZone(int , int) const;
+        bool valid_space(int) const;
         void Swap(int , int);
-        std :: vector<int> get_empty_spaces_in_zone(std :: vector<Zone>) const;
 
 
 

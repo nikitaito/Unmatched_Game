@@ -1,4 +1,5 @@
 #include "board.h"
+#include "exption_control.h"
 #include<iostream>
 
 using namespace std;
@@ -40,8 +41,20 @@ Board :: Board(){
     spaces.push_back(Space(31 , {29} , {0 , 14 , 18} , {YELLOW}));
 }
 
-std :: vector<Space> Board ::  get_spaces() const{
+const std :: vector<Space> & Board ::  get_spaces() const{
     return spaces;
+}
+
+std :: vector<Space> & Board :: get_spaces_mut(){
+    return spaces;
+}
+
+int Board :: get_space_count() const{
+    return SPACE_COUNT;
+}
+
+bool Board :: valid_space(int id) const{
+    return id >= 0 && id < SPACE_COUNT;
 }
 
 void Board :: set_Hero(Heroes * hero , int situation){
@@ -72,6 +85,22 @@ Space * Board :: search_comrades(Sidekick * comrade){
             search_comrade = &it;
     }
     return search_comrade;
+}
+
+int Board :: find_space_of_hero(Heroes * hero) const{
+    for(const auto & it : spaces){
+        if(it.get_Hero() == hero)
+            return it.get_id();
+    }
+    return -1;
+}
+
+int Board :: find_space_of_comrade(Sidekick * comrade) const{
+    for(const auto & it : spaces){
+        if(it.get_comrade() == comrade)
+            return it.get_id();
+    }
+    return -1;
 }
 
 int Board :: number_of_sisters_in_this_zone(Space * space){
@@ -137,6 +166,9 @@ bool Board :: is_way(int current , int target , CharacterType forbidden , bool a
 }
 
 void Board :: Move(int current , int target){
+    if(current == target)
+        return;
+
     if(spaces[current].get_Hero()){
         Heroes * hero = spaces[current].get_Hero();
         spaces[current].reset();
@@ -147,6 +179,39 @@ void Board :: Move(int current , int target){
         spaces[current].reset();
         spaces[target].set_comrades(sidekick);
     }
+}
+
+void Board :: Teleport(int current , int target){
+    // Unrestricted placement used by cards such as Mistform ("place on any space").
+    // The only requirement is that the destination is unoccupied.
+    if(!spaces[target].empty())
+        throw NoSpaceException();
+
+    Move(current , target);
+}
+
+bool Board :: AdjacentSpaces(int a , int b) const{
+    if(!valid_space(a) || !valid_space(b))
+        return false;
+
+    for(int n : spaces[a].get_neighbor()){
+        if(n == b)
+            return true;
+    }
+    return false;
+}
+
+bool Board :: SameZone(int a , int b) const{
+    if(!valid_space(a) || !valid_space(b))
+        return false;
+
+    for(auto za : spaces[a].get_zone()){
+        for(auto zb : spaces[b].get_zone()){
+            if(za == zb)
+                return true;
+        }
+    }
+    return false;
 }
 
 bool Board :: Adjacency(CharacterType ch1 , CharacterType ch2){
@@ -174,18 +239,3 @@ void Board :: Swap(int a , int b){
     spaces[b].set_hero(Hero_C);
 }
 
-std :: vector<int> Board :: get_empty_spaces_in_zone(std :: vector<Zone> zones) const{
-    std :: vector<int> result;
-    for(const auto & sp : spaces){
-        if(!sp.empty())
-            continue;
-
-        for(auto z : sp.get_zone()){
-            if(std :: find(zones.begin() , zones.end() , z) != zones.end()){
-                result.push_back(sp.get_id());
-                break;
-            }
-        }
-    }
-    return result;
-}
