@@ -1,4 +1,5 @@
 #include "Player.h"
+#include <algorithm>
 using namespace std;
 
 // Player :: Player(string name , int age) : age(age) , name(name) {}
@@ -42,6 +43,16 @@ int Player :: remove_card(CardName name){
     }
     return boost;
 
+}
+
+Card Player :: take_hand_card(int index){
+    Card c = std :: move(handcard[index]);
+    handcard.erase(handcard.begin() + index);
+    return c;
+}
+
+void Player :: discard_card(Card&& card){
+    discard.push_back(std :: move(card));
 }
 
 vector<Card>& Player :: get_hand_cards() {

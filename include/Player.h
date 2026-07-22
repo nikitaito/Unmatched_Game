@@ -12,7 +12,7 @@
 class Player
 {
     private:
-        Heroes * current_hero;
+        Heroes * current_hero = nullptr;
         SherlockHolmes sherlock;
         Dracula dracula;
 
@@ -32,6 +32,8 @@ class Player
         void set_age(int);
         void add_card(Card&& card);
         int remove_card(CardName);
+        Card take_hand_card(int index);
+        void discard_card(Card&& card);
         std :: vector<Card>& get_hand_cards() ;
         std :: vector<Card>& get_dis_cards() ;
         int get_age()const;
