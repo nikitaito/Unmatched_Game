@@ -101,7 +101,14 @@ enum class Action_State{
     None,
     Maneuver,
     Attack,
-    Schame,
+    Scheme,
     Move,
     
+};
+
+enum class CombatStage{
+    None,
+    AwaitAttackCard,
+    AwaitDefenseCard,
+    Ready
 };
