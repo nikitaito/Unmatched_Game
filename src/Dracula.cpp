@@ -9,6 +9,17 @@ Dracula::Dracula()
     initial_deck();
 }
 
+vector<Sidekick *> Dracula::get_sisters()
+{
+  return sidekick;
+}
+
+// void Dracula::DrawnCard()
+// {
+//   cards.hand.push_back(cards.deck.front());
+//   cards.hand.erase(cards.hand.begin());
+// }
+
 void Dracula :: initial_deck() {
 
   cards.deck.push_back(Card(CardName::Feedingfrenzy, CardTiming::During, CardType :: ATTACK, Usertype :: DRACULA , 2, 0, 3 , Make_Effect({new Boost_attack(CharacterType :: Sister  , true)})));
@@ -34,9 +45,9 @@ void Dracula :: initial_deck() {
   cards.deck.push_back(Card(CardName::Exploit, CardTiming::After, CardType :: BOTH , Usertype :: ANY , 4, 4, 1 , Make_Effect({new DrawCardEffect(1)})));
   cards.deck.push_back(Card(CardName::Exploit, CardTiming::After, CardType :: BOTH , Usertype :: ANY , 4, 4, 1 , Make_Effect({new DrawCardEffect(1)})));
 
-  cards.deck.push_back(Card(CardName::Look_into_my_eyes, CardTiming::During, CardType :: DEFENSE, Usertype :: DRACULA ,1, 0, 2 , Make_Effect({new Boost_deffence()})));
-  cards.deck.push_back(Card(CardName::Look_into_my_eyes, CardTiming::During, CardType :: DEFENSE, Usertype :: DRACULA ,1, 0, 2 , Make_Effect({new Boost_deffence()})));
-  cards.deck.push_back(Card(CardName::Look_into_my_eyes, CardTiming::During, CardType :: DEFENSE, Usertype :: DRACULA ,1, 0, 2 , Make_Effect({new Boost_deffence()})));
+  cards.deck.push_back(Card(CardName::Look_into_my_eyes, CardTiming::During, CardType :: DEFENSE, Usertype :: DRACULA ,0, 1, 2 , Make_Effect({new Boost_deffence()})));
+  cards.deck.push_back(Card(CardName::Look_into_my_eyes, CardTiming::During, CardType :: DEFENSE, Usertype :: DRACULA ,0, 1, 2 , Make_Effect({new Boost_deffence()})));
+  cards.deck.push_back(Card(CardName::Look_into_my_eyes, CardTiming::During, CardType :: DEFENSE, Usertype :: DRACULA ,0, 1, 2 , Make_Effect({new Boost_deffence()})));
 
   cards.deck.push_back(Card(CardName::Prey_upon, CardTiming::Immediate, CardType :: EVENT , Usertype :: DRACULA ,0, 0, 4 , Make_Effect({new DamageIfAdjacent(1 , CharacterType :: Dracula)})));
   cards.deck.push_back(Card(CardName::Prey_upon, CardTiming::Immediate, CardType :: EVENT , Usertype :: DRACULA ,0, 0, 4 , Make_Effect({new DamageIfAdjacent(1 , CharacterType :: Dracula)})));
@@ -45,9 +56,9 @@ void Dracula :: initial_deck() {
   cards.deck.push_back(Card(CardName::Ravening_Seduction, CardTiming::Immediate, CardType :: EVENT , Usertype :: SISTER ,0, 0, 2 , Make_Effect({new Move(2) , new DamageIfAdjacent(1 , CharacterType :: Sister)})));
   cards.deck.push_back(Card(CardName::Ravening_Seduction, CardTiming::Immediate, CardType :: EVENT , Usertype :: SISTER ,0, 0, 2 , Make_Effect({new Move(2) , new DamageIfAdjacent(1 , CharacterType :: Sister)})));
 
-  cards.deck.push_back(Card(CardName::Thirst_for_sustenance, CardTiming::After, CardType :: ATTACK, Usertype :: SISTER ,0, 3, 3 , Make_Effect({new ReplaceEffect(3)})));
-  cards.deck.push_back(Card(CardName::Thirst_for_sustenance, CardTiming::After, CardType :: ATTACK, Usertype :: SISTER ,0, 3, 3 , Make_Effect({new ReplaceEffect(3)})));
-  cards.deck.push_back(Card(CardName::Thirst_for_sustenance, CardTiming::After, CardType :: ATTACK, Usertype :: SISTER ,0, 3, 3 , Make_Effect({new ReplaceEffect(3)})));
+  cards.deck.push_back(Card(CardName::Thirst_for_sustenance, CardTiming::After, CardType :: ATTACK, Usertype :: SISTER ,3, 0, 3 , Make_Effect({new ReplaceEffect(3)})));
+  cards.deck.push_back(Card(CardName::Thirst_for_sustenance, CardTiming::After, CardType :: ATTACK, Usertype :: SISTER ,3, 0, 3 , Make_Effect({new ReplaceEffect(3)})));
+  cards.deck.push_back(Card(CardName::Thirst_for_sustenance, CardTiming::After, CardType :: ATTACK, Usertype :: SISTER ,3, 0, 3 , Make_Effect({new ReplaceEffect(3)})));
 
   cards.deck.push_back(Card(CardName::Feint, CardTiming::Before, CardType :: BOTH , Usertype :: ANY ,2, 2, 2 , Make_Effect({new Disable_effects()})));
   cards.deck.push_back(Card(CardName::Feint, CardTiming::Before, CardType :: BOTH , Usertype :: ANY ,2, 2, 2 , Make_Effect({new Disable_effects()})));
@@ -55,9 +66,10 @@ void Dracula :: initial_deck() {
 }
 
 void Dracula :: assign_sidekicks() {
+  sidekick.clear();
   sidekick.push_back(&sister1);
-  sidekick.push_back(&sister1);
-  sidekick.push_back(&sister1);
+  sidekick.push_back(&sister2);
+  sidekick.push_back(&sister3);
 }
 
 vector<Sidekick*> Dracula :: get_sidekick(){
