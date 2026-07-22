@@ -177,7 +177,7 @@ class ElementaryEffect : public Effect
     public:
         virtual void execute(Context &) override;
 };
-
+ 
 class DeduceStrategyEffect : public Effect
 {
     public:

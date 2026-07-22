@@ -1,5 +1,6 @@
 #include "Effect.h"
 #include "game.h"
+#include <algorithm>
 
 using namespace std;
 
@@ -54,8 +55,9 @@ Discard :: Discard(bool mode) : justremove(mode){}
 
 void Discard :: execute(Context & ctx){
     if(justremove){
+        // Eliminate the Impossible: discard a chosen card from the OPPONENT's hand.
         for (auto & it  : ctx.remove)
-            ctx.ownplayer->remove_card(it);
+            ctx.targetplayer->remove_card(it);
     }
     else{
         for (auto & it  : ctx.remove){
@@ -71,13 +73,23 @@ Boost_attack :: Boost_attack (CharacterType ch , bool mode) : chtype(ch) , siste
 void Boost_attack :: execute(Context & ctx){
     if(sistermode){
         int i = 0;
-        vector<Space> spaces = ctx.game->get_Board()->get_spaces();
-        for(auto it : spaces){
-            if(it.get_zone() == spaces[ctx.current_space].get_zone() &&
-                it.get_comrade() && 
-                it.get_comrade()->get_name() == chtype){
-                    i++;
+        const auto & spaces = ctx.game->get_Board()->get_spaces();
+        if(ctx.target_space >= 0 && ctx.target_space < static_cast<int>(spaces.size())){
+            const auto & target_zones = spaces[ctx.target_space].get_zone();
+            for(const auto & sp : spaces){
+                if(sp.get_comrade() && sp.get_comrade()->get_name() == chtype){
+                    const auto & sister_zones = sp.get_zone();
+                    bool shared = false;
+                    for(auto z : sister_zones){
+                        if(std::find(target_zones.begin(), target_zones.end(), z) != target_zones.end()){
+                            shared = true;
+                            break;
+                        }
+                    }
+                    if(shared)
+                        i++;
                 }
+            }
         }
         int attack = ctx.attackCard->get_Attack();
         ctx.attackCard->set_Attack(attack + i);
@@ -90,9 +102,11 @@ void Boost_attack :: execute(Context & ctx){
 }
 /////////////////////////
 void Boost_deffence :: execute(Context & ctx){
-    int boost = ctx.attackCard->get_Attack();
-    int last_attack = ctx.attackCard->get_Defense();
-    ctx.defenseCard->set_Defence(last_attack + boost);
+    if(!ctx.attackCard || !ctx.defenseCard)
+        return;
+
+    int boost = ctx.attackCard->get_Boost();
+    ctx.defenseCard->set_Defence(boost);
 }
 /////////////////////////
 Move :: Move(int x) : cost(x){}
@@ -104,17 +118,19 @@ void Move :: execute(Context & ctx){
 ReplaceEffect :: ReplaceEffect(int x) : mode(x) {}
 
 void ReplaceEffect :: execute(Context & ctx){
-    if(mode == 1)
+    if(mode == 1){
         ctx.game->Replace(ctx.current_space  , ctx.target_space);
-
+    }
     else if(mode == 2){
-        ctx.game->Replace(ctx.current_space , ctx.target_space);
+        ctx.game->Teleport(ctx.current_space , ctx.target_space);
         ctx.game->IncreaseAction(ctx.ownplayer);
     }
-
     else if(mode == 3){
         if(ctx.result == CombatResult :: Win)
-            ctx.game->Replace(ctx.current_space , ctx.target_space);
+            ctx.game->Teleport(ctx.current_space , ctx.target_space);
+    }
+    else if(mode == 4){
+        ctx.game->Teleport(ctx.current_space , ctx.target_space);
     }
 }
 /////////////////////// 
@@ -135,60 +151,126 @@ void DamageIfAdjacent :: execute(Context & ctx){
 
     if (!ctx.game)
         return;
-    if(chtype == CharacterType :: Dracula){
-        Space * situation = ctx.game->get_Board()->search_hero(ctx.ownhero);
-        for(auto & it : situation->get_neighbor()){
-            if(ctx.game->get_Board()->get_spaces()[it].get_Hero()){
-                ctx.game->get_Board()->get_spaces()[it].get_Hero()->Damage(damage);
-                ctx.ownhero->Heal(1);
-            }
 
-            else if(ctx.game->get_Board()->get_spaces()[it].get_comrade()){
-                ctx.game->get_Board()->get_spaces()[it].get_comrade()->Damage(damage);
-                ctx.ownhero->Heal(1);
+    if(chtype == CharacterType :: Dracula){
+        int self_space = ctx.game->get_Board()->find_space_of_hero(ctx.ownhero);
+        if(self_space < 0)
+            return;
+
+        const auto & spaces = ctx.game->get_Board()->get_spaces();
+        for(int nb : spaces[self_space].get_neighbor()){
+            Heroes * h = spaces[nb].get_Hero();
+            Sidekick * s = spaces[nb].get_comrade();
+
+            if(h && ctx.game->get_owner(h->get_name()) != ctx.ownplayer){
+                h->Damage(damage);
+                ctx.ownhero->Heal(damage);
+            }
+            else if(s && ctx.game->get_owner(s->get_name()) != ctx.ownplayer){
+                s->Damage(damage);
+                ctx.ownhero->Heal(damage);
             }
         }
     }
     else if(chtype == CharacterType :: SherlockHolmes){
-        CharacterType chtype = ctx.ownhero->get_name();
-        CharacterType chtype2;
+        CharacterType selfType = ctx.ownhero->get_name();
         if(ctx.targethero){
-            chtype2 = ctx.targethero->get_name();
-            if(ctx.game->Adjacency(chtype , chtype2))
+            if(ctx.game->Adjacency(selfType , ctx.targethero->get_name()))
                 ctx.targethero->Damage(damage);
         }
         else if(ctx.targetsidekick){
-            chtype2 = ctx.targetsidekick->get_name();
-            if(ctx.game->Adjacency(chtype , chtype2))
+            if(ctx.game->Adjacency(selfType , ctx.targetsidekick->get_name()))
                 ctx.targetsidekick->Damage(damage);
-        }   
-    } 
+        }
+    }
     else if(chtype == CharacterType :: Sister){
         int i = 0;
-        Space * situation = ctx.game->get_Board()->search_comrades(ctx.ownsidekick);
-        for(auto & it : situation->get_neighbor()){
-
-            if(ctx.game->get_Board()->get_spaces()[it].get_comrade() && ctx.game->get_Board()->get_spaces()[it].get_comrade()->get_name() == CharacterType :: Sister)
-                i++;
-
-        } 
+        if(ctx.target_space >= 0){
+            const auto & spaces = ctx.game->get_Board()->get_spaces();
+            for(int nb : spaces[ctx.target_space].get_neighbor()){
+                if(spaces[nb].get_comrade() && spaces[nb].get_comrade()->get_name() == CharacterType :: Sister)
+                    i++;
+            }
+        }
         if(ctx.targethero)
             ctx.targethero->Damage(i);
         else if(ctx.targetsidekick)
             ctx.targetsidekick->Damage(i);
     }
-    
+
 }
 /////////////////////
 void Disable_effects :: execute(Context & ctx){
-    for(auto & it : ctx.ownplayer->get_hand_cards())
-        it.set_ApplyEffects(false);
+    if(ctx.effectCard == ctx.attackCard && ctx.defenseCard)
+        ctx.defenseCard->set_ApplyEffects(false);
+    else if(ctx.effectCard == ctx.defenseCard && ctx.attackCard)
+        ctx.attackCard->set_ApplyEffects(false);
 }
 ////////////////////
 void See_the_deck :: execute(Context & ctx){
-    if(ctx.result == CombatResult :: Win)
-        ctx.targetplayer->get_hand_cards();
+    if(ctx.result == CombatResult :: Win && ctx.targetplayer){
+        ctx.log.push_back("Opponent's hand revealed.");
+    }
+}
+////////////////////
+void ConfirmSuspicionEffect :: execute(Context & ctx){
+    if(!ctx.targetplayer)
+        return;
 
+    auto & hand = ctx.targetplayer->get_hand_cards();
+    CardName foundName{};
+    int foundBoost = 0;
+    bool found = false;
+
+    for(auto & c : hand){
+        int val = ctx.guessAttack ? c.get_Attack() : c.get_Defense();
+        if(val == ctx.guessedValue){
+            foundName = c.get_CardName();
+            foundBoost = c.get_Boost();
+            found = true;
+            break;
+        }
+    }
+
+    if(found){
+        ctx.targetplayer->remove_card(foundName);
+        if(ctx.targethero)
+            ctx.targethero->Damage(foundBoost);
+        ctx.log.push_back("Matching card discarded.");
+    }
+    else{
+        ctx.log.push_back("No matching card - hand revealed instead.");
+    }
+}
+////////////////////
+void ElementaryEffect :: execute(Context & ctx){
+    if(!ctx.attackCard)
+        return;
+
+    if(ctx.attackCard->get_Attack() == ctx.guessedValue){
+        ctx.ignoreAttack = true;
+        ctx.attackCard->set_ApplyEffects(false);
+        ctx.log.push_back("Prediction correct - attack ignored.");
+    }
+    else{
+        ctx.log.push_back("Prediction incorrect.");
+    }
+}
+////////////////////
+void DeduceStrategyEffect :: execute(Context & ctx){
+    if(!ctx.effectCard)
+        return;
+
+    int boost = ctx.effectCard->get_Boost();
+
+    if(ctx.effectCard == ctx.attackCard && ctx.defenseCard){
+        int delta = boost - ctx.defenseCard->get_Defense();
+        ctx.defenseCard->set_Defence(delta);
+    }
+    else if(ctx.effectCard == ctx.defenseCard && ctx.attackCard){
+        int delta = boost - ctx.attackCard->get_Attack();
+        ctx.attackCard->set_Attack(delta);
+    }
 }
 
 vector<unique_ptr<Effect>> Make_Effect(vector<Effect *> effects){
