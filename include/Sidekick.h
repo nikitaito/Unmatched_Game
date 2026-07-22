@@ -10,6 +10,7 @@ class Sidekick
         CharacterType name;
         Attacktype attacktype;
         int Health;
+        int Health_max;
         int Movement;
 
     public:
@@ -20,6 +21,7 @@ class Sidekick
         Attacktype get_Attacktype() const;
         int get_Movement() const;    
         int get_Health() const;
+        int get_Health_max() const;
         CharacterType get_name() const;
 
         void Damage(int);

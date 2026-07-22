@@ -3,7 +3,7 @@
 using namespace std;
 
 Heroes::Heroes(CharacterType name, Attacktype attacktype, Style style , int Health, int Movement)
-    : name(name), attacktype(attacktype), style(style) , Health(Health), Movement(Movement) , Health_max(Health) {}
+    : name(name), attacktype(attacktype), style(style) , Health(Health), Health_max(Health) , Movement(Movement) {}
 
 CharacterType Heroes::get_name() const
 {
@@ -42,14 +42,17 @@ void Heroes :: Damage(int x){
 
 void Heroes :: Heal(int x){
     Health += x;
+    if(Health > Health_max)
+        Health = Health_max;
 }
 
 void Heroes::set_Health(int amount)
 {
-    if (Health + 2 > 13)
-        Health = 13;
-    else
-        this->Health += amount;
+    Health = amount;
+    if (Health > Health_max)
+        Health = Health_max;
+    if (Health < 0)
+        Health = 0;
 }
 
 vector<Card>& Heroes :: get_deck_cards() {

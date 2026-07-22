@@ -3,7 +3,7 @@
 using namespace std;
 
 Sidekick::Sidekick(CharacterType name, Attacktype attacktype, int Health, int Movement)
-    : name(name), attacktype(attacktype), Health(Health), Movement(Movement) {}
+    : name(name), attacktype(attacktype), Health(Health), Health_max(Health), Movement(Movement) {}
 
 bool Sidekick::get_islive() const
 {
@@ -26,6 +26,11 @@ int Sidekick::get_Health() const
     return Health;
 }
 
+int Sidekick::get_Health_max() const
+{
+    return Health_max;
+}
+
 int Sidekick::get_Movement() const
 {
     return Movement;
@@ -45,6 +50,8 @@ void Sidekick :: Damage(int x)
 
 void Sidekick :: Heal(int x){
     Health += x;
+    if(Health > Health_max)
+        Health = Health_max;
 }
 
 Sidekick::~Sidekick() = default;
