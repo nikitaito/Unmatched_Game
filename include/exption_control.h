@@ -3,6 +3,8 @@
 #define exption_conrol
 
 #include<exception>
+#include<stdexcept>
+#include<string>
 
 class NoSpaceException : public std::runtime_error {
     public:

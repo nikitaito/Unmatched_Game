@@ -8,12 +8,15 @@ class Game;
 class Card;
 #include"Enums.h"
 #include<functional>
+#include<memory>
+#include<vector>
+#include<string>
 
 struct  Context
 {
     Player* ownplayer = nullptr;
     Player* targetplayer = nullptr;
-    CombatResult result;
+    CombatResult result = CombatResult::Tie;
 
     Heroes* ownhero = nullptr;
     Sidekick* ownsidekick = nullptr;
@@ -28,13 +31,15 @@ struct  Context
 
     std :: vector<CardName> remove ;
 
-    /// move information
-    int current_space;
-    int target_space;
-    CharacterType chtype;
+    int current_space = -1;
+    int target_space = -1;
+    CharacterType chtype = CharacterType::SherlockHolmes;
     bool Allow_hidden_way = false;
 
-
+    int guessedValue = 0;
+    bool guessAttack = true;      
+    bool ignoreAttack = false;    
+    std :: vector<std :: string> log;
 
 };
 
@@ -156,6 +161,24 @@ class Disable_effects : public Effect
 };
 
 class See_the_deck : public Effect
+{
+    public:
+        virtual void execute(Context &) override;
+};
+
+class ConfirmSuspicionEffect : public Effect
+{
+    public:
+        virtual void execute(Context &) override;
+};
+
+class ElementaryEffect : public Effect
+{
+    public:
+        virtual void execute(Context &) override;
+};
+
+class DeduceStrategyEffect : public Effect
 {
     public:
         virtual void execute(Context &) override;
