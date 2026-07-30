@@ -357,12 +357,21 @@ bool Game :: PlayScheme(Player * p , int handIndex , int current_space , int tar
     if(!ResolveActingFighter(p , c.get_usertype() , actingHero , actingSidekick , err))
         return false;
 
+    Player * opponent = get_opponent(p);
+    if(c.get_CardName() == CardName :: Eliminate_The_Impossible){
+        int idx = guessedValue - 1;
+        if(idx < 0 || idx >= static_cast<int>(opponent->get_hand_cards().size())){
+            err = "Invalid opponent card index. Usage: scheme <index> <current> <target> <opponent_card_index>";
+            return false;
+        }
+    }
+
     Card played = p->take_hand_card(handIndex);
 
     Context ctx;
     ctx.game = this;
     ctx.ownplayer = p;
-    ctx.targetplayer = get_opponent(p);
+    ctx.targetplayer = opponent;
     ctx.ownhero = p->get_hero();
     ctx.ownsidekick = actingSidekick;
     ctx.targethero = ctx.targetplayer->get_hero();
@@ -375,6 +384,12 @@ bool Game :: PlayScheme(Player * p , int handIndex , int current_space , int tar
     ctx.chtype = actingSidekick ? actingSidekick->get_name() : ctx.ownhero->get_name();
     ctx.guessedValue = guessedValue;
     ctx.guessAttack = guessAttack;
+
+    if(played.get_CardName() == CardName :: Eliminate_The_Impossible){
+        auto & oppHand = ctx.targetplayer->get_hand_cards();
+        int idx = guessedValue - 1;
+        ctx.remove.push_back(oppHand[idx].get_CardName());
+    }
 
     for(auto & eff : played.get_effects()){
         if(played.get_ApplyEffects())

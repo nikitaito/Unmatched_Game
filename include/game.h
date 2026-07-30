@@ -54,17 +54,13 @@ class Game
         void IncreaseAction(Player *);
         void ChangeTurn();
 
-        
         bool ResolveActingFighter(Player * , Usertype , Heroes *& , Sidekick *& , std :: string &);
-
-       
+        
         bool Maneuver(Player * , std :: string &);
         bool MoveFighter(Player * , int from , int to , std :: string &);
 
-       
         bool PlayScheme(Player * , int handIndex , int current_space , int target_space , int guessedValue , bool guessAttack , std :: string & err , std :: vector<std :: string> & log);
 
-       
         bool DeclareAttack(Player * attacker , int attackerSpace , int targetSpace , std :: string & err);
         bool PlayAttackCard(int handIndex , std :: string & err);
         bool PlayDefenseCard(int handIndex , std :: string & err);
@@ -72,9 +68,7 @@ class Game
         std :: vector<std :: string> ResolveCombat();
         CombatStage get_CombatStage() const;
 
-
         bool BloodHarvest(Player * , int targetSpace , std :: string & err);
-
 
         bool CanEndTurn(Player *) const;
         bool DiscardExcess(Player * , int handIndex , std :: string & err);

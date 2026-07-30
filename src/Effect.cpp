@@ -55,6 +55,7 @@ Discard :: Discard(bool mode) : justremove(mode){}
 
 void Discard :: execute(Context & ctx){
     if(justremove){
+        // Eliminate the Impossible: discard a chosen card from the OPPONENT's hand.
         for (auto & it  : ctx.remove)
             ctx.targetplayer->remove_card(it);
     }
@@ -71,6 +72,8 @@ Boost_attack :: Boost_attack (CharacterType ch , bool mode) : chtype(ch) , siste
 
 void Boost_attack :: execute(Context & ctx){
     if(sistermode){
+        // Feeding Frenzy: +1 Attack for each Sister sharing a Zone with the
+        // opposing (target) fighter -- NOT the attacker's own zone.
         int i = 0;
         const auto & spaces = ctx.game->get_Board()->get_spaces();
         if(ctx.target_space >= 0 && ctx.target_space < static_cast<int>(spaces.size())){
@@ -101,6 +104,8 @@ void Boost_attack :: execute(Context & ctx){
 }
 /////////////////////////
 void Boost_deffence :: execute(Context & ctx){
+    // Look Into My Eyes: add the Boost value of the opponent's Attack card
+    // to this card's Defense value.
     if(!ctx.attackCard || !ctx.defenseCard)
         return;
 
@@ -118,17 +123,22 @@ ReplaceEffect :: ReplaceEffect(int x) : mode(x) {}
 
 void ReplaceEffect :: execute(Context & ctx){
     if(mode == 1){
+        // Master of Disguise: swap places with the opposing fighter.
         ctx.game->Replace(ctx.current_space  , ctx.target_space);
     }
     else if(mode == 2){
+        // Mistform: place Dracula on any (empty) space, then gain an extra action.
         ctx.game->Teleport(ctx.current_space , ctx.target_space);
         ctx.game->IncreaseAction(ctx.ownplayer);
     }
     else if(mode == 3){
+        // Thirst for Sustenance: if you win the combat, place Dracula on any
+        // space adjacent to the opposing fighter.
         if(ctx.result == CombatResult :: Win)
             ctx.game->Teleport(ctx.current_space , ctx.target_space);
     }
     else if(mode == 4){
+        // Administer Aid: place Dr. Watson in a space adjacent to Sherlock Holmes.
         ctx.game->Teleport(ctx.current_space , ctx.target_space);
     }
 }
@@ -152,6 +162,8 @@ void DamageIfAdjacent :: execute(Context & ctx){
         return;
 
     if(chtype == CharacterType :: Dracula){
+        // Prey Upon: deal damage to every OPPOSING fighter adjacent to Dracula
+        // (Sisters are never valid targets for this card).
         int self_space = ctx.game->get_Board()->find_space_of_hero(ctx.ownhero);
         if(self_space < 0)
             return;
@@ -172,6 +184,8 @@ void DamageIfAdjacent :: execute(Context & ctx){
         }
     }
     else if(chtype == CharacterType :: SherlockHolmes){
+        // Counterpunch: if Sherlock Holmes is adjacent to the opposing fighter
+        // that took part in this combat, deal extra damage to it.
         CharacterType selfType = ctx.ownhero->get_name();
         if(ctx.targethero){
             if(ctx.game->Adjacency(selfType , ctx.targethero->get_name()))
@@ -183,6 +197,8 @@ void DamageIfAdjacent :: execute(Context & ctx){
         }
     }
     else if(chtype == CharacterType :: Sister){
+        // Ravening Seduction: after moving the chosen fighter, deal 1 damage to
+        // IT for each Sister adjacent to its NEW space.
         int i = 0;
         if(ctx.target_space >= 0){
             const auto & spaces = ctx.game->get_Board()->get_spaces();
@@ -200,6 +216,9 @@ void DamageIfAdjacent :: execute(Context & ctx){
 }
 /////////////////////
 void Disable_effects :: execute(Context & ctx){
+    // Feint: cancel all effects on the OPPONENT's revealed combat card.
+    // ctx.effectCard identifies which side (attack/defense) is currently
+    // resolving, so the "other" card is the opponent's.
     if(ctx.effectCard == ctx.attackCard && ctx.defenseCard)
         ctx.defenseCard->set_ApplyEffects(false);
     else if(ctx.effectCard == ctx.defenseCard && ctx.attackCard)
@@ -207,6 +226,9 @@ void Disable_effects :: execute(Context & ctx){
 }
 ////////////////////
 void See_the_deck :: execute(Context & ctx){
+    // Study Methods: if you won the combat, you may look at your opponent's hand.
+    // Looking at a hand has no persistent game state -- it is reported through
+    // the context log so the caller (UI) can display it.
     if(ctx.result == CombatResult :: Win && ctx.targetplayer){
         ctx.log.push_back("Opponent's hand revealed.");
     }
@@ -243,6 +265,9 @@ void ConfirmSuspicionEffect :: execute(Context & ctx){
 }
 ////////////////////
 void ElementaryEffect :: execute(Context & ctx){
+    // Elementary: if the named Attack value matches the attacker's printed
+    // Attack value, ignore that Attack for damage purposes and cancel all
+    // (not-yet-resolved) effects on the attack card.
     if(!ctx.attackCard)
         return;
 
@@ -262,6 +287,8 @@ void DeduceStrategyEffect :: execute(Context & ctx){
 
     int boost = ctx.effectCard->get_Boost();
 
+    // Card's setters are additive (value += amount), so we compute the delta
+    // needed to make the printed value equal to `boost`.
     if(ctx.effectCard == ctx.attackCard && ctx.defenseCard){
         int delta = boost - ctx.defenseCard->get_Defense();
         ctx.defenseCard->set_Defence(delta);
