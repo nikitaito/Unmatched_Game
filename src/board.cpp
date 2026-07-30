@@ -227,13 +227,22 @@ bool Board :: Adjacency(CharacterType ch1 , CharacterType ch2){
 }
 
 void Board :: Swap(int a , int b){
-    Sidekick * sidekick_C = spaces[a].get_comrade();
-    Heroes * Hero_C = spaces[a].get_Hero();
+    Sidekick * sidekick_A = spaces[a].get_comrade();
+    Heroes * hero_A = spaces[a].get_Hero();
+    Sidekick * sidekick_B = spaces[b].get_comrade();
+    Heroes * hero_B = spaces[b].get_Hero();
 
-    spaces[a].set_comrades(spaces[b].get_comrade());
-    spaces[a].set_hero(spaces[b].get_Hero());
+    spaces[a].reset();
+    spaces[b].reset();
 
-    spaces[b].set_comrades(sidekick_C);
-    spaces[b].set_hero(Hero_C);
+    if(hero_B)
+        spaces[a].set_hero(hero_B);
+    if(sidekick_B)
+        spaces[a].set_comrades(sidekick_B);
+
+    if(hero_A)
+        spaces[b].set_hero(hero_A);
+    if(sidekick_A)
+        spaces[b].set_comrades(sidekick_A);
 }
 
