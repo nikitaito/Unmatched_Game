@@ -35,7 +35,7 @@ Board :: Board(){
     spaces.push_back(Space(25 , {20,21,24,26,27} , {} , {GRAY} ));
     spaces.push_back(Space(26 , {23,25,27} , {} , {GRAY , PURPULE} ));
     spaces.push_back(Space(27 , {25,26} , {} , {GRAY} ));
-    spaces.push_back(Space(28 , {6,7,29,30} , {} , {BROWN , GREEN , YELLOW} ));
+    spaces.push_back(Space(28 , {6,7,21,29,30} , {} , {BROWN , GREEN , YELLOW} ));
     spaces.push_back(Space(29 , {28,30,31} , {} , {YELLOW} ));
     spaces.push_back(Space(30 , {22,28,29} , {} , {YELLOW} ));
     spaces.push_back(Space(31 , {29} , {0 , 14 , 18} , {YELLOW}));

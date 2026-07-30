@@ -334,8 +334,7 @@ bool Game :: MoveFighter(Player * p , int fromSpace , int toSpace , std :: strin
     return true;
 }
 
-bool Game :: PlayScheme(Player * p , int handIndex , int current_space , int target_space ,
-                        int guessedValue , bool guessAttack , std :: string & err , std :: vector<std :: string> & log){
+bool Game :: PlayScheme(Player * p , int handIndex , int current_space , int target_space , int guessedValue , bool guessAttack , std :: string & err , std :: vector<std :: string> & log){
     if(p->get_aciton() <= 0){
         err = "No actions remaining this turn.";
         return false;
