@@ -56,7 +56,7 @@ class Game_page
     public:
         ftxui :: Component Make_Dashboard_dracula(Heroes*,int);
         ftxui :: Component Make_Dashboard_sherlock(Heroes*,int);
-        ftxui :: Component Make_card(const Card &);
+        ftxui :: Component Make_card(const Card & , int index);
         ftxui :: Component Make_hand_cards(const std :: vector<Card> &);
         ftxui :: Component Make_map(std :: vector <Space>);
         ftxui :: Component Make_command_input(Game *);

@@ -39,7 +39,7 @@ Component Help_page :: Make_page(Page& current_page) {
         "battle tells a different story.";
 
     auto paragraph_element = paragraph(help_text)
-                           | size(WIDTH, LESS_THAN, 60)  
+                           | size(WIDTH, LESS_THAN, 60)  // حداکثر عرض ۶۰ کاراکتر
                            | border
                            | center;
 
@@ -286,7 +286,7 @@ Component Game_page :: Make_Dashboard_sherlock(Heroes * hero, int dis){
     });
 }
 
-Component Game_page :: Make_card(const Card & card){
+Component Game_page :: Make_card(const Card & card , int index){
 
     Color col ;
     std :: string type;
@@ -452,8 +452,9 @@ Component Game_page :: Make_card(const Card & card){
     else
         Power = "ϟ";
 
-    return Renderer([col , type , card_name ,user_type , Power , boost , timing]{
+    return Renderer([col , type , card_name ,user_type , Power , boost , timing , index]{
         return vbox({
+            text("#" + std :: to_string(index)) | center | bold | color(Color :: White),
             text(type) | center | color(col) | bold,
             separator() | color(col),
             hbox({
@@ -469,7 +470,7 @@ Component Game_page :: Make_card(const Card & card){
             text(timing) | center | bold,
         })
         | size(WIDTH, EQUAL, 12)
-        | size(HEIGHT, EQUAL, 11)
+        | size(HEIGHT, EQUAL, 12)
         | borderStyled(col);
     }); 
 }
@@ -477,8 +478,8 @@ Component Game_page :: Make_card(const Card & card){
 Component Game_page :: Make_hand_cards (const std::vector<Card> & cards) {
     std::vector<Component> components;
 
-    for (auto& card : cards)
-        components.push_back(Make_card(card));
+    for (size_t i = 0; i < cards.size(); ++i)
+        components.push_back(Make_card(cards[i] , static_cast<int>(i) + 1));
 
     return Renderer([components = std::move(components)] {
         std::vector<Element> rows;
@@ -719,6 +720,8 @@ Component Game_page :: Make_game_command(){
             text("resolve - resolve the declared combat") | color(Color :: Yellow1),
             text("Action<Scheme> - begin the Scheme action") | color(Color :: Yellow1),
             text("scheme <index> <current> <target> [value] [A|D] - play a Scheme card") | color(Color :: Yellow1),
+            text("  (Confirm Suspicion: value=guess, A/D=which stat)") | color(Color :: Yellow1),
+            text("  (Eliminate the Impossible: value=opponent card # to discard)") | color(Color :: Yellow1),
             text("bloodharvest <target_space> - Dracula's start-of-turn ability") | color(Color :: Yellow1),
             text("discard <card_index> - discard down to 7 cards") | color(Color :: Yellow1),
             text("end - end your turn") | color(Color :: Yellow1),
@@ -726,7 +729,7 @@ Component Game_page :: Make_game_command(){
             text("deck - Show deck info") | color(Color :: Yellow1),
             text("help - Show this help") | color(Color :: Yellow1),
             text("quit - Quit game") | color(Color :: Yellow1),
-        }) | borderStyled(Color :: Yellow) | size(WIDTH, EQUAL, 60) | size(HEIGHT, EQUAL, 10);
+        }) | borderStyled(Color :: Yellow) | size(WIDTH, EQUAL, 74) | size(HEIGHT, EQUAL, 24);
     });
 }
 
