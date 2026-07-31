@@ -19,7 +19,8 @@ void HealIfAdjency :: execute(Context & ctx){
     if(ctx.ownsidekick && ctx.ownsidekick->get_name() == CharacterType ::Dr_Watson){
         if(ctx.game->Adjacency(CharacterType :: Dr_Watson , chtype)){
             ctx.ownsidekick->Heal(1);
-            ctx.targethero->Heal(1);
+            if(ctx.ownhero)
+                ctx.ownhero->Heal(1);
         }
     }
 }

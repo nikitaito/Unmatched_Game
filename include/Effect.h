@@ -23,8 +23,6 @@ struct  Context
     Heroes* targethero = nullptr;
     Sidekick* targetsidekick = nullptr;
 
-
-    
     Heroes* mover_hero = nullptr;
     Sidekick* mover_sidekick = nullptr;
 

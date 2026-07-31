@@ -399,10 +399,10 @@ bool Game :: PlayScheme(Player * p , int handIndex , int current_space , int tar
     ctx.targetplayer = opponent;
     ctx.ownhero = p->get_hero();
     ctx.ownsidekick = actingSidekick;
-
+    
     ctx.targethero = targetSpaceHero;
     ctx.targetsidekick = targetSpaceSidekick;
-
+    
     ctx.mover_hero = moverHero;
     ctx.mover_sidekick = moverSidekick;
     ctx.effectCard = &played;
