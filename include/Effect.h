@@ -37,10 +37,12 @@ struct  Context
     CharacterType chtype = CharacterType::SherlockHolmes;
     bool Allow_hidden_way = false;
 
+    int move_override_target = -1;
+
     /// prediction / information cards (Confirm Suspicion, Elementary)
     int guessedValue = 0;
-    bool guessAttack = true;      // true: naming an Attack value, false: a Defense value
-    bool ignoreAttack = false;    // set by Elementary when the prediction is correct
+    bool guessAttack = true;      
+    bool ignoreAttack = false;   
     std :: vector<std :: string> log;
 
 };
@@ -168,26 +170,20 @@ class See_the_deck : public Effect
         virtual void execute(Context &) override;
 };
 
-// Confirm Suspicion: name an Attack or Defense value; the opponent must discard a
-// card that prints that value (damage = discarded card's Boost). If no matching
-// card exists, the opponent's hand is revealed instead (logged, no state change).
+
 class ConfirmSuspicionEffect : public Effect
 {
     public:
         virtual void execute(Context &) override;
 };
 
-// Elementary: name the opponent's printed Attack value before it is revealed.
-// If correct, the attack is ignored for damage purposes and all effects on the
-// opposing combat card are cancelled.
+
 class ElementaryEffect : public Effect
 {
     public:
         virtual void execute(Context &) override;
 };
 
-// Deduce Strategy: replace the opponent's printed Attack or Defense value
-// (whichever role their card is playing) with this card's own Boost value.
 class DeduceStrategyEffect : public Effect
 {
     public:

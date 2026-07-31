@@ -618,7 +618,11 @@ void Game_page :: ExecuteCommand(Game * game){
             AddActionLog(actorType , "Combat is not ready to resolve yet.");
             return;
         }
-        auto log = game->ResolveCombat();
+        int moveDestination = -1;
+        if(!(iss >> moveDestination)) 
+            moveDestination = -1;  
+                                       
+        auto log = game->ResolveCombat(moveDestination);
         for(auto & line : log)
             AddActionLog(actorType , line);
         AcSt = Action_State :: None;
@@ -717,7 +721,7 @@ Component Game_page :: Make_game_command(){
             text("attack <from> <to> - declare attacker/target") | color(Color :: Yellow1),
             text("play <card_index> - play the pending Attack/Defense card (1-based)") | color(Color :: Yellow1),
             text("skip - skip playing a Defense card") | color(Color :: Yellow1),
-            text("resolve - resolve the declared combat") | color(Color :: Yellow1),
+            text("resolve [destination] - resolve the declared combat (destination is only needed for After-combat move cards like Dash / The Game Is Afoot)") | color(Color :: Yellow1),
             text("Action<Scheme> - begin the Scheme action") | color(Color :: Yellow1),
             text("scheme <index> <current> <target> [value] [A|D] - play a Scheme card") | color(Color :: Yellow1),
             text("  (Confirm Suspicion: value=guess, A/D=which stat)") | color(Color :: Yellow1),

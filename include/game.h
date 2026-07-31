@@ -65,7 +65,7 @@ class Game
         bool PlayAttackCard(int handIndex , std :: string & err);
         bool PlayDefenseCard(int handIndex , std :: string & err);
         void SkipDefense();
-        std :: vector<std :: string> ResolveCombat();
+        std :: vector<std :: string> ResolveCombat(int moveDestination = -1);
         CombatStage get_CombatStage() const;
 
         bool BloodHarvest(Player * , int targetSpace , std :: string & err);
