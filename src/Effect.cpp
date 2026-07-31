@@ -55,14 +55,12 @@ Discard :: Discard(bool mode) : justremove(mode){}
 
 void Discard :: execute(Context & ctx){
     if(justremove){
-        // Eliminate the Impossible: discard a chosen card from the OPPONENT's hand.
         for (auto & it  : ctx.remove)
             ctx.targetplayer->remove_card(it);
     }
     else{
         for (auto & it  : ctx.remove){
-            int attack = ctx.attackCard->get_Attack() ;
-            ctx.attackCard->set_Attack(attack + 1);
+            ctx.attackCard->set_Attack(1);
             ctx.ownplayer->remove_card(it);
         }
     }
@@ -72,14 +70,12 @@ Boost_attack :: Boost_attack (CharacterType ch , bool mode) : chtype(ch) , siste
 
 void Boost_attack :: execute(Context & ctx){
     if(sistermode){
-        // Feeding Frenzy: +1 Attack for each Sister sharing a Zone with the
-        // opposing (target) fighter -- NOT the attacker's own zone.
         int i = 0;
         const auto & spaces = ctx.game->get_Board()->get_spaces();
         if(ctx.target_space >= 0 && ctx.target_space < static_cast<int>(spaces.size())){
             const auto & target_zones = spaces[ctx.target_space].get_zone();
             for(const auto & sp : spaces){
-                if(sp.get_comrade() && sp.get_comrade()->get_name() == chtype){
+                if(sp.get_comrade() && sp.get_comrade()->get_name() == chtype && sp.get_comrade()->get_islive()){
                     const auto & sister_zones = sp.get_zone();
                     bool shared = false;
                     for(auto z : sister_zones){
@@ -93,13 +89,11 @@ void Boost_attack :: execute(Context & ctx){
                 }
             }
         }
-        int attack = ctx.attackCard->get_Attack();
-        ctx.attackCard->set_Attack(attack + i);
+        ctx.attackCard->set_Attack(i);
     }
     else{
         int boost = ctx.game->Rand_Discard(ctx.targetplayer);
-        int attack = ctx.attackCard->get_Attack();
-        ctx.attackCard->set_Attack(attack + boost);
+        ctx.attackCard->set_Attack(boost);
     }
 }
 /////////////////////////
@@ -287,8 +281,6 @@ void DeduceStrategyEffect :: execute(Context & ctx){
 
     int boost = ctx.effectCard->get_Boost();
 
-    // Card's setters are additive (value += amount), so we compute the delta
-    // needed to make the printed value equal to `boost`.
     if(ctx.effectCard == ctx.attackCard && ctx.defenseCard){
         int delta = boost - ctx.defenseCard->get_Defense();
         ctx.defenseCard->set_Defence(delta);
