@@ -573,7 +573,7 @@ CombatStage Game :: get_CombatStage() const{
     return combatStage;
 }
 
-std :: vector<std :: string> Game :: ResolveCombat(int moveDestination){
+std :: vector<std :: string> Game :: ResolveCombat(int moveDestination, std :: vector<int> boostDiscardIndices){
     vector<string> log;
     if(combatStage != CombatStage :: Ready){
         log.push_back("Combat is not ready to resolve.");
@@ -587,6 +587,13 @@ std :: vector<std :: string> Game :: ResolveCombat(int moveDestination){
     ctx.current_space = combatAttackerSpace;
     ctx.target_space = combatDefenderSpace;
     ctx.move_override_target = moveDestination;
+    {
+        auto & atkHand = combatAttackerPlayer->get_hand_cards();
+        for(int idx : boostDiscardIndices){
+            if(idx >= 0 && idx < static_cast<int>(atkHand.size()))
+                ctx.remove.push_back(atkHand[idx].get_CardName());
+        }
+    }
 
     auto setPerspectiveAttacker = [&](){
         ctx.ownplayer = combatAttackerPlayer;

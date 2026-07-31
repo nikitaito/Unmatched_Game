@@ -619,10 +619,16 @@ void Game_page :: ExecuteCommand(Game * game){
             return;
         }
         int moveDestination = -1;
-        if(!(iss >> moveDestination)) 
-            moveDestination = -1;  
-                                       
-        auto log = game->ResolveCombat(moveDestination);
+        std :: vector<int> discardIndices;
+        if(iss >> moveDestination){
+            int extra;
+            while(iss >> extra)
+                discardIndices.push_back(extra - 1);
+        }
+        else{
+            moveDestination = -1;
+        }
+        auto log = game->ResolveCombat(moveDestination , discardIndices);
         for(auto & line : log)
             AddActionLog(actorType , line);
         AcSt = Action_State :: None;
@@ -721,8 +727,9 @@ Component Game_page :: Make_game_command(){
             text("attack <from> <to> - declare attacker/target") | color(Color :: Yellow1),
             text("play <card_index> - play the pending Attack/Defense card (1-based)") | color(Color :: Yellow1),
             text("skip - skip playing a Defense card") | color(Color :: Yellow1),
-            text("resolve [destination] - resolve the declared combat (destination is only ") | color(Color :: Yellow1),
-            text("  needed for After-combat move cards like Dash / The Game Is Afoot)") | color(Color :: Yellow1),
+            text("resolve [destination] [discard_idx...] - resolve the declared combat") | color(Color :: Yellow1),
+            text("  (destination needed for After-combat move cards like Dash / The Game Is Afoot)") | color(Color :: Yellow1),
+            text("  (Beastform: discard_idx... = hand card #s to discard for +1 Attack each)") | color(Color :: Yellow1),
             text("Action<Scheme> - begin the Scheme action") | color(Color :: Yellow1),
             text("scheme <index> <current> <target> [value] [A|D] - play a Scheme card") | color(Color :: Yellow1),
             text("  (Confirm Suspicion: value=guess, A/D=which stat)") | color(Color :: Yellow1),
@@ -734,7 +741,7 @@ Component Game_page :: Make_game_command(){
             text("deck - Show deck info") | color(Color :: Yellow1),
             text("help - Show this help") | color(Color :: Yellow1),
             text("quit - Quit game") | color(Color :: Yellow1),
-        }) | borderStyled(Color :: Yellow) | size(WIDTH, EQUAL, 74) | size(HEIGHT, EQUAL, 24);
+        }) | borderStyled(Color :: Yellow) | size(WIDTH, EQUAL, 74) | size(HEIGHT, EQUAL, 26);
     });
 }
 
