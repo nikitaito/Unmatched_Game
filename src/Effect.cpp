@@ -98,8 +98,6 @@ void Boost_attack :: execute(Context & ctx){
 }
 /////////////////////////
 void Boost_deffence :: execute(Context & ctx){
-    // Look Into My Eyes: add the Boost value of the opponent's Attack card
-    // to this card's Defense value.
     if(!ctx.attackCard || !ctx.defenseCard)
         return;
 
@@ -196,10 +194,10 @@ void DamageIfAdjacent :: execute(Context & ctx){
                     i++;
             }
         }
-        if(ctx.targethero)
-            ctx.targethero->Damage(i);
-        else if(ctx.targetsidekick)
-            ctx.targetsidekick->Damage(i);
+        if(ctx.mover_hero)
+            ctx.mover_hero->Damage(i);
+        else if(ctx.mover_sidekick)
+            ctx.mover_sidekick->Damage(i);
     }
 
 }

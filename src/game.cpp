@@ -378,14 +378,33 @@ bool Game :: PlayScheme(Player * p , int handIndex , int current_space , int tar
 
     Card played = p->take_hand_card(handIndex);
 
+    Heroes * moverHero = nullptr;
+    Sidekick * moverSidekick = nullptr;
+    if(board.valid_space(current_space)){
+        auto & spaces = board.get_spaces();
+        moverHero = spaces[current_space].get_Hero();
+        moverSidekick = spaces[current_space].get_comrade();
+    }
+    Heroes * targetSpaceHero = nullptr;
+    Sidekick * targetSpaceSidekick = nullptr;
+    if(board.valid_space(target_space)){
+        auto & spaces = board.get_spaces();
+        targetSpaceHero = spaces[target_space].get_Hero();
+        targetSpaceSidekick = spaces[target_space].get_comrade();
+    }
+
     Context ctx;
     ctx.game = this;
     ctx.ownplayer = p;
     ctx.targetplayer = opponent;
     ctx.ownhero = p->get_hero();
     ctx.ownsidekick = actingSidekick;
-    ctx.targethero = ctx.targetplayer->get_hero();
-    ctx.targetsidekick = nullptr;
+
+    ctx.targethero = targetSpaceHero;
+    ctx.targetsidekick = targetSpaceSidekick;
+
+    ctx.mover_hero = moverHero;
+    ctx.mover_sidekick = moverSidekick;
     ctx.effectCard = &played;
     ctx.attackCard = nullptr;
     ctx.defenseCard = nullptr;
