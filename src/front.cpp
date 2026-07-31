@@ -623,7 +623,7 @@ void Game_page :: ExecuteCommand(Game * game){
         if(iss >> moveDestination){
             int extra;
             while(iss >> extra)
-                discardIndices.push_back(extra - 1);
+                discardIndices.push_back(extra - 1); // hand indices shown 1-based
         }
         else{
             moveDestination = -1;
@@ -741,7 +741,7 @@ Component Game_page :: Make_game_command(){
             text("deck - Show deck info") | color(Color :: Yellow1),
             text("help - Show this help") | color(Color :: Yellow1),
             text("quit - Quit game") | color(Color :: Yellow1),
-        }) | borderStyled(Color :: Yellow) | size(WIDTH, EQUAL, 74) | size(HEIGHT, EQUAL, 26);
+        }) | borderStyled(Color :: Yellow) | size(WIDTH, EQUAL, 74) | size(HEIGHT, EQUAL, 24);
     });
 }
 
