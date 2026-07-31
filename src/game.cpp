@@ -109,6 +109,15 @@ Board * Game :: get_Board(){
     return &board;
 }
 
+void Game :: RemoveDefeatedSidekicks(){
+    auto & spaces = board.get_spaces_mut();
+    for(auto & sp : spaces){
+        Sidekick * s = sp.get_comrade();
+        if(s && !s->get_islive())
+            board.reset_space(sp.get_id());
+    }
+}
+
 void Game :: DrawCard(Player * player , int x){
     for(int i = 0 ; i < x ; i++){ 
         if(((player->get_hero())->get_deck_cards()).empty()){
@@ -117,6 +126,7 @@ void Game :: DrawCard(Player * player , int x){
                 it->Damage(2);
             }
             player->get_hero()->Damage(2);
+            RemoveDefeatedSidekicks();
         }
         else{
 
@@ -399,6 +409,7 @@ bool Game :: PlayScheme(Player * p , int handIndex , int current_space , int tar
     log = ctx.log;
     p->discard_card(std :: move(played));
     DecreaseAction(p);
+    RemoveDefeatedSidekicks();
     return true;
 }
 
@@ -667,6 +678,8 @@ std :: vector<std :: string> Game :: ResolveCombat(int moveDestination){
     combatDefenderSidekick = nullptr;
     combatHasDefense = false;
 
+    RemoveDefeatedSidekicks();
+
     return log;
 }
 
@@ -710,6 +723,7 @@ bool Game :: BloodHarvest(Player * p , int targetSpace , std :: string & err){
 
     DrawCard(p , 1);
     bloodHarvestUsedThisTurn = true;
+    RemoveDefeatedSidekicks();
     return true;
 }
 

@@ -721,7 +721,8 @@ Component Game_page :: Make_game_command(){
             text("attack <from> <to> - declare attacker/target") | color(Color :: Yellow1),
             text("play <card_index> - play the pending Attack/Defense card (1-based)") | color(Color :: Yellow1),
             text("skip - skip playing a Defense card") | color(Color :: Yellow1),
-            text("resolve [destination] - resolve the declared combat (destination is only needed for After-combat move cards like Dash / The Game Is Afoot)") | color(Color :: Yellow1),
+            text("resolve [destination] - resolve the declared combat (destination is only ") | color(Color :: Yellow1),
+            text("  needed for After-combat move cards like Dash / The Game Is Afoot)") | color(Color :: Yellow1),
             text("Action<Scheme> - begin the Scheme action") | color(Color :: Yellow1),
             text("scheme <index> <current> <target> [value] [A|D] - play a Scheme card") | color(Color :: Yellow1),
             text("  (Confirm Suspicion: value=guess, A/D=which stat)") | color(Color :: Yellow1),
@@ -845,9 +846,6 @@ Component Game_page::Make_location_info(Space space) {
 }
 
 Component Game_page :: Make_page(Page& current_page , Game* game , Space * space){
-    // const std :: vector<Card> & c1 = game->get_player_of_hero(CharacterType :: Dracula)->get_hand_cards();
-    // const std :: vector<Card> & c2 = game->get_player_of_hero(CharacterType ::SherlockHolmes)->get_hand_cards();
-    ////////////////////////////
     left = Renderer([this , game]{
         return vbox({
             Make_Dashboard_dracula(game->get_player_of_hero(CharacterType :: Dracula)->get_hero(), game->get_player_of_hero(CharacterType :: Dracula)->get_dis_cards().size())->Render(),

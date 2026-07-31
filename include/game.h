@@ -32,6 +32,7 @@ class Game
 
         void PlaceStartingSidekicks(Player * , int heroSpace);
         Usertype UsertypeOf(CharacterType) const;
+        void RemoveDefeatedSidekicks();
 
     public:
 
