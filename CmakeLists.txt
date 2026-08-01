@@ -6,8 +6,8 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
-
 find_package(ftxui REQUIRED)
+find_package(raylib REQUIRED)
 
 add_executable(MyProject
     src/front.cpp
@@ -33,4 +33,5 @@ target_link_libraries(MyProject PRIVATE
     ftxui::screen
     ftxui::dom
     ftxui::component
+    raylib
 )
