@@ -23,6 +23,7 @@ Player* Game :: get_player_of_hero(CharacterType chtype){
 Player * Game :: get_turn(){
     return turn;
 }
+
 void Game :: choose (pair< int , CharacterType > p1 , pair< int , CharacterType > p2){
     player1.set_name("Player one");
     player2.set_name("Player two");
