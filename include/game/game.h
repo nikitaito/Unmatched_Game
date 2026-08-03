@@ -1,7 +1,7 @@
 #ifndef GAME_H
 #define GAME_H
 #include "Player.h"
-#include "board.h"
+#include "board/board.h"
 #include "exption_control.h"
 #include <string>
 #include <vector>

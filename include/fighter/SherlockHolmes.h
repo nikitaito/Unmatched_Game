@@ -1,7 +1,6 @@
 #pragma once
 
 #include "Heroes.h"
-#include "Card.h"
 #include "Enums.h"
 
 #include <vector>

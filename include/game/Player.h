@@ -1,12 +1,12 @@
 #ifndef PLAYER_H
 #define PLAYER_H
 
-#include "Heroes.h"
+#include "fighter/Heroes.h"
 #include "Enums.h"
-#include "SherlockHolmes.h"
-#include "Dracula.h"
-#include "Sidekick.h"
-#include "Card.h"
+#include "fighter/SherlockHolmes.h"
+#include "fighter/Dracula.h"
+#include "fighter/Sidekick.h"
+#include "card/Card.h"
 #include <string>
 
 class Player

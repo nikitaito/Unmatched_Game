@@ -3,8 +3,8 @@
 
 #include<vector>
 #include"Enums.h"
-#include"SherlockHolmes.h"
-#include"Dracula.h"
+#include"fighter/SherlockHolmes.h"
+#include"fighter/Dracula.h"
 
 class Space
 {

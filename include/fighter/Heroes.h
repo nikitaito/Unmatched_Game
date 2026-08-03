@@ -2,7 +2,7 @@
 
 #include <string>
 #include <vector>
-#include "Card.h"
+#include "card/Card.h"
 #include "Enums.h"
 #include "Sisters.h"
 #include "Dr_Watson.h"
