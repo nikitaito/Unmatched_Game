@@ -10,18 +10,18 @@ find_package(ftxui REQUIRED)
 find_package(raylib REQUIRED)
 
 add_executable(MyProject
-    src/front.cpp
+    src/front/front.cpp
     src/ftxuimain.cpp
     src/board.cpp
     src/Card.cpp 
-    src/Dr_Watson.cpp 
-    src/Dracula.cpp
+    src/fighter/Dr_Watson.cpp 
+    src/fighter/Dracula.cpp
     src/game.cpp 
-    src/Heroes.cpp 
+    src/fighter/Heroes.cpp 
     src/Player.cpp 
-    src/SherlockHolmes.cpp
-    src/Sidekick.cpp 
-    src/Sisters.cpp 
+    src/fighter/SherlockHolmes.cpp
+    src/fighter/Sidekick.cpp 
+    src/fighter/Sisters.cpp 
     src/space.cpp
     src/Effect.cpp
     
