@@ -12,18 +12,18 @@ find_package(raylib REQUIRED)
 add_executable(MyProject
     src/front/front.cpp
     src/ftxuimain.cpp
-    src/board.cpp
-    src/Card.cpp 
+    src/board/board.cpp
+    src/card/Card.cpp 
     src/fighter/Dr_Watson.cpp 
     src/fighter/Dracula.cpp
-    src/game.cpp 
+    src/game/game.cpp 
     src/fighter/Heroes.cpp 
-    src/Player.cpp 
+    src/game/Player.cpp 
     src/fighter/SherlockHolmes.cpp
     src/fighter/Sidekick.cpp 
     src/fighter/Sisters.cpp 
-    src/space.cpp
-    src/Effect.cpp
+    src/board/space.cpp
+    src/card/Effect.cpp
     
 )
 
