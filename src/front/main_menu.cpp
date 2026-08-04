@@ -39,6 +39,11 @@ void Menu :: make_Page(Page & current_page){
     InitWindow(screenWidth, screenHeight, "UNMATCHED - Main Menu");
     SetTargetFPS(60);
 
+    Texture2D background = LoadTexture("../../assets/background.png");
+    Font titleFont    = LoadFontEx("../../assets/Cinzel-Bold.ttf", 128, 0, 0);
+    Font subtitleFont = LoadFontEx("../../assets/Cinzel-Bold.ttf", 64, 0, 0);
+    Font buttonFont   = LoadFontEx("../../assets/Cinzel-SemiBold.ttf", 64, 0, 0);
+
     SetTextureFilter(titleFont.texture, TEXTURE_FILTER_BILINEAR);
     SetTextureFilter(subtitleFont.texture, TEXTURE_FILTER_BILINEAR);
     SetTextureFilter(buttonFont.texture, TEXTURE_FILTER_BILINEAR);
@@ -117,6 +122,8 @@ void Menu :: make_Page(Page & current_page){
         DrawMenuButton(startBtn, startRect, buttonFont, mousePos, mouseDown);
         DrawMenuButton(loadBtn, loadRect, buttonFont, mousePos, mouseDown);
         DrawMenuButton(exitBtn, exitRect, buttonFont, mousePos, mouseDown);
+
+        EndDrawing();
         
         if(is_clicked(startRect , mousePos)){
             current_page = Page :: Age;
@@ -127,10 +134,14 @@ void Menu :: make_Page(Page & current_page){
             break;
         }
         else if(is_clicked (exitRect , mousePos)){
+            current_page = Page :: Exit;
             break;
         }
-            
-        EndDrawing();
+    }
+
+    if (WindowShouldClose())
+    {
+        current_page = Page::Exit;
     }
 
     UnloadFont(titleFont);
