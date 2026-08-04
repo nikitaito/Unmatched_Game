@@ -1,7 +1,7 @@
 
 #include "front/main_menu.h"
 
-void menu :: DrawMenuButton(MenuButton& btn, Rectangle rect, Font font,Vector2 mousePos, bool mouseDown){
+void Menu :: DrawMenuButton(MenuButton& btn, Rectangle rect, Font font,Vector2 mousePos, bool mouseDown){
     bool hover = CheckCollisionPointRec(mousePos, rect);
 
     Color bg = btn.idleBg;
@@ -26,7 +26,12 @@ void menu :: DrawMenuButton(MenuButton& btn, Rectangle rect, Font font,Vector2 m
     DrawTextEx(font, btn.text, textPos, (float)btn.fontSize, 2.0f, textColor);
 }
 
-void menu :: make_Page(){
+bool Menu :: is_clicked(Rectangle rect , Vector2 mousePos){
+    bool hover = CheckCollisionPointRec(mousePos, rect);
+    return hover && IsMouseButtonPressed(MOUSE_BUTTON_LEFT);
+}
+
+void Menu :: make_Page(Page & current_page){
     const int screenWidth = 1280;
     const int screenHeight = 720;
 
@@ -112,7 +117,19 @@ void menu :: make_Page(){
         DrawMenuButton(startBtn, startRect, buttonFont, mousePos, mouseDown);
         DrawMenuButton(loadBtn, loadRect, buttonFont, mousePos, mouseDown);
         DrawMenuButton(exitBtn, exitRect, buttonFont, mousePos, mouseDown);
-
+        
+        if(is_clicked(startRect , mousePos)){
+            current_page = Page :: Age;
+            break;
+        }
+        else if(is_clicked(loadRect , mousePos)){
+            current_page = Page :: Help;
+            break;
+        }
+        else if(is_clicked (exitRect , mousePos)){
+            break;
+        }
+            
         EndDrawing();
     }
 
