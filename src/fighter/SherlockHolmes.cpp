@@ -1,5 +1,5 @@
 
-#include "SherlockHolmes.h"
+#include "fighter/SherlockHolmes.h"
 #include <random>
 using namespace std;
 

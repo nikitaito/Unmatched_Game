@@ -1,5 +1,5 @@
 
-#include "Heroes.h"
+#include "fighter/Heroes.h"
 using namespace std;
 
 Heroes::Heroes(CharacterType name, Attacktype attacktype, Style style , int Health, int Movement)

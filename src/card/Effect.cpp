@@ -1,5 +1,5 @@
-#include "Effect.h"
-#include "game.h"
+#include "card/Effect.h"
+#include "game/game.h"
 #include <algorithm>
 
 using namespace std;

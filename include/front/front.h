@@ -7,8 +7,8 @@
 #include <ftxui/dom/elements.hpp>
 #include <ftxui/dom/canvas.hpp>
 #include <vector>
-#include "game.h"
-#include "Card.h"
+#include "game/game.h"
+#include "card/Card.h"
 #include "Enums.h"
 
 class Main_menu

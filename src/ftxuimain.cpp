@@ -1,5 +1,5 @@
 
-#include "front.h"
+#include "front/front.h"
 #include <ctime>
 
 using namespace ftxui;

@@ -1,4 +1,4 @@
-#include "space.h"
+#include "board/space.h"
 #include "exption_control.h"
 using namespace std;
 

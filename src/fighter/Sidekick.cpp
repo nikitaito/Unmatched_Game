@@ -1,4 +1,4 @@
-#include "Sidekick.h"
+#include "fighter/Sidekick.h"
 
 using namespace std;
 

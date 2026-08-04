@@ -1,4 +1,4 @@
-#include "Card.h"
+#include "card/Card.h"
 using namespace std;
 Card::Card(CardName name, CardTiming timing, CardType cardtype , Usertype usertype, int Attack, int Defense, int Boost , vector<unique_ptr<Effect>> Effects )
     : name(name), timing(timing), cardtype(cardtype) , usertype(usertype) , Attack(Attack) , Defense(Defense), Boost(Boost) , Effects(std :: move(Effects)){}
