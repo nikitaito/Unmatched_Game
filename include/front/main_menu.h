@@ -20,6 +20,7 @@ struct MenuButton
 class menu
 {
     private:
+        void DrawMenuButton(MenuButton&, Rectangle, Font,Vector2, bool);
     public:
         void make_Page();
 
