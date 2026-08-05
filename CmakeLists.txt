@@ -25,6 +25,7 @@ add_executable(MyProject
     src/board/space.cpp
     src/card/Effect.cpp
     src/front/main_menu.cpp
+    src/front/age_page.cpp
     
 )
 
