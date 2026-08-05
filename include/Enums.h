@@ -94,6 +94,7 @@ enum class Page {
     Help,
     Age,
     Exit,
+    Choose,
     Game,
     End
 };
