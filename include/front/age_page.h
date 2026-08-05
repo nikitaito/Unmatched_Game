@@ -22,6 +22,7 @@ class AgePage
 {
     private:
         bool DrawMenuButton(MenuButton& , Rectangle , Font ,Vector2 , bool);
+        bool DrawNumberInput(Rectangle , char* , int , bool , Font , Vector2 , Color , Color , Color , Color , Color);
     public:
         
 };

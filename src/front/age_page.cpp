@@ -1,7 +1,6 @@
 #include "front/age_page.h"
 
-bool AgePage :: DrawMenuButton(MenuButton& btn, Rectangle rect, Font font,Vector2 mousePos, bool mouseDown)
-{
+bool AgePage :: DrawMenuButton(MenuButton& btn, Rectangle rect, Font font,Vector2 mousePos, bool mouseDown){
     bool hover = CheckCollisionPointRec(mousePos, rect);
     bool clicked = hover && IsMouseButtonPressed(MOUSE_BUTTON_LEFT);
 
@@ -28,3 +27,39 @@ bool AgePage :: DrawMenuButton(MenuButton& btn, Rectangle rect, Font font,Vector
 
     return clicked;
 }
+
+bool AgePage :: DrawNumberInput(Rectangle rect, char* buffer, int maxLen, bool isActive, Font font, Vector2 mousePos, Color bgColor, Color activeBorder, Color idleBorder, Color textColor, Color placeholderColor){
+    bool hover = CheckCollisionPointRec(mousePos, rect);
+    bool clicked = hover && IsMouseButtonPressed(MOUSE_BUTTON_LEFT);
+
+    DrawRectangleRounded(rect, 0.1f, 6, bgColor);
+    DrawRectangleRoundedLines(rect, 0.1f, 6, isActive ? activeBorder : idleBorder);
+
+    int len = (int)strlen(buffer);
+    float fontSize = rect.height * 0.4f;
+
+    if (len == 0 && !isActive)
+    {
+        const char* placeholder = "Enter age";
+        Vector2 size = MeasureTextEx(font, placeholder, fontSize, 1.0f);
+        Vector2 pos = { rect.x + rect.width / 2 - size.x / 2, rect.y + rect.height / 2 - size.y / 2 };
+        DrawTextEx(font, placeholder, pos, fontSize, 1.0f, placeholderColor);
+    }
+    else
+    {
+        Vector2 size = MeasureTextEx(font, buffer, fontSize, 1.0f);
+        Vector2 pos = { rect.x + rect.width / 2 - size.x / 2, rect.y + rect.height / 2 - size.y / 2 };
+        DrawTextEx(font, buffer, pos, fontSize, 1.0f, textColor);
+
+  
+        if (isActive && (int)(GetTime() * 2) % 2 == 0)
+        {
+            float cursorX = pos.x + size.x + 4;
+            DrawLine((int)cursorX, (int)(rect.y + rect.height * 0.25f),
+                     (int)cursorX, (int)(rect.y + rect.height * 0.75f), textColor);
+        }
+    }
+
+    return clicked;
+}
+
