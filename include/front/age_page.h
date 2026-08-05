@@ -1,4 +1,3 @@
-
 #ifndef AGE_PAGE
 #define AGE_PAGE
 
@@ -6,6 +5,7 @@
 #include <cstdlib>
 #include "Enums.h"
 #include "raylib.h"
+#include "ui_common.h"
 
 enum ActiveField
 {
@@ -14,31 +14,13 @@ enum ActiveField
     FIELD_PLAYER2
 };
 
-struct MenuButton
-{
-    const char* text;
-    int fontSize;
-    Color idleBg;
-    Color hoverBg;
-    Color pressBg;
-    Color idleBorder;
-    Color hoverBorder;
-    Color idleText;
-    Color hoverText;
-};
-
 class AgePage
 {
     private:
         bool DrawMenuButton(MenuButton& , Rectangle , Font ,Vector2 , bool);
         bool DrawNumberInput(Rectangle , char* , int , bool , Font , Vector2 , Color , Color , Color , Color , Color);
     public:
-        void Make_Page(Page & , int & , int &);
-        
+        void Make_Page(Page & current_page,Texture2D & background, Font & titleFont, Font & labelFont , int & age1, int & age2);
 };
-
-
-
-
 
 #endif

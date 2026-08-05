@@ -51,7 +51,6 @@ bool AgePage :: DrawNumberInput(Rectangle rect, char* buffer, int maxLen, bool i
         Vector2 pos = { rect.x + rect.width / 2 - size.x / 2, rect.y + rect.height / 2 - size.y / 2 };
         DrawTextEx(font, buffer, pos, fontSize, 1.0f, textColor);
 
-  
         if (isActive && (int)(GetTime() * 2) % 2 == 0)
         {
             float cursorX = pos.x + size.x + 4;
@@ -63,17 +62,7 @@ bool AgePage :: DrawNumberInput(Rectangle rect, char* buffer, int maxLen, bool i
     return clicked;
 }
 
-void AgePage :: Make_Page(Page & current_page , int & age1 , int & age2){
-    Texture2D background = LoadTexture("assets/background.png");
-
-    Font titleFont  = LoadFontEx("assets/Cinzel-Bold.ttf", 128, 0, 0);
-    Font labelFont  = LoadFontEx("assets/Cinzel-Bold.ttf", 64, 0, 0);
-
-    if (titleFont.texture.id == 0) titleFont = GetFontDefault();
-    if (labelFont.texture.id == 0) labelFont = GetFontDefault();
-
-    SetTextureFilter(titleFont.texture, TEXTURE_FILTER_BILINEAR);
-    SetTextureFilter(labelFont.texture, TEXTURE_FILTER_BILINEAR);
+void AgePage :: Make_Page(Page & current_page ,Texture2D & background, Font & titleFont, Font & labelFont, int & age1 , int & age2){
 
     Color overlayColor = { 0, 0, 0, 190 };
     Color goldColor    = { 212, 175, 90, 255 };
@@ -164,14 +153,12 @@ void AgePage :: Make_Page(Page & current_page , int & age1 , int & age2){
                                          labelFont, mousePos, inputBg, inputActiveBorder, inputIdleBorder,
                                          textWhite, placeholderGray);
 
-
         float section2Y = player1Rect.y + fieldHeight + sh * 0.045f;
         DrawTextEx(labelFont, "LIFE CYCLE OF PLAYER 2:", { contentX, section2Y }, labelSize, 2.0f, labelGold);
         Rectangle player2Rect = { contentX, section2Y + labelSize * 1.6f, contentWidth, fieldHeight };
         bool p2Clicked = DrawNumberInput(player2Rect, player2Age, 3, activeField == FIELD_PLAYER2,
                                          labelFont, mousePos, inputBg, inputActiveBorder, inputIdleBorder,
                                          textWhite, placeholderGray);
-
 
         float buttonsY = player2Rect.y + fieldHeight + sh * 0.06f;
         float okWidth = contentWidth * 0.62f;
@@ -190,7 +177,6 @@ void AgePage :: Make_Page(Page & current_page , int & age1 , int & age2){
 
         bool okClicked = DrawMenuButton(okBtn, okRect, labelFont, mousePos, mouseDown);
         bool retreatClicked = DrawMenuButton(retreatBtn, retreatRect, labelFont, mousePos, mouseDown);
-
 
         if (p1Clicked) activeField = FIELD_PLAYER1;
         else if (p2Clicked) activeField = FIELD_PLAYER2;
@@ -228,19 +214,17 @@ void AgePage :: Make_Page(Page & current_page , int & age1 , int & age2){
             current_page = Page :: Menu;
             age1 = atoi(player1Age);
             age2 = atoi(player2Age);
-            break;
         }
-        if (retreatClicked) {
-        current_page = Page :: Choose;
-        break;
-        }
+        if (retreatClicked) {current_page = Page :: Choose;}
 
         EndDrawing();
 
         if (okClicked || retreatClicked) break;
     }
 
-    UnloadFont(titleFont);
-    UnloadFont(labelFont);
-    UnloadTexture(background);
+    if (WindowShouldClose())
+    {
+        current_page = Page::Exit;
+    }
+
 }

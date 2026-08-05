@@ -1,4 +1,3 @@
-
 #include "front/main_menu.h"
 
 void Menu :: DrawMenuButton(MenuButton& btn, Rectangle rect, Font font,Vector2 mousePos, bool mouseDown){
@@ -31,22 +30,7 @@ bool Menu :: is_clicked(Rectangle rect , Vector2 mousePos){
     return hover && IsMouseButtonPressed(MOUSE_BUTTON_LEFT);
 }
 
-void Menu :: make_Page(Page & current_page){
-    const int screenWidth = 1280;
-    const int screenHeight = 720;
-
-    SetConfigFlags(FLAG_WINDOW_RESIZABLE | FLAG_MSAA_4X_HINT);
-    InitWindow(screenWidth, screenHeight, "UNMATCHED - Main Menu");
-    SetTargetFPS(60);
-
-    Texture2D background = LoadTexture("../../assets/background.png");
-    Font titleFont    = LoadFontEx("../../assets/Cinzel-Bold.ttf", 128, 0, 0);
-    Font subtitleFont = LoadFontEx("../../assets/Cinzel-Bold.ttf", 64, 0, 0);
-    Font buttonFont   = LoadFontEx("../../assets/Cinzel-SemiBold.ttf", 64, 0, 0);
-
-    SetTextureFilter(titleFont.texture, TEXTURE_FILTER_BILINEAR);
-    SetTextureFilter(subtitleFont.texture, TEXTURE_FILTER_BILINEAR);
-    SetTextureFilter(buttonFont.texture, TEXTURE_FILTER_BILINEAR);
+void Menu :: make_Page(Page & current_page, Texture2D & background,Font & titleFont, Font & subtitleFont, Font & buttonFont){
 
     Color overlayColor  = { 0, 0, 0, 150 };
     Color goldColor     = { 212, 175, 90, 255 };
@@ -124,7 +108,7 @@ void Menu :: make_Page(Page & current_page){
         DrawMenuButton(exitBtn, exitRect, buttonFont, mousePos, mouseDown);
 
         EndDrawing();
-        
+
         if(is_clicked(startRect , mousePos)){
             current_page = Page :: Age;
             break;
@@ -144,9 +128,4 @@ void Menu :: make_Page(Page & current_page){
         current_page = Page::Exit;
     }
 
-    UnloadFont(titleFont);
-    UnloadFont(subtitleFont);
-    UnloadFont(buttonFont);
-    UnloadTexture(background);
-    CloseWindow();
 }
