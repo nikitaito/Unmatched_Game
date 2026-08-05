@@ -5,6 +5,13 @@
 #include <string.h>
 #include "raylib.h"
 
+enum ActiveField
+{
+    FIELD_NONE,
+    FIELD_PLAYER1,
+    FIELD_PLAYER2
+};
+
 struct MenuButton
 {
     const char* text;
@@ -24,6 +31,7 @@ class AgePage
         bool DrawMenuButton(MenuButton& , Rectangle , Font ,Vector2 , bool);
         bool DrawNumberInput(Rectangle , char* , int , bool , Font , Vector2 , Color , Color , Color , Color , Color);
     public:
+        void Make_Page();
         
 };
 
