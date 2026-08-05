@@ -11,7 +11,7 @@ find_package(raylib REQUIRED)
 
 add_executable(MyProject
     src/front/front.cpp
-    src/ftxuimain.cpp
+    src/main.cpp
     src/board/board.cpp
     src/card/Card.cpp 
     src/fighter/Dr_Watson.cpp 
