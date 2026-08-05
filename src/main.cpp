@@ -84,11 +84,11 @@ int main() {
     SetTargetFPS(60);
 
     
-    Texture2D background = LoadTexture("assets/background.png");
+    Texture2D background = LoadTexture("../assets/background.png");
 
-    Font titleFont    = LoadFontEx("assets/Cinzel-Bold.ttf", 128, 0, 0);
-    Font subtitleFont = LoadFontEx("assets/Cinzel-Bold.ttf", 64, 0, 0);
-    Font buttonFont   = LoadFontEx("assets/Cinzel-SemiBold.ttf", 64, 0, 0);
+    Font titleFont    = LoadFontEx("../assets/fonts/Cinzel-Bold.ttf", 128, 0, 0);
+    Font subtitleFont = LoadFontEx("../assets/fonts/Cinzel-Bold.ttf", 64, 0, 0);
+    Font buttonFont   = LoadFontEx("../assets/fonts/Cinzel-SemiBold.ttf", 64, 0, 0);
 
     
     if (titleFont.texture.id == 0)    titleFont = GetFontDefault();
