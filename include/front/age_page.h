@@ -3,6 +3,8 @@
 #define AGE_PAGE
 
 #include <string.h>
+#include <cstdlib>
+#include "Enums.h"
 #include "raylib.h"
 
 enum ActiveField
@@ -31,7 +33,7 @@ class AgePage
         bool DrawMenuButton(MenuButton& , Rectangle , Font ,Vector2 , bool);
         bool DrawNumberInput(Rectangle , char* , int , bool , Font , Vector2 , Color , Color , Color , Color , Color);
     public:
-        void Make_Page();
+        void Make_Page(Page & , int & , int &);
         
 };
 

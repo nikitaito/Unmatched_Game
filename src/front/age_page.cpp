@@ -63,14 +63,7 @@ bool AgePage :: DrawNumberInput(Rectangle rect, char* buffer, int maxLen, bool i
     return clicked;
 }
 
-void AgePage :: Make_Page(){
-    const int screenWidth = 1280;
-    const int screenHeight = 720;
-
-    SetConfigFlags(FLAG_WINDOW_RESIZABLE | FLAG_MSAA_4X_HINT);
-    InitWindow(screenWidth, screenHeight, "Assessment of Mortality");
-    SetTargetFPS(60);
-
+void AgePage :: Make_Page(Page & current_page , int & age1 , int & age2){
     Texture2D background = LoadTexture("assets/background.png");
 
     Font titleFont  = LoadFontEx("assets/Cinzel-Bold.ttf", 128, 0, 0);
@@ -231,16 +224,23 @@ void AgePage :: Make_Page(){
             }
         }
 
-        if (okClicked)      { }
-        if (retreatClicked) { }
+        if (okClicked){
+            current_page = Page :: Menu;
+            age1 = atoi(player1Age);
+            age2 = atoi(player2Age);
+            break;
+        }
+        if (retreatClicked) {
+        current_page = Page :: Choose;
+        break;
+        }
 
         EndDrawing();
+
+        if (okClicked || retreatClicked) break;
     }
 
     UnloadFont(titleFont);
     UnloadFont(labelFont);
     UnloadTexture(background);
-    CloseWindow();
-
-
 }
