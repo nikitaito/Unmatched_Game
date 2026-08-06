@@ -335,7 +335,7 @@ bool Game :: MoveFighter(Player * p , int fromSpace , int toSpace , std :: strin
     }
 
     try{
-        Move_characters(fromSpace , toSpace , fighterType , false , moveLimit);
+        Move_characters(fromSpace , toSpace , fighterType , true , moveLimit);
     }
     catch(const No_Way &){
         err = "No valid path within that fighter's movement range.";
@@ -774,5 +774,3 @@ bool Game :: DiscardExcess(Player * p , int handIndex , std :: string & err){
 void Game :: EndTurn(){
     ChangeTurn();
 }
-
-
