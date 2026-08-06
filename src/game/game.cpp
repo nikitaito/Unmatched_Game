@@ -1,4 +1,4 @@
-#include "game/game.h"
+#include "game.h"
 #include <iostream>
 using namespace std;
 
@@ -23,7 +23,6 @@ Player* Game :: get_player_of_hero(CharacterType chtype){
 Player * Game :: get_turn(){
     return turn;
 }
-
 void Game :: choose (pair< int , CharacterType > p1 , pair< int , CharacterType > p2){
     player1.set_name("Player one");
     player2.set_name("Player two");
@@ -336,7 +335,7 @@ bool Game :: MoveFighter(Player * p , int fromSpace , int toSpace , std :: strin
     }
 
     try{
-        Move_characters(fromSpace , toSpace , fighterType , false , moveLimit);
+        Move_characters(fromSpace , toSpace , fighterType , true , moveLimit);
     }
     catch(const No_Way &){
         err = "No valid path within that fighter's movement range.";
@@ -775,5 +774,3 @@ bool Game :: DiscardExcess(Player * p , int handIndex , std :: string & err){
 void Game :: EndTurn(){
     ChangeTurn();
 }
-
-
