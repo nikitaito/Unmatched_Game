@@ -29,6 +29,19 @@ enum class CardName
     Service_Revolver,
     Study_Methods,
 
+    Coded_Notes,
+    ConFound,
+    Covert_PreParation,
+    Deaming_of_Revenge,
+    Emerge_from_Mist,
+    Impossible_to_See,
+    Into_Thin_Air,
+    Lurking,
+    Reign_of_Terror,
+    Rolling_Fog,
+    Slip_Away,
+    Step_Lightly,
+    Vanish,
 };
 
 enum class CardTiming
@@ -42,7 +55,8 @@ enum class CardTiming
 enum class Style
 {
     ARRGD,
-    INTEL
+    INTEL,
+    STEALTH
 };
 
 enum class Attacktype{
@@ -55,6 +69,7 @@ enum class Usertype{
     HOLMES,
     SISTER,
     DRACULA,
+    INVMAN,
     ANY
  };
 
@@ -62,7 +77,8 @@ enum class CharacterType{
     SherlockHolmes,
     Dracula,
     Dr_Watson,
-    Sister
+    Sister,
+    Invman
 };
 
 
