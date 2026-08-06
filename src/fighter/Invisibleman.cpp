@@ -4,12 +4,53 @@
 using namespace std;
 
 Invman::Invman()
-    : Heroes()
+    : Heroes(CharacterType :: Invman , Attacktype :: MELEE , Style :: STEALTH , 15 , 2)
 {
     initial_deck();
 }
 
 void Invman :: initial_deck() {
+    cards.deck.push_back(Card(CardName :: Coded_Notes , CardTiming :: After , CardType :: DEFENSE , Usertype :: INVMAN , 0 , 3 , 2 , Make_Effect({})));
+    cards.deck.push_back(Card(CardName :: Coded_Notes , CardTiming :: After , CardType :: DEFENSE , Usertype :: INVMAN , 0 , 3 , 2 , Make_Effect({})));
+
+    cards.deck.push_back(Card(CardName :: ConFound , CardTiming :: After , CardType :: BOTH , Usertype :: INVMAN , 3 , 3 , 2 , Make_Effect({})));
+    cards.deck.push_back(Card(CardName :: ConFound , CardTiming :: After , CardType :: BOTH , Usertype :: INVMAN , 3 , 3 , 2 , Make_Effect({}))); 
+
+
+    cards.deck.push_back(Card(CardName :: Covert_PreParation , CardTiming :: After , CardType :: BOTH , Usertype :: INVMAN , 2, 2 , 1 , Make_Effect({})));
+    cards.deck.push_back(Card(CardName :: Covert_PreParation , CardTiming :: After , CardType :: BOTH , Usertype :: INVMAN , 2, 2 , 1 , Make_Effect({})));
+    cards.deck.push_back(Card(CardName :: Covert_PreParation , CardTiming :: After , CardType :: BOTH , Usertype :: INVMAN , 2, 2 , 1 , Make_Effect({})));
+
+    cards.deck.push_back(Card(CardName :: Deaming_of_Revenge , CardTiming :: After , CardType :: BOTH , Usertype :: INVMAN , 3, 3 , 1 , Make_Effect({})));
+    cards.deck.push_back(Card(CardName :: Deaming_of_Revenge , CardTiming :: After , CardType :: BOTH , Usertype :: INVMAN , 3, 3 , 1 , Make_Effect({})));
+
+    cards.deck.push_back(Card(CardName :: Emerge_from_Mist , CardTiming :: During , CardType :: ATTACK , Usertype :: INVMAN , 3, 0 , 2 , Make_Effect({})));
+    cards.deck.push_back(Card(CardName :: Emerge_from_Mist , CardTiming :: During , CardType :: ATTACK , Usertype :: INVMAN , 3, 0 , 2 , Make_Effect({})));
+
+    cards.deck.push_back(Card(CardName :: Impossible_to_See , CardTiming :: Immediate , CardType :: BOTH , Usertype :: INVMAN , 2, 2 , 2 , Make_Effect({})));
+    cards.deck.push_back(Card(CardName :: Impossible_to_See , CardTiming :: Immediate , CardType :: BOTH , Usertype :: INVMAN , 2, 2 , 2 , Make_Effect({})));
+
+    cards.deck.push_back(Card(CardName :: Into_Thin_Air , CardTiming :: After , CardType :: DEFENSE , Usertype :: INVMAN , 0, 4 , 1 , Make_Effect({})));
+    cards.deck.push_back(Card(CardName :: Into_Thin_Air , CardTiming :: After , CardType :: DEFENSE , Usertype :: INVMAN , 0, 4 , 1 , Make_Effect({})));
+
+    cards.deck.push_back(Card(CardName :: Lurking , CardTiming :: After , CardType :: DEFENSE , Usertype :: INVMAN , 0, 2 , 2 , Make_Effect({})));
+    cards.deck.push_back(Card(CardName :: Lurking , CardTiming :: After , CardType :: DEFENSE , Usertype :: INVMAN , 0, 2 , 2 , Make_Effect({})));
+
+    cards.deck.push_back(Card(CardName :: Reign_of_Terror , CardTiming :: Immediate , CardType :: EVENT , Usertype :: INVMAN , 0, 0 , 1 , Make_Effect({})));
+    cards.deck.push_back(Card(CardName :: Reign_of_Terror , CardTiming :: Immediate , CardType :: EVENT , Usertype :: INVMAN , 0, 0 , 1 , Make_Effect({})));
+
+    cards.deck.push_back(Card(CardName :: Rolling_Fog , CardTiming :: Immediate , CardType :: EVENT , Usertype :: INVMAN , 0, 0 , 1 , Make_Effect({})));
+    cards.deck.push_back(Card(CardName :: Rolling_Fog , CardTiming :: Immediate , CardType :: EVENT , Usertype :: INVMAN , 0, 0 , 1 , Make_Effect({})));
+
+    cards.deck.push_back(Card(CardName :: Slip_Away , CardTiming :: After , CardType :: ATTACK , Usertype :: INVMAN , 3, 0 , 2 , Make_Effect({})));
+    cards.deck.push_back(Card(CardName :: Slip_Away , CardTiming :: After , CardType :: ATTACK , Usertype :: INVMAN , 3, 0 , 2 , Make_Effect({})));
+    cards.deck.push_back(Card(CardName :: Slip_Away , CardTiming :: After , CardType :: ATTACK , Usertype :: INVMAN , 3, 0 , 2 , Make_Effect({})));
+
+    cards.deck.push_back(Card(CardName :: Step_Lightly , CardTiming :: Immediate , CardType :: EVENT , Usertype :: INVMAN , 0, 0 , 2 , Make_Effect({})));
+    cards.deck.push_back(Card(CardName :: Step_Lightly , CardTiming :: Immediate , CardType :: EVENT , Usertype :: INVMAN , 0, 0 , 2 , Make_Effect({})));
+
+    cards.deck.push_back(Card(CardName :: Vanish , CardTiming :: Immediate , CardType :: EVENT , Usertype :: INVMAN , 0, 0 , 3 , Make_Effect({})));
+    cards.deck.push_back(Card(CardName :: Vanish , CardTiming :: Immediate , CardType :: EVENT , Usertype :: INVMAN , 0, 0 , 3 , Make_Effect({})));
 }
 
 void Invman :: assign_sidekicks() {
