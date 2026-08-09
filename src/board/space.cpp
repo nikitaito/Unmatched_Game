@@ -46,6 +46,13 @@ void Space::set_comrades(Sidekick* comrade){
         throw NoSpaceException();
 }
 
+void Space::set_token(Sidekick* token){
+    if (this->token == nullptr)
+        this->token = token;
+    else
+        throw NoSpaceException();
+}
+
 void Space :: set_zone(vector<Zone> & zone){
     this->zone = zone;
 }
@@ -54,9 +61,18 @@ Sidekick* Space :: get_comrade() const{
     return comrade;
 }
 
+Sidekick* Space :: get_token() const{
+    return token;
+}
+
+void Space :: clear_token(){
+    token = nullptr;
+}
+
 void Space :: reset(){
     hero = nullptr;
     comrade = nullptr;
+    token = nullptr;
 }
 
 bool Space :: operator == (const Space & s) const{
@@ -65,6 +81,8 @@ bool Space :: operator == (const Space & s) const{
     if(s.get_comrade() != comrade)
         return false;
     if(s.get_Hero() != hero)
+        return false;
+    if(s.get_token() != token)
         return false;
     if(s.get_Hidden_way() != Hidden_way)
         return false;
