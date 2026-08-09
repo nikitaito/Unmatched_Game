@@ -24,7 +24,7 @@ class Space
         Space(int , std :: vector<int> , std :: vector<int> , std :: vector<Zone> ) ;
         void reset();
 
-        //set and get
+        //set
         void set_zone(std :: vector<Zone> &);
         void set_hero(Heroes *);
         void set_comrades(Sidekick *);
