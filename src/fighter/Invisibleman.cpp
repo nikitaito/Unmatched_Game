@@ -52,3 +52,18 @@ void Invman :: initial_deck() {
     cards.deck.push_back(Card(CardName :: Vanish , CardTiming :: Immediate , CardType :: EVENT , Usertype :: INVMAN , 0, 0 , 3 , Make_Effect({})));
     cards.deck.push_back(Card(CardName :: Vanish , CardTiming :: Immediate , CardType :: EVENT , Usertype :: INVMAN , 0, 0 , 3 , Make_Effect({})));
 }
+
+void Invman :: assign_sidekicks(){
+    sidekick.clear();
+    sidekick.push_back(&token1);
+    sidekick.push_back(&token2);
+    sidekick.push_back(&token3);
+}
+
+vector<Sidekick*> Invman :: get_sidekick(){
+    vector<Sidekick *> tokens;
+    tokens.push_back(&token1);
+    tokens.push_back(&token2);
+    tokens.push_back(&token3);
+    return tokens;
+}
