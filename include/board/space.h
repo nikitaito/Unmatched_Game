@@ -17,6 +17,7 @@ class Space
         
         Heroes * hero = nullptr;
         Sidekick * comrade = nullptr;
+        Sidekick * token = nullptr;
 
     public:
         Space() = default;
@@ -27,6 +28,8 @@ class Space
         void set_zone(std :: vector<Zone> &);
         void set_hero(Heroes *);
         void set_comrades(Sidekick *);
+        void set_token(Sidekick *);
+        void clear_token();
         void set_neighbor(std :: vector<int> & );
         void set_hidden_way(std :: vector<int> & );
 
@@ -37,6 +40,7 @@ class Space
         std :: vector<Zone> get_zone() const;
         Heroes* get_Hero() const;
         Sidekick* get_comrade() const;
+        Sidekick* get_token() const;
         bool operator == (const Space &) const;
 
 
