@@ -208,6 +208,11 @@ void Board :: Move(int current , int target){
         spaces[current].reset();
         spaces[target].set_comrades(sidekick);
     }
+    else if(spaces[current].get_token()){
+        Sidekick * token = spaces[current].get_token();
+        spaces[current].clear_token();
+        spaces[target].set_token(token);
+    }
 }
 
 void Board :: Teleport(int current , int target){
@@ -258,8 +263,10 @@ bool Board :: Adjacency(CharacterType ch1 , CharacterType ch2){
 void Board :: Swap(int a , int b){
     Sidekick * sidekick_A = spaces[a].get_comrade();
     Heroes * hero_A = spaces[a].get_Hero();
+    Sidekick * token_A = spaces[a].get_token();
     Sidekick * sidekick_B = spaces[b].get_comrade();
     Heroes * hero_B = spaces[b].get_Hero();
+    Sidekick * token_B = spaces[b].get_token();
 
     spaces[a].reset();
     spaces[b].reset();
@@ -268,10 +275,14 @@ void Board :: Swap(int a , int b){
         spaces[a].set_hero(hero_B);
     if(sidekick_B)
         spaces[a].set_comrades(sidekick_B);
+    if(token_B)
+        spaces[a].set_token(token_B);
 
     if(hero_A)
         spaces[b].set_hero(hero_A);
     if(sidekick_A)
         spaces[b].set_comrades(sidekick_A);
+    if(token_A)
+        spaces[b].set_token(token_A);
 }
 
