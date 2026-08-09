@@ -78,7 +78,8 @@ enum class CharacterType{
     Dracula,
     Dr_Watson,
     Sister,
-    Invman
+    Invman,
+    InvmanToken
 };
 
 
