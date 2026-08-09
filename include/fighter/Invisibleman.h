@@ -12,11 +12,7 @@ class Invman : public Heroes
 
     public:
         Invman();
-
-        std::vector<Sidekick *> get_sisters();
-        virtual void initial_deck() override ;
-        virtual void assign_sidekicks() override;
-        virtual std :: vector<Sidekick *> get_sidekick() override;
+        virtual void initial_deck() override;
     
 
 };

@@ -52,10 +52,3 @@ void Invman :: initial_deck() {
     cards.deck.push_back(Card(CardName :: Vanish , CardTiming :: Immediate , CardType :: EVENT , Usertype :: INVMAN , 0, 0 , 3 , Make_Effect({})));
     cards.deck.push_back(Card(CardName :: Vanish , CardTiming :: Immediate , CardType :: EVENT , Usertype :: INVMAN , 0, 0 , 3 , Make_Effect({})));
 }
-
-void Invman :: assign_sidekicks() {
-
-}
-
-vector<Sidekick*> Invman :: get_sidekick(){
-}
