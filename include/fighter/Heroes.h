@@ -46,7 +46,7 @@ class Heroes
 
         //virtual
         virtual void initial_deck() = 0;
-        virtual void assign_sidekicks() {};
-        virtual std :: vector<Sidekick *> get_sidekick() {};
+        virtual void assign_sidekicks() = 0;
+        virtual std :: vector<Sidekick *> get_sidekick() = 0;
 
 };
