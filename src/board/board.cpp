@@ -65,6 +65,10 @@ void Board :: set_Comrade(Sidekick* comrade , int situation){
     spaces[situation].set_comrades(comrade);
 }
 
+void Board :: set_Token(Sidekick* token , int situation){
+    spaces[situation].set_token(token);
+}
+
 void Board :: reset_space(int situation){
     spaces[situation].reset();
 }
@@ -98,6 +102,23 @@ int Board :: find_space_of_hero(Heroes * hero) const{
 int Board :: find_space_of_comrade(Sidekick * comrade) const{
     for(const auto & it : spaces){
         if(it.get_comrade() == comrade)
+            return it.get_id();
+    }
+    return -1;
+}
+
+Space * Board :: search_token(Sidekick * token){
+    Space * search_token = nullptr;
+    for (auto & it : spaces){
+        if(token == it.get_token())
+            search_token = &it;
+    }
+    return search_token;
+}
+
+int Board :: find_space_of_token(Sidekick * token) const{
+    for(const auto & it : spaces){
+        if(it.get_token() == token)
             return it.get_id();
     }
     return -1;
@@ -163,6 +184,14 @@ bool Board :: is_way(int current , int target , CharacterType forbidden , bool a
     std :: vector<bool> visited (SPACE_COUNT , false);
     return dfs(current , target , visited , forbidden , allowhiddenway , cost);
 
+}
+
+bool Board :: is_way_for_token(int current , int target , CharacterType forbidden , bool allowhiddenway, int cost) const{
+    if(spaces[target].get_token() != nullptr)
+        return false;
+
+    std :: vector<bool> visited (SPACE_COUNT , false);
+    return dfs(current , target , visited , forbidden , allowhiddenway , cost);
 }
 
 void Board :: Move(int current , int target){
