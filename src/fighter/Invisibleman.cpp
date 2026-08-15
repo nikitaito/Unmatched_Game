@@ -27,8 +27,8 @@ void Invman :: initial_deck() {
     cards.deck.push_back(Card(CardName :: Emerge_from_Mist , CardTiming :: During , CardType :: ATTACK , Usertype :: INVMAN , 3, 0 , 2 , Make_Effect({new EmergeFromMistEffect()})));
     cards.deck.push_back(Card(CardName :: Emerge_from_Mist , CardTiming :: During , CardType :: ATTACK , Usertype :: INVMAN , 3, 0 , 2 , Make_Effect({new EmergeFromMistEffect()})));
 
-    cards.deck.push_back(Card(CardName :: Impossible_to_See , CardTiming :: Immediate , CardType :: BOTH , Usertype :: INVMAN , 2, 2 , 2 , Make_Effect({})));
-    cards.deck.push_back(Card(CardName :: Impossible_to_See , CardTiming :: Immediate , CardType :: BOTH , Usertype :: INVMAN , 2, 2 , 2 , Make_Effect({})));
+    cards.deck.push_back(Card(CardName :: Impossible_to_See , CardTiming :: Before , CardType :: BOTH , Usertype :: INVMAN , 2, 2 , 2 , Make_Effect({new ImpossibleToSeeEffect()})));
+    cards.deck.push_back(Card(CardName :: Impossible_to_See , CardTiming :: Before , CardType :: BOTH , Usertype :: INVMAN , 2, 2 , 2 , Make_Effect({new ImpossibleToSeeEffect()})));
 
     cards.deck.push_back(Card(CardName :: Into_Thin_Air , CardTiming :: After , CardType :: DEFENSE , Usertype :: INVMAN , 0, 4 , 1 , Make_Effect({})));
     cards.deck.push_back(Card(CardName :: Into_Thin_Air , CardTiming :: After , CardType :: DEFENSE , Usertype :: INVMAN , 0, 4 , 1 , Make_Effect({})));
