@@ -109,6 +109,17 @@ void Game :: Move_characters(int current, int target , CharacterType characterty
     board.Move(current , target);
 }
 
+void Game :: Move_FogToken(int current, int target , int cost){
+    const auto & spaces = board.get_spaces();
+    if(current < 0 || current >= static_cast<int>(spaces.size()) || spaces[current].get_token() == nullptr)
+        throw No_Way();
+
+    if(board.is_way_for_token(current , target , CharacterType :: InvmanToken , false , cost) == false)
+        throw No_Way();
+
+    board.MoveToken(current , target);
+}
+
 bool Game :: Adjacency(CharacterType ch1, CharacterType ch2){
     return board.Adjacency(ch1 , ch2);
 }

@@ -50,6 +50,7 @@ class Game
         void DrawCard(Player * , int);
         int Rand_Discard(Player *);
         void Move_characters(int , int , CharacterType , bool , int);
+        void Move_FogToken(int , int , int);
         bool Adjacency(CharacterType , CharacterType);
         void Replace(int , int);
         void Teleport(int , int);
