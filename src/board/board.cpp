@@ -194,6 +194,59 @@ bool Board :: is_way_for_token(int current , int target , CharacterType forbidde
     return dfs(current , target , visited , forbidden , allowhiddenway , cost);
 }
 
+bool Board :: dfs_fog(int current , int target , std :: vector<bool> & visited , const std :: vector<CharacterType> & enemyTypes , bool allowhiddenway , int cost) const{
+    if(current == target)
+        return true;
+
+    if(cost <= 0)
+        return false;
+
+    visited[current] = true;
+    const Space & space = spaces[current];
+
+    for(int next : space.get_neighbor()){
+        if(visited[next] == true)
+            continue;
+        if(dfs_fog(next , target , visited , enemyTypes , allowhiddenway , cost - 1))
+            return true;
+    }
+
+    if(allowhiddenway){
+        for(int next : space.get_Hidden_way()){
+            if(visited[next] == true)
+                continue;
+            if(dfs_fog(next , target , visited , enemyTypes , allowhiddenway , cost - 1))
+                return true;
+        }
+    }
+
+    if(space.get_token() != nullptr){
+        for(const auto & other : spaces){
+            int next = other.get_id();
+            if(next == current || visited[next] == true)
+                continue;
+            if(other.get_token() == nullptr)
+                continue;
+
+            bool enemyPresent = false;
+            for(auto et : enemyTypes){
+                if(other.get_Hero() && other.get_Hero()->get_name() == et)
+                    enemyPresent = true;
+                if(other.get_comrade() && other.get_comrade()->get_name() == et)
+                    enemyPresent = true;
+            }
+            if(enemyPresent)
+                continue;
+
+            if(dfs_fog(next , target , visited , enemyTypes , allowhiddenway , cost - 1))
+                return true;
+        }
+    }
+
+    visited[current] = false;
+    return false;
+}
+
 void Board :: Move(int current , int target){
     if(current == target)
         return;

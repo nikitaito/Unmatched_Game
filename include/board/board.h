@@ -9,6 +9,7 @@ class Board
         static constexpr int SPACE_COUNT = 32;
         std :: vector<Space> spaces;
         bool dfs(int , int , std::vector<bool>& , CharacterType , bool , int ) const;
+        bool dfs_fog(int , int , std::vector<bool>& , const std :: vector<CharacterType> & , bool , int ) const;
     public:
         Board();
 
