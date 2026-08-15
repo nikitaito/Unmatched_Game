@@ -201,6 +201,7 @@ void DamageIfAdjacent :: execute(Context & ctx){
             ctx.mover_sidekick->Damage(i);
     }
     else if(chtype == CharacterType :: Invman){
+        // Reign of Terror: if the Invisible Man is on a fog token space, damage every enemy fighter.
         if(!ctx.targetplayer)
             return;
 
@@ -357,54 +358,85 @@ void EmergeFromMistEffect :: execute(Context & ctx){
     }
 }
 //////////////////////
-void IntoThinAirEffect :: execute(Context & ctx){
+SelfMoveEffect :: SelfMoveEffect(int c) : cost(c){}
+
+void SelfMoveEffect :: execute(Context & ctx){
     if(!ctx.ownhero || !ctx.game)
         return;
 
+    if(ctx.self_move_destination < 0)
+        return;
+
     Board * board = ctx.game->get_Board();
+    int selfSpace = board->find_space_of_hero(ctx.ownhero);
+    if(selfSpace < 0 || selfSpace == ctx.self_move_destination)
+        return;
 
-    // Step 1: move the Invisible Man up to 1 space (optional).
-    if(ctx.self_move_destination >= 0){
-        int selfSpace = board->find_space_of_hero(ctx.ownhero);
-        if(selfSpace >= 0 && selfSpace != ctx.self_move_destination){
-            try{
-                ctx.game->Move_characters(selfSpace , ctx.self_move_destination , ctx.ownhero->get_name() , false , 1);
-                ctx.log.push_back("Vanishing into Thin Air: the Invisible Man slips to a new space.");
-            }
-            catch(const std :: exception &){
-                ctx.log.push_back("Vanishing into Thin Air: no legal space for the Invisible Man to move to.");
-            }
-        }
+    try{
+        ctx.game->Move_characters(selfSpace , ctx.self_move_destination , ctx.ownhero->get_name() , false , cost);
+        ctx.log.push_back("The Invisible Man slips to a new space.");
     }
-
-    // Step 2: move one fog token up to 3 spaces (optional).
-    if(ctx.fog_token_space >= 0 && ctx.fog_token_destination >= 0 && ctx.fog_token_space != ctx.fog_token_destination){
-        try{
-            ctx.game->Move_FogToken(ctx.fog_token_space , ctx.fog_token_destination , 3);
-            ctx.log.push_back("Vanishing into Thin Air: a fog token drifts to a new space.");
-        }
-        catch(const std :: exception &){
-            ctx.log.push_back("Vanishing into Thin Air: the fog token had no legal destination.");
-        }
+    catch(const std :: exception &){
+        ctx.log.push_back("No legal space for the Invisible Man to move to.");
     }
 }
 //////////////////////
-void RollingFogEffect :: execute(Context & ctx){
-    if(!ctx.game || !ctx.ownplayer)
+MoveFogTokenEffect :: MoveFogTokenEffect(int c , bool requireEmpty) : cost(c) , requireEmptyDestination(requireEmpty){}
+
+void MoveFogTokenEffect :: execute(Context & ctx){
+    if(!ctx.game)
         return;
-    if(ctx.fog_token_space >= 0 && ctx.fog_token_destination >= 0 && ctx.fog_token_space != ctx.fog_token_destination){
-        try{
-            int cost = ctx.game->get_Board()->get_space_count();
-            ctx.game->Move_FogToken(ctx.fog_token_space , ctx.fog_token_destination , cost);
-            ctx.log.push_back("Rolling Fog: a fog token rolls to a new space.");
-        }
-        catch(const std :: exception &){
-            ctx.log.push_back("Rolling Fog: the fog token had no legal destination.");
-        }
+
+    if(ctx.fog_token_space < 0 || ctx.fog_token_destination < 0 || ctx.fog_token_space == ctx.fog_token_destination)
+        return;
+
+    Board * board = ctx.game->get_Board();
+    const auto & spaces = board->get_spaces();
+    if(ctx.fog_token_destination >= static_cast<int>(spaces.size()))
+        return;
+
+    if(requireEmptyDestination && !spaces[ctx.fog_token_destination].empty()){
+        ctx.log.push_back("The destination space is not empty.");
+        return;
     }
 
+    try{
+        int effectiveCost = (cost < 0) ? board->get_space_count() : cost;
+        ctx.game->Move_FogToken(ctx.fog_token_space , ctx.fog_token_destination , effectiveCost);
+        ctx.log.push_back("A fog token drifts to a new space.");
+    }
+    catch(const std :: exception &){
+        ctx.log.push_back("The fog token had no legal destination.");
+    }
+}
+//////////////////////
+void PlaceSelfOnFogTokenEffect :: execute(Context & ctx){
+    if(!ctx.ownhero || !ctx.game)
+        return;
+
+    if(ctx.fog_token_destination < 0)
+        return;
+
+    Board * board = ctx.game->get_Board();
+    int selfSpace = board->find_space_of_hero(ctx.ownhero);
+    if(selfSpace < 0 || selfSpace == ctx.fog_token_destination)
+        return;
+
+    try{
+        ctx.game->Teleport(selfSpace , ctx.fog_token_destination);
+        ctx.log.push_back("The Invisible Man appears where the fog token landed.");
+    }
+    catch(const std :: exception &){
+        ctx.log.push_back("Could not place the Invisible Man on the new space.");
+    }
+}
+//////////////////////
+void GainActionEffect :: execute(Context & ctx){
+    if(!ctx.game || !ctx.ownplayer)
+        return;
+
     ctx.game->IncreaseAction(ctx.ownplayer);
-    ctx.log.push_back("Rolling Fog: gained 1 action.");
+    ctx.log.push_back("Gained 1 action.");
 }
 //////////////////////
 void ImpossibleToSeeEffect :: execute(Context & ctx){

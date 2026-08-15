@@ -218,13 +218,32 @@ class ImpossibleToSeeEffect : public Effect
         virtual void execute(Context & ctx) override;
 };
 
-class IntoThinAirEffect : public Effect
+class SelfMoveEffect : public Effect
+{
+    private:
+        int cost;
+    public:
+        SelfMoveEffect(int);
+        virtual void execute(Context & ctx) override;
+};
+
+class MoveFogTokenEffect : public Effect
+{
+    private:
+        int cost;                    
+        bool requireEmptyDestination; 
+    public:
+        MoveFogTokenEffect(int , bool);
+        virtual void execute(Context & ctx) override;
+};
+
+class PlaceSelfOnFogTokenEffect : public Effect
 {
     public:
         virtual void execute(Context & ctx) override;
 };
 
-class RollingFogEffect : public Effect
+class GainActionEffect : public Effect
 {
     public:
         virtual void execute(Context & ctx) override;
