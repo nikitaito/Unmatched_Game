@@ -200,6 +200,31 @@ void DamageIfAdjacent :: execute(Context & ctx){
         else if(ctx.mover_sidekick)
             ctx.mover_sidekick->Damage(i);
     }
+    else if(chtype == CharacterType :: Invman){
+        if(!ctx.targetplayer)
+            return;
+
+        Board * board = ctx.game->get_Board();
+        int self_space = board->find_space_of_hero(ctx.ownhero);
+        if(self_space < 0)
+            return;
+
+        const auto & spaces = board->get_spaces();
+        if(spaces[self_space].get_token() == nullptr)
+            return;
+
+        Heroes * enemyHero = ctx.targetplayer->get_hero();
+        if(!enemyHero)
+            return;
+
+        if(enemyHero->get_HP() > 0)
+            enemyHero->Damage(damage);
+
+        for(Sidekick * sk : enemyHero->get_sidekick()){
+            if(sk && sk->get_islive())
+                sk->Damage(damage);
+        }
+    }
 
 }
 /////////////////////
@@ -338,6 +363,7 @@ void IntoThinAirEffect :: execute(Context & ctx){
 
     Board * board = ctx.game->get_Board();
 
+    // Step 1: move the Invisible Man up to 1 space (optional).
     if(ctx.self_move_destination >= 0){
         int selfSpace = board->find_space_of_hero(ctx.ownhero);
         if(selfSpace >= 0 && selfSpace != ctx.self_move_destination){
@@ -351,6 +377,7 @@ void IntoThinAirEffect :: execute(Context & ctx){
         }
     }
 
+    // Step 2: move one fog token up to 3 spaces (optional).
     if(ctx.fog_token_space >= 0 && ctx.fog_token_destination >= 0 && ctx.fog_token_space != ctx.fog_token_destination){
         try{
             ctx.game->Move_FogToken(ctx.fog_token_space , ctx.fog_token_destination , 3);
@@ -361,6 +388,7 @@ void IntoThinAirEffect :: execute(Context & ctx){
         }
     }
 }
+//////////////////////
 //////////////////////
 void ImpossibleToSeeEffect :: execute(Context & ctx){
     Card * target = nullptr;
