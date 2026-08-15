@@ -38,6 +38,8 @@ int Card::get_Attack() const
 
 void Card::set_Attack(int amount)
 {
+    if(ValueLocked)
+        return;
     Attack += amount;
 }
 
@@ -47,7 +49,19 @@ int Card::get_Defense() const
 }
 void Card::set_Defence(int amount)
 {
+    if(ValueLocked)
+        return;
     Defense += amount;
+}
+
+bool Card::get_ValueLocked() const
+{
+    return ValueLocked;
+}
+
+void Card::LockValue()
+{
+    ValueLocked = true;
 }
 
 void Card::set_ApplyEffects(bool b)

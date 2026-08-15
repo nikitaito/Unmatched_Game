@@ -20,6 +20,8 @@ class Card
         int Boost;
 
         bool ApplyEffects{true};
+        bool ValueLocked{false};
+        
         std :: vector<std :: unique_ptr<Effect>> Effects;
     public:
         Card() = default;
@@ -47,6 +49,9 @@ class Card
 
         bool get_ApplyEffects();
         void set_ApplyEffects(bool);
+
+        bool get_ValueLocked() const;
+        void LockValue();
 
         std :: vector<std :: unique_ptr<Effect>>& get_effects() ;
         
