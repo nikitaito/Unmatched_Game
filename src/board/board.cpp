@@ -247,6 +247,14 @@ bool Board :: dfs_fog(int current , int target , std :: vector<bool> & visited ,
     return false;
 }
 
+bool Board :: is_way_with_fog_jump(int current , int target , const std :: vector<CharacterType> & enemyTypes , bool allowhiddenway , int cost) const{
+    if(!(spaces[target].empty()))
+        return false;
+
+    std :: vector<bool> visited (SPACE_COUNT , false);
+    return dfs_fog(current , target , visited , enemyTypes , allowhiddenway , cost);
+}
+
 void Board :: Move(int current , int target){
     if(current == target)
         return;

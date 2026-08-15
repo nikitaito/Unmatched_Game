@@ -29,6 +29,7 @@ class Board
         int number_of_sisters_in_this_zone(Space *);
         bool is_way(int , int , CharacterType , bool , int) const;
         bool is_way_for_token(int , int , CharacterType , bool , int) const;
+        bool is_way_with_fog_jump(int , int , const std :: vector<CharacterType> & , bool , int) const;
         void Move(int , int);
         void Teleport(int , int);
         bool Adjacency(CharacterType , CharacterType);
