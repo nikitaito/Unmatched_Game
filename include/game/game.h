@@ -42,7 +42,7 @@ class Game
         Player* get_player_of_hero(CharacterType);
         Player* get_owner(CharacterType);
         Player* get_opponent(Player *);
-        void choose(std :: pair< int , CharacterType > , std :: pair< int , CharacterType >);
+        void choose (CharacterType , CharacterType , int , int );
         void inital_hand_cards();
         Board * get_Board();
         void DrawCard(Player * , int);

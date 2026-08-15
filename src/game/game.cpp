@@ -23,65 +23,106 @@ Player* Game :: get_player_of_hero(CharacterType chtype){
 Player * Game :: get_turn(){
     return turn;
 }
-void Game :: choose (pair< int , CharacterType > p1 , pair< int , CharacterType > p2){
+
+void Game :: choose (CharacterType ch1 , CharacterType ch2 , int position1 , int position2){
+
     player1.set_name("Player one");
     player2.set_name("Player two");
-    if(p1.first < p2.first){
-        turn = &player1;
-        switch(p1.second){
-            case CharacterType :: SherlockHolmes:
-                player1.set_age(p1.first);
-                player2.set_age(p2.first);
-                player1.assign_Characters(CharacterType :: SherlockHolmes);
-                player2.assign_Characters(CharacterType :: Dracula);
-                board.set_Hero(player1.get_hero() , 4);
-                board.set_Hero(player2.get_hero() , 24);
-                PlaceStartingSidekicks(&player1 , 4);
-                PlaceStartingSidekicks(&player2 , 24);
-                break;
 
-            case CharacterType :: Dracula:
-                player1.set_age(p1.first);
-                player2.set_age(p2.first);
-                player1.assign_Characters(CharacterType :: Dracula);
-                player2.assign_Characters(CharacterType :: SherlockHolmes);
-                board.set_Hero(player1.get_hero() , 4);
-                board.set_Hero(player2.get_hero() , 24);
-                PlaceStartingSidekicks(&player1 , 4);
-                PlaceStartingSidekicks(&player2 , 24);
-                break;
-            default:
-                break;
-        }
-    }
-    else{
-        turn = &player2;
-        switch(p2.second){
-            case CharacterType :: SherlockHolmes:
-                player1.set_age(p1.first);
-                player2.set_age(p2.first);
-                player2.assign_Characters(CharacterType :: SherlockHolmes);
-                player1.assign_Characters(CharacterType :: Dracula);
-                board.set_Hero(player2.get_hero() , 4);
-                board.set_Hero(player1.get_hero() , 24);
-                PlaceStartingSidekicks(&player2 , 4);
-                PlaceStartingSidekicks(&player1 , 24);
-                break;
+    turn = &player1;
 
-            case CharacterType :: Dracula:
-                player1.set_age(p1.first);
-                player2.set_age(p2.first);
-                player2.assign_Characters(CharacterType :: Dracula);
-                player1.assign_Characters(CharacterType :: SherlockHolmes);
-                board.set_Hero(player2.get_hero() , 4);
-                board.set_Hero(player1.get_hero() , 24);
-                PlaceStartingSidekicks(&player2 , 4);
-                PlaceStartingSidekicks(&player1 , 24);
-                break;
-            default:
-                break;
-        }
-    }
+    player1.assign_Characters(ch1);
+    player2.assign_Characters(ch2);
+    board.set_Hero(player1.get_hero() , position1);
+    board.set_Hero(player2.get_hero() , position2);
+    PlaceStartingSidekicks(&player1 , position1);
+    PlaceStartingSidekicks(&player2 , position2);
+
+    // switch(ch2){
+    //     case CharacterType :: SherlockHolmes:
+    //         // player1.set_age(p1.first);
+    //         // player2.set_age(p2.first);
+    //         player1.assign_Characters(ch1);
+    //         player2.assign_Characters(ch2);
+    //         board.set_Hero(player1.get_hero() , 4);
+    //         board.set_Hero(player2.get_hero() , 24);
+    //         PlaceStartingSidekicks(&player1 , 4);
+    //         PlaceStartingSidekicks(&player2 , 24);
+    //         break;
+
+    //     case CharacterType :: Dracula:
+    //         // player1.set_age(p1.first);
+    //         // player2.set_age(p2.first);
+    //         player1.assign_Characters(c);
+    //         player2.assign_Characters(CharacterType :: SherlockHolmes);
+    //         board.set_Hero(player1.get_hero() , 4);
+    //         board.set_Hero(player2.get_hero() , 24);
+    //         PlaceStartingSidekicks(&player1 , 4);
+    //         PlaceStartingSidekicks(&player2 , 24);
+    //         break;
+    //     default:
+    //         break;
+    // }
+
+    // ///////////
+    // player1.set_name("Player one");
+    // player2.set_name("Player two");
+    // if(p1.first < p2.first){
+    //     turn = &player1;
+    //     switch(p1.second){
+    //         case CharacterType :: SherlockHolmes:
+    //             player1.set_age(p1.first);
+    //             player2.set_age(p2.first);
+    //             player1.assign_Characters(CharacterType :: SherlockHolmes);
+    //             player2.assign_Characters(CharacterType :: Dracula);
+    //             board.set_Hero(player1.get_hero() , 4);
+    //             board.set_Hero(player2.get_hero() , 24);
+    //             PlaceStartingSidekicks(&player1 , 4);
+    //             PlaceStartingSidekicks(&player2 , 24);
+    //             break;
+
+    //         case CharacterType :: Dracula:
+    //             player1.set_age(p1.first);
+    //             player2.set_age(p2.first);
+    //             player1.assign_Characters(CharacterType :: Dracula);
+    //             player2.assign_Characters(CharacterType :: SherlockHolmes);
+    //             board.set_Hero(player1.get_hero() , 4);
+    //             board.set_Hero(player2.get_hero() , 24);
+    //             PlaceStartingSidekicks(&player1 , 4);
+    //             PlaceStartingSidekicks(&player2 , 24);
+    //             break;
+    //         default:
+    //             break;
+    //     }
+    // }
+    // else{
+    //     turn = &player2;
+    //     switch(p2.second){
+    //         case CharacterType :: SherlockHolmes:
+    //             player1.set_age(p1.first);
+    //             player2.set_age(p2.first);
+    //             player2.assign_Characters(CharacterType :: SherlockHolmes);
+    //             player1.assign_Characters(CharacterType :: Dracula);
+    //             board.set_Hero(player2.get_hero() , 4);
+    //             board.set_Hero(player1.get_hero() , 24);
+    //             PlaceStartingSidekicks(&player2 , 4);
+    //             PlaceStartingSidekicks(&player1 , 24);
+    //             break;
+
+    //         case CharacterType :: Dracula:
+    //             player1.set_age(p1.first);
+    //             player2.set_age(p2.first);
+    //             player2.assign_Characters(CharacterType :: Dracula);
+    //             player1.assign_Characters(CharacterType :: SherlockHolmes);
+    //             board.set_Hero(player2.get_hero() , 4);
+    //             board.set_Hero(player1.get_hero() , 24);
+    //             PlaceStartingSidekicks(&player2 , 4);
+    //             PlaceStartingSidekicks(&player1 , 24);
+    //             break;
+    //         default:
+    //             break;
+    //     }
+    // }
 }
 
 void Game::inital_hand_cards() {
