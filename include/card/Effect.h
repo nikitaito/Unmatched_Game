@@ -42,6 +42,10 @@ struct  Context
 
     int move_override_target = -1;
 
+    int self_move_destination = -1;
+    int fog_token_space = -1;
+    int fog_token_destination = -1;
+
     /// prediction / information cards (Confirm Suspicion, Elementary)
     int guessedValue = 0;
     bool guessAttack = true;      
@@ -214,7 +218,11 @@ class ImpossibleToSeeEffect : public Effect
         virtual void execute(Context & ctx) override;
 };
 
-
+class IntoThinAirEffect : public Effect
+{
+    public:
+        virtual void execute(Context & ctx) override;
+};
 
 std :: vector<std :: unique_ptr<Effect>> Make_Effect(std :: vector<Effect *> effects);
 

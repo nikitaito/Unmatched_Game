@@ -332,6 +332,36 @@ void EmergeFromMistEffect :: execute(Context & ctx){
     }
 }
 //////////////////////
+void IntoThinAirEffect :: execute(Context & ctx){
+    if(!ctx.ownhero || !ctx.game)
+        return;
+
+    Board * board = ctx.game->get_Board();
+
+    if(ctx.self_move_destination >= 0){
+        int selfSpace = board->find_space_of_hero(ctx.ownhero);
+        if(selfSpace >= 0 && selfSpace != ctx.self_move_destination){
+            try{
+                ctx.game->Move_characters(selfSpace , ctx.self_move_destination , ctx.ownhero->get_name() , false , 1);
+                ctx.log.push_back("Vanishing into Thin Air: the Invisible Man slips to a new space.");
+            }
+            catch(const std :: exception &){
+                ctx.log.push_back("Vanishing into Thin Air: no legal space for the Invisible Man to move to.");
+            }
+        }
+    }
+
+    if(ctx.fog_token_space >= 0 && ctx.fog_token_destination >= 0 && ctx.fog_token_space != ctx.fog_token_destination){
+        try{
+            ctx.game->Move_FogToken(ctx.fog_token_space , ctx.fog_token_destination , 3);
+            ctx.log.push_back("Vanishing into Thin Air: a fog token drifts to a new space.");
+        }
+        catch(const std :: exception &){
+            ctx.log.push_back("Vanishing into Thin Air: the fog token had no legal destination.");
+        }
+    }
+}
+//////////////////////
 void ImpossibleToSeeEffect :: execute(Context & ctx){
     Card * target = nullptr;
     bool targetIsAttack = false;
