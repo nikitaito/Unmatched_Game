@@ -1,4 +1,4 @@
-#include "game.h"
+#include "game/game.h"
 #include <iostream>
 using namespace std;
 
@@ -217,6 +217,7 @@ Usertype Game :: UsertypeOf(CharacterType chtype) const{
         case CharacterType :: SherlockHolmes: return Usertype :: HOLMES;
         case CharacterType :: Sister: return Usertype :: SISTER;
         case CharacterType :: Dr_Watson: return Usertype :: DR_WATSON;
+        case CharacterType :: Invman: return Usertype :: INVMAN;
         default: return Usertype :: ANY;
     }
 }
@@ -264,6 +265,18 @@ bool Game :: ResolveActingFighter(Player * p , Usertype ut , Heroes *& outHero ,
             }
             if(hero->get_HP() <= 0){
                 err = "Sherlock Holmes has been defeated and his cards can no longer be played.";
+                return false;
+            }
+            outHero = hero;
+            return true;
+
+        case Usertype :: INVMAN:
+            if(hero->get_name() != CharacterType :: Invman){
+                err = "This card can only be played by the Invisible Man.";
+                return false;
+            }
+            if(hero->get_HP() <= 0){
+                err = "The Invisible Man has been defeated and his cards can no longer be played.";
                 return false;
             }
             outHero = hero;
