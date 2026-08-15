@@ -389,6 +389,23 @@ void IntoThinAirEffect :: execute(Context & ctx){
     }
 }
 //////////////////////
+void RollingFogEffect :: execute(Context & ctx){
+    if(!ctx.game || !ctx.ownplayer)
+        return;
+    if(ctx.fog_token_space >= 0 && ctx.fog_token_destination >= 0 && ctx.fog_token_space != ctx.fog_token_destination){
+        try{
+            int cost = ctx.game->get_Board()->get_space_count();
+            ctx.game->Move_FogToken(ctx.fog_token_space , ctx.fog_token_destination , cost);
+            ctx.log.push_back("Rolling Fog: a fog token rolls to a new space.");
+        }
+        catch(const std :: exception &){
+            ctx.log.push_back("Rolling Fog: the fog token had no legal destination.");
+        }
+    }
+
+    ctx.game->IncreaseAction(ctx.ownplayer);
+    ctx.log.push_back("Rolling Fog: gained 1 action.");
+}
 //////////////////////
 void ImpossibleToSeeEffect :: execute(Context & ctx){
     Card * target = nullptr;
