@@ -136,6 +136,11 @@ void Game :: ChangeTurn(){
     bloodHarvestUsedThisTurn = false;
 }
 
+void Game :: RecordStartOfTurnPositions(){
+    RecordHeroAndSidekickPositions(&player1);
+    RecordHeroAndSidekickPositions(&player2);
+}
+
 void Game :: RecordHeroAndSidekickPositions(Player * p){
     if(!p)
         return;
