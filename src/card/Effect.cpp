@@ -331,3 +331,28 @@ void EmergeFromMistEffect :: execute(Context & ctx){
         ctx.log.push_back("Emerging from the Fog: attack value becomes 5.");
     }
 }
+//////////////////////
+void ImpossibleToSeeEffect :: execute(Context & ctx){
+    Card * target = nullptr;
+    bool targetIsAttack = false;
+
+    if(ctx.effectCard == ctx.attackCard && ctx.defenseCard){
+        target = ctx.defenseCard;
+        targetIsAttack = false;
+    }
+    else if(ctx.effectCard == ctx.defenseCard && ctx.attackCard){
+        target = ctx.attackCard;
+        targetIsAttack = true;
+    }
+
+    if(!target)
+        return;
+
+    if(targetIsAttack)
+        target->set_Attack(-target->get_Attack());
+    else
+        target->set_Defence(-target->get_Defense());
+
+    target->LockValue();
+    ctx.log.push_back("Impossible to See: opponent's card value is locked at 0.");
+}
