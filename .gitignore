@@ -41,3 +41,5 @@ Makefile
 
 # system files
 .DS_Store
+include/.DS_Store
+src/.DS_Store
