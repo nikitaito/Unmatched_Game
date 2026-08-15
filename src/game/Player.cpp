@@ -4,9 +4,9 @@ using namespace std;
 
 // Player :: Player(string name , int age) : age(age) , name(name) {}
 
-int Player :: get_age() const{
-    return age;
-}
+// int Player :: get_age() const{
+//     return age;
+// }
 
 string Player :: get_name() const{
     return name;
@@ -21,9 +21,9 @@ void Player :: assign_Characters(CharacterType ht){
         current_hero = &dracula;
 }
 
-void Player :: set_age(int x){
-    age = x;
-}
+// void Player :: set_age(int x){
+//     age = x;
+// }
 
 void Player :: set_name (string name){
     this->name = name;

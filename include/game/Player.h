@@ -22,7 +22,7 @@ class Player
         std::vector<Card> discard;
 
         std :: string name;
-        int age;
+        // int age;
 
         int action = 2;
 
@@ -31,14 +31,14 @@ class Player
         
         //set and get
         void set_name(std :: string);
-        void set_age(int);
+        // void set_age(int);
         void add_card(Card&& card);
         int remove_card(CardName);
         Card take_hand_card(int index);
         void discard_card(Card&& card);
         std :: vector<Card>& get_hand_cards() ;
         std :: vector<Card>& get_dis_cards() ;
-        int get_age()const;
+        // int get_age()const;
         std :: string get_name() const;
         Heroes * get_hero();
         void assign_Characters(CharacterType) ;
