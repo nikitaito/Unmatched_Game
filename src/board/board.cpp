@@ -204,8 +204,20 @@ bool Board :: dfs_fog(int current , int target , std :: vector<bool> & visited ,
     visited[current] = true;
     const Space & space = spaces[current];
 
+    auto blockedByEnemy = [&](const Space & sp){
+        for(auto et : enemyTypes){
+            if(sp.get_Hero() && sp.get_Hero()->get_name() == et)
+                return true;
+            if(sp.get_comrade() && sp.get_comrade()->get_name() == et)
+                return true;
+        }
+        return false;
+    };
+
     for(int next : space.get_neighbor()){
         if(visited[next] == true)
+            continue;
+        if(blockedByEnemy(spaces[next]))
             continue;
         if(dfs_fog(next , target , visited , enemyTypes , allowhiddenway , cost - 1))
             return true;
@@ -214,6 +226,8 @@ bool Board :: dfs_fog(int current , int target , std :: vector<bool> & visited ,
     if(allowhiddenway){
         for(int next : space.get_Hidden_way()){
             if(visited[next] == true)
+                continue;
+            if(blockedByEnemy(spaces[next]))
                 continue;
             if(dfs_fog(next , target , visited , enemyTypes , allowhiddenway , cost - 1))
                 return true;
@@ -228,14 +242,7 @@ bool Board :: dfs_fog(int current , int target , std :: vector<bool> & visited ,
             if(other.get_token() == nullptr)
                 continue;
 
-            bool enemyPresent = false;
-            for(auto et : enemyTypes){
-                if(other.get_Hero() && other.get_Hero()->get_name() == et)
-                    enemyPresent = true;
-                if(other.get_comrade() && other.get_comrade()->get_name() == et)
-                    enemyPresent = true;
-            }
-            if(enemyPresent)
+            if(blockedByEnemy(other))
                 continue;
 
             if(dfs_fog(next , target , visited , enemyTypes , allowhiddenway , cost - 1))
