@@ -5,6 +5,7 @@
 #include "Enums.h"
 #include "fighter/SherlockHolmes.h"
 #include "fighter/Dracula.h"
+#include "fighter/Invisibleman.h"
 #include "fighter/Sidekick.h"
 #include "card/Card.h"
 #include <string>
@@ -15,6 +16,7 @@ class Player
         Heroes * current_hero = nullptr;
         SherlockHolmes sherlock;
         Dracula dracula;
+        Invman invman;
 
         std::vector<Card> handcard;
         std::vector<Card> discard;

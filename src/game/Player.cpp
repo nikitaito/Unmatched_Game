@@ -15,6 +15,8 @@ string Player :: get_name() const{
 void Player :: assign_Characters(CharacterType ht){
     if(ht == CharacterType :: SherlockHolmes)
         current_hero = &sherlock;
+    else if(ht == CharacterType :: Invman)
+        current_hero = &invman;
     else
         current_hero = &dracula;
 }
