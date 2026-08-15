@@ -33,6 +33,7 @@ class Game
         void PlaceStartingSidekicks(Player * , int heroSpace);
         Usertype UsertypeOf(CharacterType) const;
         void RemoveDefeatedSidekicks();
+        void RecordHeroAndSidekickPositions(Player *);
 
     public:
 
