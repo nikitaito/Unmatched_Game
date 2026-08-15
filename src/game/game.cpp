@@ -227,7 +227,6 @@ void Game :: PlaceStartingSidekicks(Player * p , int heroSpace){
     auto sidekicks = hero->get_sidekick();
 
     if(hero->get_name() == CharacterType :: Dracula){
-        // All three Sisters begin in Dracula's starting Zone.
         vector<int> spots = (heroSpace == 24) ? vector<int>{21 , 22 , 23} : vector<int>{1 , 5 , 8};
         for(size_t i = 0 ; i < sidekicks.size() && i < spots.size() ; ++i)
             board.set_Comrade(sidekicks[i] , spots[i]);
