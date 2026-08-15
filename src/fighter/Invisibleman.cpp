@@ -39,8 +39,8 @@ void Invman :: initial_deck() {
     cards.deck.push_back(Card(CardName :: Reign_of_Terror , CardTiming :: Immediate , CardType :: EVENT , Usertype :: INVMAN , 0, 0 , 1 , Make_Effect({new DamageIfAdjacent(2 , CharacterType :: Invman)})));
     cards.deck.push_back(Card(CardName :: Reign_of_Terror , CardTiming :: Immediate , CardType :: EVENT , Usertype :: INVMAN , 0, 0 , 1 , Make_Effect({new DamageIfAdjacent(2 , CharacterType :: Invman)})));
 
-    cards.deck.push_back(Card(CardName :: Rolling_Fog , CardTiming :: Immediate , CardType :: EVENT , Usertype :: INVMAN , 0, 0 , 1 , Make_Effect({})));
-    cards.deck.push_back(Card(CardName :: Rolling_Fog , CardTiming :: Immediate , CardType :: EVENT , Usertype :: INVMAN , 0, 0 , 1 , Make_Effect({})));
+    cards.deck.push_back(Card(CardName :: Rolling_Fog , CardTiming :: Immediate , CardType :: EVENT , Usertype :: INVMAN , 0, 0 , 1 , Make_Effect({new RollingFogEffect()})));
+    cards.deck.push_back(Card(CardName :: Rolling_Fog , CardTiming :: Immediate , CardType :: EVENT , Usertype :: INVMAN , 0, 0 , 1 , Make_Effect({new RollingFogEffect()})));
 
     cards.deck.push_back(Card(CardName :: Slip_Away , CardTiming :: After , CardType :: ATTACK , Usertype :: INVMAN , 3, 0 , 2 , Make_Effect({})));
     cards.deck.push_back(Card(CardName :: Slip_Away , CardTiming :: After , CardType :: ATTACK , Usertype :: INVMAN , 3, 0 , 2 , Make_Effect({})));
