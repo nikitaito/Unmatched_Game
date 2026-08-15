@@ -313,3 +313,21 @@ void DamageIfOnFog :: execute(Context & ctx){
             s->Damage(damage);
     }
 }
+//////////////////////
+void EmergeFromMistEffect :: execute(Context & ctx){
+    if(!ctx.ownhero || !ctx.game || !ctx.effectCard)
+        return;
+
+    int startSpace = ctx.ownhero->get_StartTurnSpace();
+    if(startSpace < 0)
+        return;
+
+    const auto & spaces = ctx.game->get_Board()->get_spaces();
+    if(startSpace >= static_cast<int>(spaces.size()))
+        return;
+
+    if(spaces[startSpace].get_token() != nullptr){
+        ctx.effectCard->set_Attack(2); // base value 3 -> 5
+        ctx.log.push_back("Emerging from the Fog: attack value becomes 5.");
+    }
+}

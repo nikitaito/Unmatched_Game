@@ -202,6 +202,12 @@ class DamageIfOnFog : public Effect
         virtual void execute(Context & ctx) override;
 };
 
+class EmergeFromMistEffect : public Effect
+{
+    public:
+        virtual void execute(Context & ctx) override;
+};
+
 
 
 std :: vector<std :: unique_ptr<Effect>> Make_Effect(std :: vector<Effect *> effects);
