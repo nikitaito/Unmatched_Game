@@ -402,6 +402,25 @@ bool Game :: MoveFighter(Player * p , int fromSpace , int toSpace , std :: strin
         return false;
     }
 
+    if(h && h->get_name() == CharacterType :: Invman){
+        Player * opponent = get_opponent(p);
+        Heroes * enemyHero = opponent->get_hero();
+
+        std :: vector<CharacterType> enemyTypes;
+        enemyTypes.push_back(enemyHero->get_name());
+        for(auto * sk : enemyHero->get_sidekick()){
+            if(sk->get_islive() && sk->occupies_space())
+                enemyTypes.push_back(sk->get_name());
+        }
+
+        if(!board.is_way_with_fog_jump(fromSpace , toSpace , enemyTypes , true , moveLimit)){
+            err = "No valid path within that fighter's movement range.";
+            return false;
+        }
+        board.Move(fromSpace , toSpace);
+        return true;
+    }
+
     try{
         Move_characters(fromSpace , toSpace , fighterType , true , moveLimit);
     }
