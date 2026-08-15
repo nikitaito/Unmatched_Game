@@ -40,6 +40,14 @@ CharacterType Sidekick :: get_name() const{
     return name;
 }
 
+int Sidekick :: get_StartTurnSpace() const{
+    return startTurnSpace;
+}
+
+void Sidekick :: set_StartTurnSpace(int space){
+    startTurnSpace = space;
+}
+
 void Sidekick :: Damage(int x)
 {
     if(Health <= x)

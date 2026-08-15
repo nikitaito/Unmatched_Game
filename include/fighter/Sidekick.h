@@ -13,6 +13,8 @@ class Sidekick
         int Health_max;
         int Movement;
 
+        int startTurnSpace{-1};
+
     public:
         Sidekick(CharacterType, Attacktype, int, int);
 
@@ -22,6 +24,9 @@ class Sidekick
         int get_Health() const;
         int get_Health_max() const;
         CharacterType get_name() const;
+
+        int get_StartTurnSpace() const;
+        void set_StartTurnSpace(int);
 
         void Heal(int);
 
