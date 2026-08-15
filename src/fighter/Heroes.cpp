@@ -33,6 +33,14 @@ int Heroes :: get_HP_max() const{
     return Health_max;
 }
 
+int Heroes :: get_StartTurnSpace() const{
+    return startTurnSpace;
+}
+
+void Heroes :: set_StartTurnSpace(int space){
+    startTurnSpace = space;
+}
+
 void Heroes :: Damage(int x){
     if(Health <= x)
         Health = 0;

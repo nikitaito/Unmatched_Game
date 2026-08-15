@@ -24,6 +24,8 @@ class Heroes
         int Health_max;
         int Movement;
 
+        int startTurnSpace{-1};
+
     protected :
         Cards cards;
         std :: vector<Sidekick *> sidekick;
@@ -38,6 +40,9 @@ class Heroes
         int get_Movement() const;
         int get_HP() const;
         int get_HP_max()const;
+
+        int get_StartTurnSpace() const;
+        void set_StartTurnSpace(int);
 
         void Damage(int);
         void Heal(int);
