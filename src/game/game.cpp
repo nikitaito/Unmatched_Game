@@ -244,10 +244,20 @@ void Game :: PlaceStartingSidekicks(Player * p , int heroSpace){
 }
 
 Player* Game :: get_owner(CharacterType chtype){
-    CharacterType heroType = (chtype == CharacterType :: Sister || chtype == CharacterType :: Dracula)
-                                ? CharacterType :: Dracula
-                                : CharacterType :: SherlockHolmes;
-    return get_player_of_hero(heroType);
+    if(player1.get_hero()->get_name() == chtype)
+        return &player1;
+    if(player2.get_hero()->get_name() == chtype)
+        return &player2;
+
+    for(auto * sk : player1.get_hero()->get_sidekick())
+        if(sk->get_name() == chtype)
+            return &player1;
+
+    for(auto * sk : player2.get_hero()->get_sidekick())
+        if(sk->get_name() == chtype)
+            return &player2;
+
+    return nullptr;
 }
 
 Player* Game :: get_opponent(Player * p){
