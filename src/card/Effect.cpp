@@ -284,3 +284,32 @@ vector<unique_ptr<Effect>> Make_Effect(vector<Effect *> effects){
 
     return result;
 }
+//////////////////////
+DamageIfOnFog :: DamageIfOnFog(int d) : damage(d){}
+
+void DamageIfOnFog :: execute(Context & ctx){
+    if(!ctx.ownhero || !ctx.game)
+        return;
+
+    Board * board = ctx.game->get_Board();
+    int selfSpace = board->find_space_of_hero(ctx.ownhero);
+    if(selfSpace < 0)
+        return;
+
+    const auto & spaces = board->get_spaces();
+    if(spaces[selfSpace].get_token() == nullptr)
+        return;
+
+    for(const auto & sp : spaces){
+        if(sp.get_token() == nullptr)
+            continue;
+
+        Heroes * h = sp.get_Hero();
+        if(h && ctx.game->get_owner(h->get_name()) == ctx.targetplayer)
+            h->Damage(damage);
+
+        Sidekick * s = sp.get_comrade();
+        if(s && s->get_islive() && ctx.game->get_owner(s->get_name()) == ctx.targetplayer)
+            s->Damage(damage);
+    }
+}

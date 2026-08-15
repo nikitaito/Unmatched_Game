@@ -193,6 +193,15 @@ class DeduceStrategyEffect : public Effect
         virtual void execute(Context &) override;
 };
 
+class DamageIfOnFog : public Effect
+{
+    private:
+        int damage;
+    public:
+        DamageIfOnFog(int);
+        virtual void execute(Context & ctx) override;
+};
+
 
 
 std :: vector<std :: unique_ptr<Effect>> Make_Effect(std :: vector<Effect *> effects);
