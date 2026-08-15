@@ -24,8 +24,8 @@ void Invman :: initial_deck() {
     cards.deck.push_back(Card(CardName :: Deaming_of_Revenge , CardTiming :: After , CardType :: BOTH , Usertype :: INVMAN , 3, 3 , 1 , Make_Effect({new DamageIfOnFog(1)})));
     cards.deck.push_back(Card(CardName :: Deaming_of_Revenge , CardTiming :: After , CardType :: BOTH , Usertype :: INVMAN , 3, 3 , 1 , Make_Effect({new DamageIfOnFog(1)})));
 
-    cards.deck.push_back(Card(CardName :: Emerge_from_Mist , CardTiming :: During , CardType :: ATTACK , Usertype :: INVMAN , 3, 0 , 2 , Make_Effect({})));
-    cards.deck.push_back(Card(CardName :: Emerge_from_Mist , CardTiming :: During , CardType :: ATTACK , Usertype :: INVMAN , 3, 0 , 2 , Make_Effect({})));
+    cards.deck.push_back(Card(CardName :: Emerge_from_Mist , CardTiming :: During , CardType :: ATTACK , Usertype :: INVMAN , 3, 0 , 2 , Make_Effect({new EmergeFromMistEffect()})));
+    cards.deck.push_back(Card(CardName :: Emerge_from_Mist , CardTiming :: During , CardType :: ATTACK , Usertype :: INVMAN , 3, 0 , 2 , Make_Effect({new EmergeFromMistEffect()})));
 
     cards.deck.push_back(Card(CardName :: Impossible_to_See , CardTiming :: Immediate , CardType :: BOTH , Usertype :: INVMAN , 2, 2 , 2 , Make_Effect({})));
     cards.deck.push_back(Card(CardName :: Impossible_to_See , CardTiming :: Immediate , CardType :: BOTH , Usertype :: INVMAN , 2, 2 , 2 , Make_Effect({})));
