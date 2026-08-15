@@ -37,6 +37,7 @@ void Game :: choose (CharacterType ch1 , CharacterType ch2 , int position1 , int
     board.set_Hero(player2.get_hero() , position2);
     PlaceStartingSidekicks(&player1 , position1);
     PlaceStartingSidekicks(&player2 , position2);
+    RecordStartOfTurnPositions();
 }
 
 void Game::inital_hand_cards() {
@@ -134,6 +135,7 @@ void Game :: ChangeTurn(){
         player2.reset_action();
     }
     bloodHarvestUsedThisTurn = false;
+    RecordStartOfTurnPositions();
 }
 
 void Game :: RecordStartOfTurnPositions(){
