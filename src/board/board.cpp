@@ -283,6 +283,21 @@ void Board :: Move(int current , int target){
     }
 }
 
+void Board :: MoveToken(int current , int target){
+    if(current == target)
+        return;
+
+    Sidekick * token = spaces[current].get_token();
+    if(!token)
+        return;
+
+    if(spaces[target].get_token() != nullptr)
+        return;
+
+    spaces[current].clear_token();
+    spaces[target].set_token(token);
+}
+
 void Board :: Teleport(int current , int target){
     if(!spaces[target].empty())
         throw NoSpaceException();
