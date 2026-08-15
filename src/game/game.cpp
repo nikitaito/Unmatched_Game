@@ -232,6 +232,11 @@ void Game :: PlaceStartingSidekicks(Player * p , int heroSpace){
         for(size_t i = 0 ; i < sidekicks.size() && i < spots.size() ; ++i)
             board.set_Comrade(sidekicks[i] , spots[i]);
     }
+    else if(hero->get_name() == CharacterType :: Invman){
+        vector<int> spots = (heroSpace == 24) ? vector<int>{21 , 22 , 23} : vector<int>{1 , 5 , 8};
+        for(size_t i = 0 ; i < sidekicks.size() && i < spots.size() ; ++i)
+            board.set_Token(sidekicks[i] , spots[i]);
+    }
     else{
         int spot = (heroSpace == 4) ? 1 : 21;
         if(!sidekicks.empty())
