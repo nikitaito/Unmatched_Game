@@ -30,8 +30,8 @@ void Invman :: initial_deck() {
     cards.deck.push_back(Card(CardName :: Impossible_to_See , CardTiming :: Before , CardType :: BOTH , Usertype :: INVMAN , 2, 2 , 2 , Make_Effect({new ImpossibleToSeeEffect()})));
     cards.deck.push_back(Card(CardName :: Impossible_to_See , CardTiming :: Before , CardType :: BOTH , Usertype :: INVMAN , 2, 2 , 2 , Make_Effect({new ImpossibleToSeeEffect()})));
 
-    cards.deck.push_back(Card(CardName :: Into_Thin_Air , CardTiming :: After , CardType :: DEFENSE , Usertype :: INVMAN , 0, 4 , 1 , Make_Effect({new IntoThinAirEffect()})));
-    cards.deck.push_back(Card(CardName :: Into_Thin_Air , CardTiming :: After , CardType :: DEFENSE , Usertype :: INVMAN , 0, 4 , 1 , Make_Effect({new IntoThinAirEffect()})));
+    cards.deck.push_back(Card(CardName :: Into_Thin_Air , CardTiming :: After , CardType :: DEFENSE , Usertype :: INVMAN , 0, 4 , 1 , Make_Effect({new SelfMoveEffect(1) , new MoveFogTokenEffect(3 , false)})));
+    cards.deck.push_back(Card(CardName :: Into_Thin_Air , CardTiming :: After , CardType :: DEFENSE , Usertype :: INVMAN , 0, 4 , 1 , Make_Effect({new SelfMoveEffect(1) , new MoveFogTokenEffect(3 , false)})));
 
     cards.deck.push_back(Card(CardName :: Lurking , CardTiming :: After , CardType :: DEFENSE , Usertype :: INVMAN , 0, 2 , 2 , Make_Effect({})));
     cards.deck.push_back(Card(CardName :: Lurking , CardTiming :: After , CardType :: DEFENSE , Usertype :: INVMAN , 0, 2 , 2 , Make_Effect({})));
@@ -39,12 +39,12 @@ void Invman :: initial_deck() {
     cards.deck.push_back(Card(CardName :: Reign_of_Terror , CardTiming :: Immediate , CardType :: EVENT , Usertype :: INVMAN , 0, 0 , 1 , Make_Effect({new DamageIfAdjacent(2 , CharacterType :: Invman)})));
     cards.deck.push_back(Card(CardName :: Reign_of_Terror , CardTiming :: Immediate , CardType :: EVENT , Usertype :: INVMAN , 0, 0 , 1 , Make_Effect({new DamageIfAdjacent(2 , CharacterType :: Invman)})));
 
-    cards.deck.push_back(Card(CardName :: Rolling_Fog , CardTiming :: Immediate , CardType :: EVENT , Usertype :: INVMAN , 0, 0 , 1 , Make_Effect({new RollingFogEffect()})));
-    cards.deck.push_back(Card(CardName :: Rolling_Fog , CardTiming :: Immediate , CardType :: EVENT , Usertype :: INVMAN , 0, 0 , 1 , Make_Effect({new RollingFogEffect()})));
+    cards.deck.push_back(Card(CardName :: Rolling_Fog , CardTiming :: Immediate , CardType :: EVENT , Usertype :: INVMAN , 0, 0 , 1 , Make_Effect({new MoveFogTokenEffect(-1 , false) , new GainActionEffect()})));
+    cards.deck.push_back(Card(CardName :: Rolling_Fog , CardTiming :: Immediate , CardType :: EVENT , Usertype :: INVMAN , 0, 0 , 1 , Make_Effect({new MoveFogTokenEffect(-1 , false) , new GainActionEffect()})));
 
-    cards.deck.push_back(Card(CardName :: Slip_Away , CardTiming :: After , CardType :: ATTACK , Usertype :: INVMAN , 3, 0 , 2 , Make_Effect({})));
-    cards.deck.push_back(Card(CardName :: Slip_Away , CardTiming :: After , CardType :: ATTACK , Usertype :: INVMAN , 3, 0 , 2 , Make_Effect({})));
-    cards.deck.push_back(Card(CardName :: Slip_Away , CardTiming :: After , CardType :: ATTACK , Usertype :: INVMAN , 3, 0 , 2 , Make_Effect({})));
+    cards.deck.push_back(Card(CardName :: Slip_Away , CardTiming :: After , CardType :: ATTACK , Usertype :: INVMAN , 3, 0 , 2 , Make_Effect({new MoveFogTokenEffect(-1 , true) , new PlaceSelfOnFogTokenEffect()})));
+    cards.deck.push_back(Card(CardName :: Slip_Away , CardTiming :: After , CardType :: ATTACK , Usertype :: INVMAN , 3, 0 , 2 , Make_Effect({new MoveFogTokenEffect(-1 , true) , new PlaceSelfOnFogTokenEffect()})));
+    cards.deck.push_back(Card(CardName :: Slip_Away , CardTiming :: After , CardType :: ATTACK , Usertype :: INVMAN , 3, 0 , 2 , Make_Effect({new MoveFogTokenEffect(-1 , true) , new PlaceSelfOnFogTokenEffect()})));
 
     cards.deck.push_back(Card(CardName :: Step_Lightly , CardTiming :: Immediate , CardType :: EVENT , Usertype :: INVMAN , 0, 0 , 1 , Make_Effect({})));
     cards.deck.push_back(Card(CardName :: Step_Lightly , CardTiming :: Immediate , CardType :: EVENT , Usertype :: INVMAN , 0, 0 , 1 , Make_Effect({})));
