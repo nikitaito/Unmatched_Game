@@ -10,8 +10,8 @@ Invman::Invman()
 }
 
 void Invman :: initial_deck() {
-    cards.deck.push_back(Card(CardName :: Coded_Notes , CardTiming :: After , CardType :: DEFENSE , Usertype :: INVMAN , 0 , 3 , 2 , Make_Effect({})));
-    cards.deck.push_back(Card(CardName :: Coded_Notes , CardTiming :: After , CardType :: DEFENSE , Usertype :: INVMAN , 0 , 3 , 2 , Make_Effect({})));
+    cards.deck.push_back(Card(CardName :: Coded_Notes , CardTiming :: After , CardType :: DEFENSE , Usertype :: INVMAN , 0 , 3 , 2 , Make_Effect({new CodedNotesEffect()})));
+    cards.deck.push_back(Card(CardName :: Coded_Notes , CardTiming :: After , CardType :: DEFENSE , Usertype :: INVMAN , 0 , 3 , 2 , Make_Effect({new CodedNotesEffect()})));
 
     cards.deck.push_back(Card(CardName :: ConFound , CardTiming :: After , CardType :: BOTH , Usertype :: INVMAN , 3 , 3 , 2 , Make_Effect({})));
     cards.deck.push_back(Card(CardName :: ConFound , CardTiming :: After , CardType :: BOTH , Usertype :: INVMAN , 3 , 3 , 2 , Make_Effect({}))); 
