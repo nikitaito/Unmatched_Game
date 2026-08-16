@@ -69,7 +69,7 @@ class Game
         bool PlayAttackCard(int handIndex , std :: string & err);
         bool PlayDefenseCard(int handIndex , std :: string & err);
         void SkipDefense();
-        std :: vector<std :: string> ResolveCombat(int moveDestination = -1, std :: vector<int> boostDiscardIndices = {}, int selfMoveDestination = -1, int fogTokenSpace = -1, int fogTokenDestination = -1);
+        std :: vector<std :: string> ResolveCombat(int moveDestination = -1, std :: vector<int> boostDiscardIndices = {}, int selfMoveDestination = -1, int fogTokenSpace = -1, int fogTokenDestination = -1, std :: vector<int> codedNotesReturnOrder = {});
         CombatStage get_CombatStage() const;
 
         bool BloodHarvest(Player * , int targetSpace , std :: string & err);

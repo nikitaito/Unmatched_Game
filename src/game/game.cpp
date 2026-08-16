@@ -75,7 +75,15 @@ void Game :: RemoveDefeatedSidekicks(){
 }
 
 void Game :: DrawCard(Player * player , int x){
-    for(int i = 0 ; i < x ; i++){ 
+    for(int i = 0 ; i < x ; i++){
+        auto & top = player->get_hero()->get_top_of_deck();
+        if(!top.empty()){
+            Card c = std :: move(top.front());
+            top.erase(top.begin());
+            player->add_card(std :: move(c));
+            continue;
+        }
+
         if(((player->get_hero())->get_deck_cards()).empty()){
 
             for(auto & it  : player->get_hero()->get_sidekick()){
@@ -631,7 +639,7 @@ CombatStage Game :: get_CombatStage() const{
     return combatStage;
 }
 
-std :: vector<std :: string> Game :: ResolveCombat(int moveDestination, std :: vector<int> boostDiscardIndices, int selfMoveDestination, int fogTokenSpace, int fogTokenDestination){
+std :: vector<std :: string> Game :: ResolveCombat(int moveDestination, std :: vector<int> boostDiscardIndices, int selfMoveDestination, int fogTokenSpace, int fogTokenDestination, std :: vector<int> codedNotesReturnOrder){
     vector<string> log;
     if(combatStage != CombatStage :: Ready){
         log.push_back("Combat is not ready to resolve.");
@@ -648,6 +656,7 @@ std :: vector<std :: string> Game :: ResolveCombat(int moveDestination, std :: v
     ctx.self_move_destination = selfMoveDestination;
     ctx.fog_token_space = fogTokenSpace;
     ctx.fog_token_destination = fogTokenDestination;
+    ctx.codedNotesReturnOrder = codedNotesReturnOrder;
     {
         auto & atkHand = combatAttackerPlayer->get_hand_cards();
         for(int idx : boostDiscardIndices){
