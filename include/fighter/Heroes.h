@@ -10,6 +10,7 @@
 struct Cards
 {
     std::vector<Card> deck;
+    std::vector<Card> top_of_deck;
 };
 
 
