@@ -494,3 +494,55 @@ void ImpossibleToSeeEffect :: execute(Context & ctx){
     target->LockValue();
     ctx.log.push_back("Impossible to See: opponent's card value is locked at 0.");
 }
+//////////////////////
+// Coded Notes: draw 3 cards, then choose 2 of them and place them on top of the
+// deck in any order. The player's choice is supplied ahead of time in
+// ctx.codedNotesReturnOrder as two draw-order positions (0 = 1st card drawn this
+// effect, 1 = 2nd, 2 = 3rd); codedNotesReturnOrder[0] is the one that comes back
+// on top (drawn next), codedNotesReturnOrder[1] the one drawn after that.
+void CodedNotesEffect :: execute(Context & ctx){
+    if(!ctx.ownhero || !ctx.ownplayer || !ctx.game)
+        return;
+
+    auto & hand = ctx.ownplayer->get_hand_cards();
+    int beforeDraw = static_cast<int>(hand.size());
+
+    ctx.game->DrawCard(ctx.ownplayer , 3);
+
+    int actuallyDrawn = static_cast<int>(hand.size()) - beforeDraw;
+    if(actuallyDrawn <= 0){
+        ctx.log.push_back("Coded Notes: no cards left to draw.");
+        return;
+    }
+
+    if(ctx.codedNotesReturnOrder.size() != 2){
+        ctx.log.push_back("Coded Notes: no valid choice supplied, drawn cards stay in hand.");
+        return;
+    }
+
+    int pos0 = ctx.codedNotesReturnOrder[0];
+    int pos1 = ctx.codedNotesReturnOrder[1];
+
+    if(pos0 < 0 || pos1 < 0 || pos0 == pos1 || pos0 >= actuallyDrawn || pos1 >= actuallyDrawn){
+        ctx.log.push_back("Coded Notes: invalid choice, drawn cards stay in hand.");
+        return;
+    }
+
+    int idx0 = beforeDraw + pos0;
+    int idx1 = beforeDraw + pos1;
+
+    // Take the higher hand index first so removing it doesn't shift the lower
+    // index out from under us; slots[0] must stay the one that goes on top.
+    std :: vector<Card> slots(2);
+    if(idx0 > idx1){
+        slots[0] = ctx.ownplayer->take_hand_card(idx0);
+        slots[1] = ctx.ownplayer->take_hand_card(idx1);
+    }
+    else{
+        slots[1] = ctx.ownplayer->take_hand_card(idx1);
+        slots[0] = ctx.ownplayer->take_hand_card(idx0);
+    }
+
+    ctx.ownhero->add_to_top_of_deck(std :: move(slots));
+    ctx.log.push_back("Coded Notes: 2 cards placed on top of the deck.");
+}
