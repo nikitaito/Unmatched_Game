@@ -30,6 +30,8 @@ class Space
         void set_comrades(Sidekick *);
         void set_token(Sidekick *);
         void clear_token();
+        void clear_comrade();
+        void clear_hero();
         void set_neighbor(std :: vector<int> & );
         void set_hidden_way(std :: vector<int> & );
 

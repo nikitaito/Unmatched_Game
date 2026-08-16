@@ -69,6 +69,14 @@ void Space :: clear_token(){
     token = nullptr;
 }
 
+void Space :: clear_comrade(){
+    comrade = nullptr;
+}
+
+void Space :: clear_hero(){
+    hero = nullptr;
+}
+
 void Space :: reset(){
     hero = nullptr;
     comrade = nullptr;
