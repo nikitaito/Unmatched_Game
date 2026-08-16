@@ -46,6 +46,8 @@ struct  Context
     int fog_token_space = -1;
     int fog_token_destination = -1;
 
+    std :: vector<int> codedNotesReturnOrder;
+
     /// prediction / information cards (Confirm Suspicion, Elementary)
     int guessedValue = 0;
     bool guessAttack = true;      
@@ -250,6 +252,12 @@ class GainActionEffect : public Effect
 };
 
 class MoveToFogTokenSpaceEffect : public Effect
+{
+    public:
+        virtual void execute(Context & ctx) override;
+};
+
+class CodedNotesEffect : public Effect
 {
     public:
         virtual void execute(Context & ctx) override;
