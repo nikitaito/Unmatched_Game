@@ -439,6 +439,36 @@ void GainActionEffect :: execute(Context & ctx){
     ctx.log.push_back("Gained 1 action.");
 }
 //////////////////////
+void MoveToFogTokenSpaceEffect :: execute(Context & ctx){
+    if(!ctx.ownhero || !ctx.game)
+        return;
+
+    if(ctx.self_move_destination < 0)
+        return;
+
+    Board * board = ctx.game->get_Board();
+    int selfSpace = board->find_space_of_hero(ctx.ownhero);
+    if(selfSpace < 0 || selfSpace == ctx.self_move_destination)
+        return;
+
+    const auto & spaces = board->get_spaces();
+    if(ctx.self_move_destination >= static_cast<int>(spaces.size()))
+        return;
+
+    if(spaces[ctx.self_move_destination].get_token() == nullptr){
+        ctx.log.push_back("Lurking: the chosen space does not contain a fog token.");
+        return;
+    }
+
+    try{
+        ctx.game->Teleport(selfSpace , ctx.self_move_destination);
+        ctx.log.push_back("The Invisible Man slips onto the fog token.");
+    }
+    catch(const std :: exception &){
+        ctx.log.push_back("Could not move the Invisible Man onto the fog token.");
+    }
+}
+//////////////////////
 void ImpossibleToSeeEffect :: execute(Context & ctx){
     Card * target = nullptr;
     bool targetIsAttack = false;

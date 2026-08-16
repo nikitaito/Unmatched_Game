@@ -249,6 +249,12 @@ class GainActionEffect : public Effect
         virtual void execute(Context & ctx) override;
 };
 
+class MoveToFogTokenSpaceEffect : public Effect
+{
+    public:
+        virtual void execute(Context & ctx) override;
+};
+
 std :: vector<std :: unique_ptr<Effect>> Make_Effect(std :: vector<Effect *> effects);
 
 
