@@ -49,6 +49,8 @@ class Heroes
         void Heal(int);
         void set_Health(int);
         std :: vector<Card> & get_deck_cards();
+        std :: vector<Card> & get_top_of_deck();
+        void add_to_top_of_deck(std :: vector<Card> orderedCards);
 
         //virtual
         virtual void initial_deck() = 0;

@@ -66,3 +66,12 @@ void Heroes::set_Health(int amount)
 vector<Card>& Heroes :: get_deck_cards() {
     return cards.deck;
 }
+
+vector<Card>& Heroes :: get_top_of_deck() {
+    return cards.top_of_deck;
+}
+
+void Heroes :: add_to_top_of_deck(vector<Card> orderedCards){
+    for(auto it = orderedCards.rbegin() ; it != orderedCards.rend() ; ++it)
+        cards.top_of_deck.insert(cards.top_of_deck.begin() , std :: move(*it));
+}
