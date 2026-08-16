@@ -353,7 +353,8 @@ void EmergeFromMistEffect :: execute(Context & ctx){
         return;
 
     if(spaces[startSpace].get_token() != nullptr){
-        ctx.effectCard->set_Attack(2); // base value 3 -> 5
+        int delta = 5 - ctx.effectCard->get_Attack();
+        ctx.effectCard->set_Attack(delta);
         ctx.log.push_back("Emerging from the Fog: attack value becomes 5.");
     }
 }
