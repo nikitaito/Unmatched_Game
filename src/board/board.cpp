@@ -268,12 +268,12 @@ void Board :: Move(int current , int target){
 
     if(spaces[current].get_Hero()){
         Heroes * hero = spaces[current].get_Hero();
-        spaces[current].reset();
+        spaces[current].clear_hero();
         spaces[target].set_hero(hero);
     }
     else if(spaces[current].get_comrade()){
         Sidekick * sidekick = spaces[current].get_comrade();
-        spaces[current].reset();
+        spaces[current].clear_comrade();
         spaces[target].set_comrades(sidekick);
     }
     else if(spaces[current].get_token()){
