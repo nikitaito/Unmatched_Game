@@ -70,7 +70,7 @@ void Game :: RemoveDefeatedSidekicks(){
     for(auto & sp : spaces){
         Sidekick * s = sp.get_comrade();
         if(s && !s->get_islive())
-            board.reset_space(sp.get_id());
+            sp.clear_comrade();
     }
 }
 
@@ -381,7 +381,7 @@ bool Game :: MoveFighter(Player * p , int fromSpace , int toSpace , std :: strin
     return true;
 }
 
-bool Game :: PlayScheme(Player * p , int handIndex , int current_space , int target_space , int guessedValue , bool guessAttack , std :: string & err , std :: vector<std :: string> & log){
+bool Game :: PlayScheme(Player * p , int handIndex , int current_space , int target_space , int guessedValue , bool guessAttack , std :: string & err , std :: vector<std :: string> & log , int fogTokenSpace , int fogTokenDestination){
     if(p->get_aciton() <= 0){
         err = "No actions remaining this turn.";
         return false;
@@ -450,6 +450,8 @@ bool Game :: PlayScheme(Player * p , int handIndex , int current_space , int tar
     ctx.chtype = actingSidekick ? actingSidekick->get_name() : ctx.ownhero->get_name();
     ctx.guessedValue = guessedValue;
     ctx.guessAttack = guessAttack;
+    ctx.fog_token_space = fogTokenSpace;
+    ctx.fog_token_destination = fogTokenDestination;
 
     if(played.get_CardName() == CardName :: Eliminate_The_Impossible){
         auto & oppHand = ctx.targetplayer->get_hand_cards();
@@ -629,7 +631,7 @@ CombatStage Game :: get_CombatStage() const{
     return combatStage;
 }
 
-std :: vector<std :: string> Game :: ResolveCombat(int moveDestination, std :: vector<int> boostDiscardIndices){
+std :: vector<std :: string> Game :: ResolveCombat(int moveDestination, std :: vector<int> boostDiscardIndices, int selfMoveDestination, int fogTokenSpace, int fogTokenDestination){
     vector<string> log;
     if(combatStage != CombatStage :: Ready){
         log.push_back("Combat is not ready to resolve.");
@@ -643,6 +645,9 @@ std :: vector<std :: string> Game :: ResolveCombat(int moveDestination, std :: v
     ctx.current_space = combatAttackerSpace;
     ctx.target_space = combatDefenderSpace;
     ctx.move_override_target = moveDestination;
+    ctx.self_move_destination = selfMoveDestination;
+    ctx.fog_token_space = fogTokenSpace;
+    ctx.fog_token_destination = fogTokenDestination;
     {
         auto & atkHand = combatAttackerPlayer->get_hand_cards();
         for(int idx : boostDiscardIndices){
