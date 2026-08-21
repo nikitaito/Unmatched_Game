@@ -211,11 +211,11 @@ void AgePage :: Make_Page(Page & current_page ,Texture2D & background, Font & ti
         }
 
         if (okClicked){
-            current_page = Page :: Menu;
+            current_page = Page :: Choose;
             age1 = atoi(player1Age);
             age2 = atoi(player2Age);
         }
-        if (retreatClicked) {current_page = Page :: Choose;}
+        if (retreatClicked) {current_page = Page :: Menu;}
 
         EndDrawing();
 

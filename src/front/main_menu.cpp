@@ -1,6 +1,6 @@
 #include "front/main_menu.h"
 
-void Menu :: DrawMenuButton(MenuButton& btn, Rectangle rect, Font font,Vector2 mousePos, bool mouseDown){
+void Main_Menu :: DrawMenuButton(MenuButton& btn, Rectangle rect, Font font,Vector2 mousePos, bool mouseDown){
     bool hover = CheckCollisionPointRec(mousePos, rect);
 
     Color bg = btn.idleBg;
@@ -25,12 +25,12 @@ void Menu :: DrawMenuButton(MenuButton& btn, Rectangle rect, Font font,Vector2 m
     DrawTextEx(font, btn.text, textPos, (float)btn.fontSize, 2.0f, textColor);
 }
 
-bool Menu :: is_clicked(Rectangle rect , Vector2 mousePos){
+bool Main_Menu :: is_clicked(Rectangle rect , Vector2 mousePos){
     bool hover = CheckCollisionPointRec(mousePos, rect);
     return hover && IsMouseButtonPressed(MOUSE_BUTTON_LEFT);
 }
 
-void Menu :: make_Page(Page & current_page, Texture2D & background,Font & titleFont, Font & subtitleFont, Font & buttonFont){
+void Main_Menu :: make_Page(Page & current_page, Texture2D & background,Font & titleFont, Font & subtitleFont, Font & buttonFont){
 
     Color overlayColor  = { 0, 0, 0, 150 };
     Color goldColor     = { 212, 175, 90, 255 };
