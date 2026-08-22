@@ -48,7 +48,6 @@ struct  Context
 
     std :: vector<int> codedNotesReturnOrder;
 
-    /// prediction / information cards (Confirm Suspicion, Elementary)
     int guessedValue = 0;
     bool guessAttack = true;      
     bool ignoreAttack = false;   
@@ -258,6 +257,12 @@ class MoveToFogTokenSpaceEffect : public Effect
 };
 
 class CodedNotesEffect : public Effect
+{
+    public:
+        virtual void execute(Context & ctx) override;
+};
+
+class ConfoundEffect : public Effect
 {
     public:
         virtual void execute(Context & ctx) override;

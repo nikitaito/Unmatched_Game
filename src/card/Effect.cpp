@@ -61,7 +61,7 @@ void Discard :: execute(Context & ctx){
     }
     else{
         for (auto & it  : ctx.remove){
-            ctx.attackCard->set_Attack(1);
+            ctx.attackCard->set_Attack(ctx.attackCard->get_Attack() + 1);
             ctx.ownplayer->remove_card(it);
         }
     }
@@ -495,11 +495,6 @@ void ImpossibleToSeeEffect :: execute(Context & ctx){
     ctx.log.push_back("Impossible to See: opponent's card value is locked at 0.");
 }
 //////////////////////
-// Coded Notes: draw 3 cards, then choose 2 of them and place them on top of the
-// deck in any order. The player's choice is supplied ahead of time in
-// ctx.codedNotesReturnOrder as two draw-order positions (0 = 1st card drawn this
-// effect, 1 = 2nd, 2 = 3rd); codedNotesReturnOrder[0] is the one that comes back
-// on top (drawn next), codedNotesReturnOrder[1] the one drawn after that.
 void CodedNotesEffect :: execute(Context & ctx){
     if(!ctx.ownhero || !ctx.ownplayer || !ctx.game)
         return;
@@ -546,3 +541,27 @@ void CodedNotesEffect :: execute(Context & ctx){
     ctx.ownhero->add_to_top_of_deck(std :: move(slots));
     ctx.log.push_back("Coded Notes: 2 cards placed on top of the deck.");
 }
+//////////////////
+void ConfoundEffect :: execute(Context & ctx){
+    if(!ctx.game)
+        return;
+
+    if(!ctx.remove.empty()){
+        if(ctx.targetplayer)
+            for(auto & cn : ctx.remove)
+                ctx.targetplayer->remove_card(cn);
+        ctx.log.push_back("Your opponent discards a card.");
+        return;
+    }
+
+    if(ctx.fog_token_space >= 0 && ctx.fog_token_destination >= 0 && ctx.fog_token_space != ctx.fog_token_destination){
+        try{
+            ctx.game->Move_FogToken(ctx.fog_token_space , ctx.fog_token_destination , ctx.game->get_Board()->get_space_count());
+            ctx.log.push_back("A fog token moves to a new location.");
+        }
+        catch(const std :: exception &){
+            ctx.log.push_back("No legal destination for that fog token.");
+        }
+    }
+}
+//////////////////////
