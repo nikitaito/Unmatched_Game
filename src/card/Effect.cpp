@@ -592,5 +592,40 @@ void CovertPreparationEffect :: execute(Context & ctx){
     }
 }
 //////////////////////
+void StepLightlyEffect :: execute(Context & ctx){
+    if(!ctx.game || !ctx.ownhero)
+        return;
+
+    Board * board = ctx.game->get_Board();
+    int self_space = board->find_space_of_hero(ctx.ownhero);
+
+    if(self_space >= 0 && ctx.target_space >= 0 && board->AdjacentSpaces(self_space , ctx.target_space)){
+        const auto & spaces = board->get_spaces();
+        bool onFog = spaces[self_space].get_token() != nullptr;
+        int damage = onFog ? 3 : 1;
+
+        Heroes * h = spaces[ctx.target_space].get_Hero();
+        Sidekick * s = spaces[ctx.target_space].get_comrade();
+        if(h){
+            h->Damage(damage);
+            ctx.log.push_back("Dealt " + std :: to_string(damage) + " damage to an adjacent fighter.");
+        }
+        else if(s){
+            s->Damage(damage);
+            ctx.log.push_back("Dealt " + std :: to_string(damage) + " damage to an adjacent fighter.");
+        }
+    }
+
+    if(ctx.self_move_destination >= 0 && ctx.move_override_target >= 0 && ctx.self_move_destination != ctx.move_override_target){
+        try{
+            ctx.game->Move_FogToken(ctx.self_move_destination , ctx.move_override_target , 2);
+            ctx.log.push_back("Your opponent shifts a fog token up to 2 spaces.");
+        }
+        catch(const std :: exception &){
+            ctx.log.push_back("Your opponent had no legal move for that fog token.");
+        }
+    }
+}
+//////////////////////
 
 
