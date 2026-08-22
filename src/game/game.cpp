@@ -389,7 +389,7 @@ bool Game :: MoveFighter(Player * p , int fromSpace , int toSpace , std :: strin
     return true;
 }
 
-bool Game :: PlayScheme(Player * p , int handIndex , int current_space , int target_space , int guessedValue , bool guessAttack , std :: string & err , std :: vector<std :: string> & log , int fogTokenSpace , int fogTokenDestination){
+bool Game :: PlayScheme(Player * p , int handIndex , int current_space , int target_space , int guessedValue , bool guessAttack , std :: string & err , std :: vector<std :: string> & log , int fogTokenSpace , int fogTokenDestination , int secondFogTokenSpace , int secondFogTokenDestination){
     if(p->get_aciton() <= 0){
         err = "No actions remaining this turn.";
         return false;
@@ -420,7 +420,6 @@ bool Game :: PlayScheme(Player * p , int handIndex , int current_space , int tar
             return false;
         }
     }
-
     Card played = p->take_hand_card(handIndex);
 
     Heroes * moverHero = nullptr;
@@ -460,11 +459,19 @@ bool Game :: PlayScheme(Player * p , int handIndex , int current_space , int tar
     ctx.guessAttack = guessAttack;
     ctx.fog_token_space = fogTokenSpace;
     ctx.fog_token_destination = fogTokenDestination;
+    ctx.second_fog_token_space = secondFogTokenSpace;
+    ctx.second_fog_token_destination = secondFogTokenDestination;
 
     if(played.get_CardName() == CardName :: Eliminate_The_Impossible){
         auto & oppHand = ctx.targetplayer->get_hand_cards();
         int idx = guessedValue - 1;
         ctx.remove.push_back(oppHand[idx].get_CardName());
+    }
+    if(played.get_CardName() == CardName :: ConFound && guessedValue > 0){
+        auto & oppHand = ctx.targetplayer->get_hand_cards();
+        int idx = guessedValue - 1;
+        if(idx >= 0 && idx < static_cast<int>(oppHand.size()))
+            ctx.remove.push_back(oppHand[idx].get_CardName());
     }
 
     for(auto & eff : played.get_effects()){
@@ -639,7 +646,7 @@ CombatStage Game :: get_CombatStage() const{
     return combatStage;
 }
 
-std :: vector<std :: string> Game :: ResolveCombat(int moveDestination, std :: vector<int> boostDiscardIndices, int selfMoveDestination, int fogTokenSpace, int fogTokenDestination, std :: vector<int> codedNotesReturnOrder){
+std :: vector<std :: string> Game :: ResolveCombat(int moveDestination, std :: vector<int> boostDiscardIndices, int selfMoveDestination, int fogTokenSpace, int fogTokenDestination, std :: vector<int> codedNotesReturnOrder, int predictedValue, bool predictAttack, int secondFogTokenSpace, int secondFogTokenDestination){
     vector<string> log;
     if(combatStage != CombatStage :: Ready){
         log.push_back("Combat is not ready to resolve.");
@@ -656,7 +663,11 @@ std :: vector<std :: string> Game :: ResolveCombat(int moveDestination, std :: v
     ctx.self_move_destination = selfMoveDestination;
     ctx.fog_token_space = fogTokenSpace;
     ctx.fog_token_destination = fogTokenDestination;
+    ctx.second_fog_token_space = secondFogTokenSpace;
+    ctx.second_fog_token_destination = secondFogTokenDestination;
     ctx.codedNotesReturnOrder = codedNotesReturnOrder;
+    ctx.guessedValue = predictedValue;
+    ctx.guessAttack = predictAttack;
     {
         auto & atkHand = combatAttackerPlayer->get_hand_cards();
         for(int idx : boostDiscardIndices){
@@ -726,6 +737,15 @@ std :: vector<std :: string> Game :: ResolveCombat(int moveDestination, std :: v
         setPerspectiveDefender();
         ctx.effectCard = &combatDefenseCard;
         ctx.result = attackerWon ? CombatResult :: Lose : CombatResult :: Win;
+        // ConFound - Extra: predictedValue doubles as a 1-based index into the
+        // opponent's (here: the attacker's) hand for the discard the defender
+        // named ahead of time; 0 means the opponent declined to discard.
+        if(combatDefenseCard.get_CardName() == CardName :: ConFound && predictedValue > 0){
+            auto & oppHand = ctx.targetplayer->get_hand_cards();
+            int idx = predictedValue - 1;
+            if(idx >= 0 && idx < static_cast<int>(oppHand.size()))
+                ctx.remove.push_back(oppHand[idx].get_CardName());
+        }
         for(auto & eff : combatDefenseCard.get_effects())
             eff->execute(ctx);
     }
@@ -733,6 +753,12 @@ std :: vector<std :: string> Game :: ResolveCombat(int moveDestination, std :: v
         setPerspectiveAttacker();
         ctx.effectCard = &combatAttackCard;
         ctx.result = attackerWon ? CombatResult :: Win : CombatResult :: Lose;
+        if(combatAttackCard.get_CardName() == CardName :: ConFound && predictedValue > 0){
+            auto & oppHand = ctx.targetplayer->get_hand_cards();
+            int idx = predictedValue - 1;
+            if(idx >= 0 && idx < static_cast<int>(oppHand.size()))
+                ctx.remove.push_back(oppHand[idx].get_CardName());
+        }
         for(auto & eff : combatAttackCard.get_effects())
             eff->execute(ctx);
     }

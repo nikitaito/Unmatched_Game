@@ -63,13 +63,13 @@ class Game
         bool Maneuver(Player * , std :: string &);
         bool MoveFighter(Player * , int from , int to , std :: string &);
 
-        bool PlayScheme(Player * , int handIndex , int current_space , int target_space , int guessedValue , bool guessAttack , std :: string & err , std :: vector<std :: string> & log , int fogTokenSpace = -1 , int fogTokenDestination = -1);
+        bool PlayScheme(Player * , int handIndex , int current_space , int target_space , int guessedValue , bool guessAttack , std :: string & err , std :: vector<std :: string> & log , int fogTokenSpace = -1 , int fogTokenDestination = -1 , int secondFogTokenSpace = -1 , int secondFogTokenDestination = -1);
 
         bool DeclareAttack(Player * attacker , int attackerSpace , int targetSpace , std :: string & err);
         bool PlayAttackCard(int handIndex , std :: string & err);
         bool PlayDefenseCard(int handIndex , std :: string & err);
         void SkipDefense();
-        std :: vector<std :: string> ResolveCombat(int moveDestination = -1, std :: vector<int> boostDiscardIndices = {}, int selfMoveDestination = -1, int fogTokenSpace = -1, int fogTokenDestination = -1, std :: vector<int> codedNotesReturnOrder = {});
+        std :: vector<std :: string> ResolveCombat(int moveDestination = -1, std :: vector<int> boostDiscardIndices = {}, int selfMoveDestination = -1, int fogTokenSpace = -1, int fogTokenDestination = -1, std :: vector<int> codedNotesReturnOrder = {}, int predictedValue = 0, bool predictAttack = true, int secondFogTokenSpace = -1, int secondFogTokenDestination = -1);
         CombatStage get_CombatStage() const;
 
         bool BloodHarvest(Player * , int targetSpace , std :: string & err);
