@@ -627,5 +627,25 @@ void StepLightlyEffect :: execute(Context & ctx){
     }
 }
 //////////////////////
+void VanishEffect :: execute(Context & ctx){
+    if(!ctx.ownhero || !ctx.game)
+        return;
+
+    ctx.ownhero->Heal(1);
+
+    Board * board = ctx.game->get_Board();
+    int self_space = board->find_space_of_hero(ctx.ownhero);
+    if(self_space < 0 || ctx.target_space < 0 || self_space == ctx.target_space)
+        return;
+
+    try{
+        ctx.game->Teleport(self_space , ctx.target_space);
+        ctx.log.push_back("The Invisible Man reappears elsewhere.");
+    }
+    catch(const std :: exception &){
+        ctx.log.push_back("That space was occupied - the Invisible Man could not reappear there.");
+    }
+}
+//////////////////////
 
 
