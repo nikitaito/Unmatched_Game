@@ -71,6 +71,9 @@ class Game
         void SkipDefense();
         std :: vector<std :: string> ResolveCombat(int moveDestination = -1, std :: vector<int> boostDiscardIndices = {}, int selfMoveDestination = -1, int fogTokenSpace = -1, int fogTokenDestination = -1, std :: vector<int> codedNotesReturnOrder = {}, int predictedValue = 0, bool predictAttack = true, int secondFogTokenSpace = -1, int secondFogTokenDestination = -1);
         CombatStage get_CombatStage() const;
+        CardName get_CombatAttackCardName() const;
+        bool get_CombatHasDefense() const ;
+        CardName get_CombatDefenseCardName() const ;
 
         bool BloodHarvest(Player * , int targetSpace , std :: string & err);
 

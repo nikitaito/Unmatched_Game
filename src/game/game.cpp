@@ -851,3 +851,15 @@ bool Game :: DiscardExcess(Player * p , int handIndex , std :: string & err){
 void Game :: EndTurn(){
     ChangeTurn();
 }
+
+CardName Game :: get_CombatAttackCardName() const{
+     return combatAttackCard.get_CardName(); 
+}
+
+bool Game :: get_CombatHasDefense() const{
+     return combatHasDefense; 
+}
+
+CardName Game :: get_CombatDefenseCardName() const { 
+    return combatDefenseCard.get_CardName(); 
+}
