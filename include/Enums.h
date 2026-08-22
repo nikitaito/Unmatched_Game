@@ -96,14 +96,14 @@ enum class CardType{
     BOTH
 };
 
-enum Zone{
-    LIGHT_BLUE,
-    DARK_BLUE,
-    BROWN,
-    YELLOW,
-    GREEN,
-    PURPULE,
-    GRAY
+enum class Zone{
+    LightBlue,
+    DarkBlue,
+    Brown,
+    Yellow,
+    Green,
+    Purple,
+    Gray
 };
 
 enum class Page {

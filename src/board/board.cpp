@@ -7,38 +7,38 @@ using namespace std;
 
 Board :: Board(){
     
-    spaces.push_back(Space(0 , {1,2} , {14 , 18 , 31} , {LIGHT_BLUE} ));
-    spaces.push_back(Space(1 , {0,4} , {} , {LIGHT_BLUE}));
-    spaces.push_back(Space(2 , {0,3} , {} , {LIGHT_BLUE}));
-    spaces.push_back(Space(3 , {2,8} , {} , {LIGHT_BLUE} ));
-    spaces.push_back(Space(4 , {1,5,8} , {} , {LIGHT_BLUE , BROWN} ));
-    spaces.push_back(Space(5 , {4,6,7} , {} , {BROWN} ));
-    spaces.push_back(Space(6 , {5,7,28} , {} , {BROWN} ));
-    spaces.push_back(Space(7 , {5,28} , {} , {BROWN} ));
-    spaces.push_back(Space(8 , {3,4,9} , {} , {LIGHT_BLUE , DARK_BLUE} ));
-    spaces.push_back(Space(9 , {8,10} , {} , {DARK_BLUE} ));
-    spaces.push_back(Space(10 , {2,9,11} , {} , {DARK_BLUE} ));
-    spaces.push_back(Space(11 , {10,12,18} , {} , {DARK_BLUE  ,GRAY} ));
-    spaces.push_back(Space(12 , {11,13} , {} , {DARK_BLUE , GREEN} ));
-    spaces.push_back(Space(13 , {12,14,15} , {} , {GREEN} ));
-    spaces.push_back(Space(14 , {13,21} , {0 , 18 , 31} , {GREEN} ));
-    spaces.push_back(Space(15 , {14,16,19,20} , {} , {GRAY , GREEN} ));
-    spaces.push_back(Space(16 , {15,17,19} , {} , {GRAY} ));
-    spaces.push_back(Space(17 , {16,18} , {} , {GRAY} ));
-    spaces.push_back(Space(18 , {11,17} , {0 , 14 ,31} , {GRAY}));
-    spaces.push_back(Space(19 , {15,16,20} , {} , {GRAY} ));
-    spaces.push_back(Space(20 , {15,19,21,25} , {} , {GRAY} ));
-    spaces.push_back(Space(21 , {14,20,22,24,25,28} , {} , {GREEN , PURPULE} ));
-    spaces.push_back(Space(22 , {21,23,24,30} , {} , {PURPULE} ));
-    spaces.push_back(Space(23 , {22,24,26} , {} , {PURPULE} ));
-    spaces.push_back(Space(24 , {21,22} , {} , {PURPULE} ));
-    spaces.push_back(Space(25 , {20,21,24,26,27} , {} , {GRAY} ));
-    spaces.push_back(Space(26 , {23,25,27} , {} , {GRAY , PURPULE} ));
-    spaces.push_back(Space(27 , {25,26} , {} , {GRAY} ));
-    spaces.push_back(Space(28 , {6,7,21,29,30} , {} , {BROWN , GREEN , YELLOW} ));
-    spaces.push_back(Space(29 , {28,30,31} , {} , {YELLOW} ));
-    spaces.push_back(Space(30 , {22,28,29} , {} , {YELLOW} ));
-    spaces.push_back(Space(31 , {29} , {0 , 14 , 18} , {YELLOW}));
+    spaces.push_back(Space(0 , {1,2} , {14 , 18 , 31} , {Zone::LightBlue} ));
+    spaces.push_back(Space(1 , {0,4} , {} , {Zone::LightBlue}));
+    spaces.push_back(Space(2 , {0,3} , {} , {Zone::LightBlue}));
+    spaces.push_back(Space(3 , {2,8} , {} , {Zone::LightBlue} ));
+    spaces.push_back(Space(4 , {1,5,8} , {} , {Zone::LightBlue , Zone::Brown} ));
+    spaces.push_back(Space(5 , {4,6,7} , {} , {Zone::Brown} ));
+    spaces.push_back(Space(6 , {5,7,28} , {} , {Zone::Brown} ));
+    spaces.push_back(Space(7 , {5,28} , {} , {Zone::Brown} ));
+    spaces.push_back(Space(8 , {3,4,9} , {} , {Zone::LightBlue , Zone::DarkBlue} ));
+    spaces.push_back(Space(9 , {8,10} , {} , {Zone::DarkBlue} ));
+    spaces.push_back(Space(10 , {2,9,11} , {} , {Zone::DarkBlue} ));
+    spaces.push_back(Space(11 , {10,12,18} , {} , {Zone::DarkBlue  ,Zone::Gray} ));
+    spaces.push_back(Space(12 , {11,13} , {} , {Zone::DarkBlue , Zone::Green} ));
+    spaces.push_back(Space(13 , {12,14,15} , {} , {Zone::Green} ));
+    spaces.push_back(Space(14 , {13,21} , {0 , 18 , 31} , {Zone::Green} ));
+    spaces.push_back(Space(15 , {14,16,19,20} , {} , {Zone::Gray , Zone::Green} ));
+    spaces.push_back(Space(16 , {15,17,19} , {} , {Zone::Gray} ));
+    spaces.push_back(Space(17 , {16,18} , {} , {Zone::Gray} ));
+    spaces.push_back(Space(18 , {11,17} , {0 , 14 ,31} , {Zone::Gray}));
+    spaces.push_back(Space(19 , {15,16,20} , {} , {Zone::Gray} ));
+    spaces.push_back(Space(20 , {15,19,21,25} , {} , {Zone::Gray} ));
+    spaces.push_back(Space(21 , {14,20,22,24,25,28} , {} , {Zone::Green , Zone::Purple} ));
+    spaces.push_back(Space(22 , {21,23,24,30} , {} , {Zone::Purple} ));
+    spaces.push_back(Space(23 , {22,24,26} , {} , {Zone::Purple} ));
+    spaces.push_back(Space(24 , {21,22} , {} , {Zone::Purple} ));
+    spaces.push_back(Space(25 , {20,21,24,26,27} , {} , {Zone::Gray} ));
+    spaces.push_back(Space(26 , {23,25,27} , {} , {Zone::Gray , Zone::Purple} ));
+    spaces.push_back(Space(27 , {25,26} , {} , {Zone::Gray} ));
+    spaces.push_back(Space(28 , {6,7,21,29,30} , {} , {Zone::Brown , Zone::Green , Zone::Yellow} ));
+    spaces.push_back(Space(29 , {28,30,31} , {} , {Zone::Yellow} ));
+    spaces.push_back(Space(30 , {22,28,29} , {} , {Zone::Yellow} ));
+    spaces.push_back(Space(31 , {29} , {0 , 14 , 18} , {Zone::Yellow}));
 }
 
 const std :: vector<Space> & Board ::  get_spaces() const{
@@ -341,6 +341,45 @@ bool Board :: Adjacency(CharacterType ch1 , CharacterType ch2){
         }
     }
     return false;
+}
+
+vector<int> Board :: reachable_spaces(int current , CharacterType forbidden , bool allowhiddenway , int cost) const{
+    vector<int> result;
+    if(!valid_space(current))
+        return result;
+    for(int target = 0 ; target < SPACE_COUNT ; target++){
+        if(target == current)
+            continue;
+        if(is_way(current , target , forbidden , allowhiddenway , cost))
+            result.push_back(target);
+    }
+    return result;
+}
+
+vector<int> Board :: reachable_spaces_for_token(int current , CharacterType forbidden , bool allowhiddenway , int cost) const{
+    vector<int> result;
+    if(!valid_space(current))
+        return result;
+    for(int target = 0 ; target < SPACE_COUNT ; target++){
+        if(target == current)
+            continue;
+        if(is_way_for_token(current , target , forbidden , allowhiddenway , cost))
+            result.push_back(target);
+    }
+    return result;
+}
+
+vector<int> Board :: reachable_spaces_with_fog_jump(int current , const vector<CharacterType> & enemyTypes , bool allowhiddenway , int cost) const{
+    vector<int> result;
+    if(!valid_space(current))
+        return result;
+    for(int target = 0 ; target < SPACE_COUNT ; target++){
+        if(target == current)
+            continue;
+        if(is_way_with_fog_jump(current , target , enemyTypes , allowhiddenway , cost))
+            result.push_back(target);
+    }
+    return result;
 }
 
 void Board :: Swap(int a , int b){
