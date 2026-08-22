@@ -46,6 +46,9 @@ void Invman :: initial_deck() {
     cards.deck.push_back(Card(CardName :: Slip_Away , CardTiming :: After , CardType :: ATTACK , Usertype :: INVMAN , 3, 0 , 2 , Make_Effect({new MoveFogTokenEffect(-1 , true) , new PlaceSelfOnFogTokenEffect()})));
     cards.deck.push_back(Card(CardName :: Slip_Away , CardTiming :: After , CardType :: ATTACK , Usertype :: INVMAN , 3, 0 , 2 , Make_Effect({new MoveFogTokenEffect(-1 , true) , new PlaceSelfOnFogTokenEffect()})));
 
+    cards.deck.push_back(Card(CardName :: Step_Lightly , CardTiming :: Immediate , CardType :: EVENT , Usertype :: INVMAN , 0, 0 , 1 , Make_Effect({new StepLightlyEffect()})));
+    cards.deck.push_back(Card(CardName :: Step_Lightly , CardTiming :: Immediate , CardType :: EVENT , Usertype :: INVMAN , 0, 0 , 1 , Make_Effect({new StepLightlyEffect()})));
+
 
 }
 
