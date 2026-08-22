@@ -10,6 +10,8 @@ class CardViewWindow
         bool         isOpen = false;
         Texture2D    cardTexture{};
         bool         hasCardTexture = false;
+        std::string  cardLabel;      // shown when there's no texture: the card's name
+        std::string  cardStatLine;   // shown when there's no texture: printed values
 
         Font         customFont{};
         int          fontBaseSize;
@@ -36,6 +38,7 @@ class CardViewWindow
 
 
         void Open(Texture2D cardTexture);
+        void Open(Texture2D cardTexture, const std::string &label, const std::string &statLine = "");
         void Close();
 
         bool IsOpen() const { return isOpen; }

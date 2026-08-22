@@ -24,7 +24,7 @@ CardViewWindow::CardViewWindow(const std::string& fontPath, int fontBaseSize_): 
     {
         SetTextureFilter(customFont.texture, TEXTURE_FILTER_BILINEAR);
     }
-    blurShader = LoadShader(0, "assets/shaders/blur.fs");
+    blurShader = LoadShader(0, "../assets/shaders/blur.fs");
     blurShaderLoaded = (blurShader.id != 0);
 }
 
@@ -39,6 +39,17 @@ CardViewWindow::~CardViewWindow(){
 void CardViewWindow::Open(Texture2D card){
     cardTexture = card;
     hasCardTexture = true;
+    cardLabel.clear();
+    cardStatLine.clear();
+    isOpen = true;
+    CalculateLayout();
+}
+
+void CardViewWindow::Open(Texture2D card, const std::string &label, const std::string &statLine){
+    cardTexture = card;
+    hasCardTexture = (card.id != 0);
+    cardLabel = label;
+    cardStatLine = statLine;
     isOpen = true;
     CalculateLayout();
 }
@@ -183,11 +194,41 @@ void CardViewWindow::Draw(const RenderTexture2D& backgroundTexture){
     else
     {
         DrawRectangleRec(cardBounds, DARKGRAY);
+
+        // no card art shipped with this project: draw the name + stat line
+        // centered inside the card silhouette instead of a picture
+        float pad = cardBounds.width * 0.08f;
+        Rectangle textArea{ cardBounds.x + pad, cardBounds.y + pad, cardBounds.width - pad * 2, cardBounds.height - pad * 2 };
+        float nameFontSize = cardBounds.width * 0.11f;
+
+        std::string remaining = cardLabel;
+        float lineY = textArea.y + textArea.height * 0.35f;
+        while(!remaining.empty()){
+            size_t fit = remaining.size();
+            while(fit > 0 && MeasureTextEx(customFont, remaining.substr(0, fit).c_str(), nameFontSize, 1.0f).x > textArea.width)
+                fit--;
+            if(fit < remaining.size()){
+                size_t breakAt = remaining.rfind(' ', fit);
+                if(breakAt != std::string::npos && breakAt > 0)
+                    fit = breakAt;
+            }
+            std::string line = remaining.substr(0, fit);
+            Vector2 lineSize = MeasureTextEx(customFont, line.c_str(), nameFontSize, 1.0f);
+            DrawTextEx(customFont, line.c_str(), { textArea.x + textArea.width / 2 - lineSize.x / 2, lineY }, nameFontSize, 1.0f, RAYWHITE);
+            lineY += nameFontSize * 1.2f;
+            remaining = (fit < remaining.size()) ? remaining.substr(remaining[fit] == ' ' ? fit + 1 : fit) : "";
+        }
+
+        if(!cardStatLine.empty()){
+            float statFontSize = cardBounds.width * 0.08f;
+            Vector2 statSize = MeasureTextEx(customFont, cardStatLine.c_str(), statFontSize, 1.0f);
+            DrawTextEx(customFont, cardStatLine.c_str(), { textArea.x + textArea.width / 2 - statSize.x / 2, lineY + 10.0f }, statFontSize, 1.0f, Color{ 225, 220, 210, 255 });
+        }
     }
 
     DrawRectangleLinesEx(cardBounds, 2.0f, CardWindowTheme::WindowBorder);
 
-    const char* title = "Card";
+    const char* title = cardLabel.empty() ? "Card" : cardLabel.c_str();
     float fSize = (float)fontBaseSize * 0.6f;
     Vector2 textSize = MeasureTextEx(customFont, title, fSize, 1.0f);
     Vector2 textPos = {

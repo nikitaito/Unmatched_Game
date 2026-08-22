@@ -9,6 +9,9 @@ class DeckCardWindow
     private:
         bool isOpen = false;
         std::vector<Texture2D> cardTextures;
+        std::vector<std::string> cardLabels; // shown on cells with no texture (this project ships no card art)
+        std::string windowTitle = "Deck Card";
+        bool pickMode = false; // when true, a "Decline"/close-only affordance is drawn alongside picking
 
         Font customFont{};
         int  fontBaseSize;
@@ -52,6 +55,10 @@ class DeckCardWindow
 
 
         void Open(const std::vector<Texture2D>& cards);
+        // labels.size() should equal cards.size() (or be empty to skip labels);
+        // 'title' overrides the "Deck Card" heading (e.g. "Opponent's Hand");
+        // 'pick' just changes the heading style to hint the grid is clickable.
+        void Open(const std::vector<Texture2D>& cards, const std::vector<std::string>& labels, const std::string &title = "Deck Card", bool pick = false);
         void Close();
 
         bool IsOpen() const { return isOpen; }

@@ -34,7 +34,7 @@ DeckCardWindow::DeckCardWindow(const std::string& fontPath, int fontBaseSize_)
         SetTextureFilter(customFont.texture, TEXTURE_FILTER_BILINEAR);
     }
 
-    blurShader = LoadShader(0, "assets/src/blur.fs");
+    blurShader = LoadShader(0, "../assets/shaders/blur.fs");
     blurShaderLoaded = (blurShader.id != 0);
 }
 
@@ -50,6 +50,20 @@ DeckCardWindow::~DeckCardWindow()
 void DeckCardWindow::Open(const std::vector<Texture2D>& cards)
 {
     cardTextures = cards;
+    cardLabels.clear();
+    windowTitle = "Deck Card";
+    pickMode = false;
+    isOpen = true;
+    scrollOffset = 0.0f;
+    CalculateLayout();
+}
+
+void DeckCardWindow::Open(const std::vector<Texture2D>& cards, const std::vector<std::string>& labels, const std::string &title, bool pick)
+{
+    cardTextures = cards;
+    cardLabels = labels;
+    windowTitle = title;
+    pickMode = pick;
     isOpen = true;
     scrollOffset = 0.0f;
     CalculateLayout();
@@ -277,7 +291,7 @@ void DeckCardWindow::Draw(const RenderTexture2D& backgroundTexture)
     DrawRectangleRounded(windowBounds, 0.03f, 8, DeckWindowTheme::WindowBg);
     DrawDashedRectangle(windowBounds, 10.0f, 6.0f, 2.0f, DeckWindowTheme::WindowBorder);
 
-    const char* title = "Deck Card";
+    const char* title = windowTitle.c_str();
     float titleFSize = (float)fontBaseSize * 0.7f;
     Vector2 titleSize = MeasureTextEx(customFont, title, titleFSize, 1.0f);
     Vector2 titlePos = {
@@ -316,8 +330,36 @@ void DeckCardWindow::Draw(const RenderTexture2D& backgroundTexture)
                     { 0, 0 }, 0.0f, WHITE
                 );
             }
+            else if (index < cardLabels.size() && !cardLabels[index].empty())
+            {
+                // no card art in this project: draw the name centered in the cell instead
+                float pad = cellRect.width * 0.08f;
+                Rectangle textArea{ cellRect.x + pad, cellRect.y + pad, cellRect.width - pad * 2, cellRect.height - pad * 2 };
+                float fSize = cellRect.width * 0.115f;
 
-            DrawRectangleLinesEx(cellRect, 2.0f, DeckWindowTheme::WindowBorder);
+                std::string remaining = cardLabels[index];
+                float lineY = textArea.y;
+                while (!remaining.empty() && lineY < textArea.y + textArea.height)
+                {
+                    size_t fit = remaining.size();
+                    while (fit > 0 && MeasureTextEx(customFont, remaining.substr(0, fit).c_str(), fSize, 1.0f).x > textArea.width)
+                        fit--;
+                    if (fit < remaining.size())
+                    {
+                        size_t breakAt = remaining.rfind(' ', fit);
+                        if (breakAt != std::string::npos && breakAt > 0)
+                            fit = breakAt;
+                    }
+                    std::string line = remaining.substr(0, fit);
+                    Vector2 lineSize = MeasureTextEx(customFont, line.c_str(), fSize, 1.0f);
+                    DrawTextEx(customFont, line.c_str(), { textArea.x + textArea.width / 2 - lineSize.x / 2, lineY }, fSize, 1.0f, Color{ 30, 26, 22, 255 });
+                    lineY += fSize * 1.2f;
+                    remaining = (fit < remaining.size()) ? remaining.substr(remaining[fit] == ' ' ? fit + 1 : fit) : "";
+                }
+            }
+
+            Color cellBorder = (pickMode && CheckCollisionPointRec(GetMousePosition(), cellRect)) ? DeckWindowTheme::ScrollThumbHov : DeckWindowTheme::WindowBorder;
+            DrawRectangleLinesEx(cellRect, pickMode ? 3.0f : 2.0f, cellBorder);
         }
     }
 
