@@ -46,6 +46,9 @@ struct  Context
     int fog_token_space = -1;
     int fog_token_destination = -1;
 
+    int second_fog_token_space = -1;
+    int second_fog_token_destination = -1;
+
     std :: vector<int> codedNotesReturnOrder;
 
     int guessedValue = 0;
@@ -263,6 +266,12 @@ class CodedNotesEffect : public Effect
 };
 
 class ConfoundEffect : public Effect
+{
+    public:
+        virtual void execute(Context & ctx) override;
+};
+
+class CovertPreparationEffect : public Effect
 {
     public:
         virtual void execute(Context & ctx) override;

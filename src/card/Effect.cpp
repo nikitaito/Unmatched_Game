@@ -565,3 +565,32 @@ void ConfoundEffect :: execute(Context & ctx){
     }
 }
 //////////////////////
+void CovertPreparationEffect :: execute(Context & ctx){
+    if(!ctx.game || !ctx.ownplayer)
+        return;
+
+    ctx.game->DrawCard(ctx.ownplayer , 1);
+
+    if(ctx.fog_token_space >= 0 && ctx.fog_token_destination >= 0 && ctx.fog_token_space != ctx.fog_token_destination){
+        try{
+            ctx.game->Move_FogToken(ctx.fog_token_space , ctx.fog_token_destination , 2);
+            ctx.log.push_back("A fog token drifts up to 2 spaces.");
+        }
+        catch(const std :: exception &){
+            ctx.log.push_back("No legal move for that fog token.");
+        }
+    }
+
+    if(ctx.second_fog_token_space >= 0 && ctx.second_fog_token_destination >= 0 && ctx.second_fog_token_space != ctx.second_fog_token_destination){
+        try{
+            ctx.game->Move_FogToken(ctx.second_fog_token_space , ctx.second_fog_token_destination , 2);
+            ctx.log.push_back("Your opponent shifts another fog token up to 2 spaces.");
+        }
+        catch(const std :: exception &){
+            ctx.log.push_back("Your opponent had no legal move for that fog token.");
+        }
+    }
+}
+//////////////////////
+
+
