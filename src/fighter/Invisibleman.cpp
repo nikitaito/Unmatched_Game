@@ -16,7 +16,9 @@ void Invman :: initial_deck() {
     cards.deck.push_back(Card(CardName :: ConFound , CardTiming :: After , CardType :: BOTH , Usertype :: INVMAN , 3 , 3 , 2 , Make_Effect({new ConfoundEffect()})));
     cards.deck.push_back(Card(CardName :: ConFound , CardTiming :: After , CardType :: BOTH , Usertype :: INVMAN , 3 , 3 , 2 , Make_Effect({new ConfoundEffect()})));
 
-
+    cards.deck.push_back(Card(CardName :: Covert_PreParation , CardTiming :: After , CardType :: BOTH , Usertype :: INVMAN , 2, 2 , 1 , Make_Effect({new CovertPreparationEffect()})));
+    cards.deck.push_back(Card(CardName :: Covert_PreParation , CardTiming :: After , CardType :: BOTH , Usertype :: INVMAN , 2, 2 , 1 , Make_Effect({new CovertPreparationEffect()})));
+    cards.deck.push_back(Card(CardName :: Covert_PreParation , CardTiming :: After , CardType :: BOTH , Usertype :: INVMAN , 2, 2 , 1 , Make_Effect({new CovertPreparationEffect()})));
 
 
     cards.deck.push_back(Card(CardName :: Deaming_of_Revenge , CardTiming :: After , CardType :: BOTH , Usertype :: INVMAN , 3, 3 , 1 , Make_Effect({new DamageIfOnFog(1)})));
