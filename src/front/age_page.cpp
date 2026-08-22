@@ -96,11 +96,6 @@ void AgePage :: Make_Page(Page & current_page ,Texture2D & background, Font & ti
     MenuButton retreatBtn = { "RETREAT", 26, panelBg, panelHoverBg, panelPressBg,
                               panelBorder, panelHoverBorder, textGray, textWhite };
 
-    ActiveField activeField = FIELD_NONE;
-    char player1Age[4] = "";
-    char player2Age[4] = "";
-
-    while (!WindowShouldClose())
     {
         int sw = GetScreenWidth();
         int sh = GetScreenHeight();
@@ -109,7 +104,6 @@ void AgePage :: Make_Page(Page & current_page ,Texture2D & background, Font & ti
         Vector2 mousePos = GetMousePosition();
         bool mouseDown = IsMouseButtonDown(MOUSE_BUTTON_LEFT);
 
-        BeginDrawing();
         ClearBackground(BLACK);
 
         DrawTexturePro(background,
@@ -216,15 +210,11 @@ void AgePage :: Make_Page(Page & current_page ,Texture2D & background, Font & ti
             age2 = atoi(player2Age);
         }
         if (retreatClicked) {current_page = Page :: Menu;}
-
-        EndDrawing();
-
-        if (okClicked || retreatClicked) break;
     }
+}
 
-    if (WindowShouldClose())
-    {
-        current_page = Page::Exit;
-    }
-
+void AgePage :: Reset(){
+    activeField = FIELD_NONE;
+    player1Age[0] = '\0';
+    player2Age[0] = '\0';
 }
