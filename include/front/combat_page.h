@@ -4,7 +4,9 @@
 
 
 #include "handmenu.h"
+#include "Enums.h"
 #include <vector>
+#include <string>
 
 
 
@@ -38,6 +40,14 @@ class CombatPage {
         bool chooseHovered = false;
         int  defenceCardClicked = -1; 
         int  attackCardClicked  = -1; 
+
+        CombatStage stage = CombatStage::None;
+
+        bool showingResult = false;
+
+        std::string attackerLabel; 
+        std::string defenderLabel;  
+        std::string resultLog;     
 
         void Init(Rectangle newArea);
 
