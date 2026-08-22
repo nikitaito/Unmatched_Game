@@ -116,14 +116,8 @@ void ChoosePage :: Make_Page(Page & current_page, Texture2D & background,
         { CharacterType :: SherlockHolmes, "SHERLOCK HOLMES","THE GRAND DETECTIVE",  subtitleColor,             &holmesTex  },
     };
 
-    // Whoever has the lower age picks first (ties go to the age1 player).
     bool age1PicksFirst = (age1 <= age2);
 
-    int firstPickIndex  = -1;
-    int secondPickIndex = -1;
-    bool selectionDone  = false;
-
-    while (!WindowShouldClose() && !selectionDone)
     {
         int sw = GetScreenWidth();
         int sh = GetScreenHeight();
@@ -135,7 +129,6 @@ void ChoosePage :: Make_Page(Page & current_page, Texture2D & background,
         bool isFirstPick = (firstPickIndex == -1);
         int displayedPlayerNumber = isFirstPick ? 1 : 2;
 
-        BeginDrawing();
         ClearBackground(BLACK);
 
         DrawTexturePro(background,
@@ -180,8 +173,6 @@ void ChoosePage :: Make_Page(Page & current_page, Texture2D & background,
         Vector2 capSize = MeasureTextEx(labelFont, caption, capFontSize, 2.0f);
         DrawTextEx(labelFont, caption, { centerX - capSize.x / 2, cardY + cardHeight + sh * 0.05f }, capFontSize, 2.0f, Color{ 190, 190, 195, 200 });
 
-        EndDrawing();
-
         if (clickedIndex != -1)
         {
             if (isFirstPick)
@@ -191,30 +182,28 @@ void ChoosePage :: Make_Page(Page & current_page, Texture2D & background,
             else
             {
                 secondPickIndex = clickedIndex;
-                selectionDone = true;
+
+                CharacterType firstPickType  = options[firstPickIndex].type;
+                CharacterType secondPickType = options[secondPickIndex].type;
+
+                if (age1PicksFirst)
+                {
+                    character1 = firstPickType;
+                    character2 = secondPickType;
+                }
+                else
+                {
+                    character2 = firstPickType;
+                    character1 = secondPickType;
+                }
+
+                current_page = Page :: Game;
             }
         }
     }
+}
 
-    if (WindowShouldClose())
-    {
-        current_page = Page :: Exit;
-        return;
-    }
-
-    CharacterType firstPickType  = options[firstPickIndex].type;
-    CharacterType secondPickType = options[secondPickIndex].type;
-
-    if (age1PicksFirst)
-    {
-        character1 = firstPickType;
-        character2 = secondPickType;
-    }
-    else
-    {
-        character2 = firstPickType;
-        character1 = secondPickType;
-    }
-
-    current_page = Page :: Game;
+void ChoosePage :: Reset(){
+    firstPickIndex  = -1;
+    secondPickIndex = -1;
 }
