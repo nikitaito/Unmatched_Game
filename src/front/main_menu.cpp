@@ -58,7 +58,6 @@ void Main_Menu :: make_Page(Page & current_page, Texture2D & background,Font & t
     MenuButton exitBtn  = { "EXIT", 26, panelBg, panelHoverBg, panelPressBg,
                             panelBorder, panelHoverBorder, textGray, textWhite };
 
-    while (!WindowShouldClose())
     {
         int sw = GetScreenWidth();
         int sh = GetScreenHeight();
@@ -83,7 +82,6 @@ void Main_Menu :: make_Page(Page & current_page, Texture2D & background,Font & t
 
         SetMouseCursor(anyHover ? MOUSE_CURSOR_POINTING_HAND : MOUSE_CURSOR_DEFAULT);
 
-        BeginDrawing();
         ClearBackground(BLACK);
 
         DrawTexturePro(background,
@@ -107,25 +105,14 @@ void Main_Menu :: make_Page(Page & current_page, Texture2D & background,Font & t
         DrawMenuButton(loadBtn, loadRect, buttonFont, mousePos, mouseDown);
         DrawMenuButton(exitBtn, exitRect, buttonFont, mousePos, mouseDown);
 
-        EndDrawing();
-
         if(is_clicked(startRect , mousePos)){
             current_page = Page :: Age;
-            break;
         }
         else if(is_clicked(loadRect , mousePos)){
             current_page = Page :: Help;
-            break;
         }
         else if(is_clicked (exitRect , mousePos)){
             current_page = Page :: Exit;
-            break;
         }
     }
-
-    if (WindowShouldClose())
-    {
-        current_page = Page::Exit;
-    }
-
 }
