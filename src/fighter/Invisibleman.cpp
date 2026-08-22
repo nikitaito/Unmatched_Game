@@ -49,7 +49,8 @@ void Invman :: initial_deck() {
     cards.deck.push_back(Card(CardName :: Step_Lightly , CardTiming :: Immediate , CardType :: EVENT , Usertype :: INVMAN , 0, 0 , 1 , Make_Effect({new StepLightlyEffect()})));
     cards.deck.push_back(Card(CardName :: Step_Lightly , CardTiming :: Immediate , CardType :: EVENT , Usertype :: INVMAN , 0, 0 , 1 , Make_Effect({new StepLightlyEffect()})));
 
-
+    cards.deck.push_back(Card(CardName :: Vanish , CardTiming :: Immediate , CardType :: EVENT , Usertype :: INVMAN , 0, 0 , 3 , Make_Effect({new VanishEffect()})));
+    cards.deck.push_back(Card(CardName :: Vanish , CardTiming :: Immediate , CardType :: EVENT , Usertype :: INVMAN , 0, 0 , 3 , Make_Effect({new VanishEffect()})));
 }
 
 void Invman :: assign_sidekicks(){
