@@ -2,7 +2,6 @@
 #include <cstdio>
 #include <cmath>
 
-// gold-on-navy theme, kept in one place so re-theming only touches this block
 namespace
 {
     Color NavyBackground()  { return Color{ 10, 14, 26, 255 }; }
@@ -26,7 +25,7 @@ namespace
     Color PhosphorGreen()     { return Color{ 90, 255, 140, 255 }; }
     Color PhosphorGreenGlow() { return Color{ 90, 255, 140, 70 }; }
 
-    // panel with drop shadow + double gold border, shared by every framed region
+
     void DrawFramedPanel(Rectangle rect, Color fill, bool cornerAccents = false){
         DrawRectangleRec({ rect.x + 3, rect.y + 4, rect.width, rect.height }, NavyShadow());
         DrawRectangleRec(rect, fill);
@@ -48,7 +47,7 @@ namespace
         }
     }
 
-    // filled when 'primary' (e.g. End Turn), outline-only otherwise (Maneuver/Attack/Scheme)
+
     void DrawThemedButton(Rectangle rect, const char *label, Font font, float fontSize, bool primary){
         DrawRectangleRounded({ rect.x + 2, rect.y + 3, rect.width, rect.height }, 0.16f, 8, NavyShadow());
 
@@ -65,7 +64,7 @@ namespace
         DrawTextEx(font, label, textPos, fontSize, 1.0f, textColor);
     }
 
-    // small gold diamond, used beside the turn banner
+
     void DrawDiamondAccent(Vector2 center, float size, Color color){
         Vector2 top = { center.x, center.y - size };
         Vector2 right = { center.x + size, center.y };
@@ -75,14 +74,12 @@ namespace
         DrawTriangle(bottom, right, left, color);
     }
 
-    // thin centered divider line, shared between sections
+
     void DrawCenteredDivider(float centerX, float y, float width, Color color){
         DrawLineEx({ centerX - width / 2, y }, { centerX + width / 2, y }, 1.0f, color);
     }
 }
 
-// normalized (0-1) centers of the board's 32 numbered spaces, measured
-// against the 1337x866 map art; nudge an entry if its ring looks off-center
 namespace
 {
     const Vector2 kSpaceCenterNorm[GP_SPACE_COUNT] = {
@@ -97,7 +94,6 @@ namespace
     };
 }
 
-// small heart badge showing only current HP (a fraction wouldn't be legible at this size)
 void GamePage :: DrawLifeBadge(Vector2 center, int currentHP, float radius){
     float r = radius;
     DrawCircleV({ center.x, center.y + r * 0.12f }, r * 1.18f, Color{ 0, 0, 0, 90 });
@@ -119,7 +115,6 @@ void GamePage :: DrawLifeBadge(Vector2 center, int currentHP, float radius){
     DrawText(hpText, (int)(center.x - textW / 2.0f), (int)(center.y - fontSize / 2.0f + r * 0.1f), (int)fontSize, TextWhite());
 }
 
-// fixed 1337x866 source map, scaled to fit 'area' keeping aspect ratio, centered
 Rectangle GamePage :: DrawMap(Rectangle area, Texture2D mapTexture){
     const float srcW = 1337.0f, srcH = 866.0f;
     float srcRatio = srcH / srcW;
@@ -161,8 +156,6 @@ Rectangle GamePage :: DrawMap(Rectangle area, Texture2D mapTexture){
     return destRect;
 }
 
-// Deck/Discard buttons + portrait + name + life badge + sidekick row. 'mirrored' flips
-// which side things sit on for the right-hand hero so both panels mirror each other.
 Rectangle GamePage :: DrawHeroPanel(Rectangle area, const HeroPanelData &data, Font nameFont, Font labelFont, bool mirrored, Rectangle &outDeckBtn, Rectangle &outDiscardBtn){
     Rectangle inset = { area.x + 6, area.y + 6, area.width - 12, area.height - 12 };
     DrawFramedPanel(inset, NavyPanelBg(), true);
@@ -206,7 +199,6 @@ Rectangle GamePage :: DrawHeroPanel(Rectangle area, const HeroPanelData &data, F
     }
     DrawRectangleLinesEx(portraitRect, 1.5f, GoldDim());
 
-    // life badge overlaps the portrait's outer-bottom corner, always in bounds
     float badgeRadius = fmin(area.width * 0.062f, destW * 0.22f);
     float badgeX = mirrored ? (portraitRect.x + portraitRect.width) : portraitRect.x;
     Vector2 badgeCenter = { badgeX, portraitRect.y + portraitRect.height - badgeRadius * 0.3f };
@@ -229,8 +221,6 @@ Rectangle GamePage :: DrawHeroPanel(Rectangle area, const HeroPanelData &data, F
     return area;
 }
 
-// row of 638x400 circular token art, sized to fit both the panel width and the
-// vertical room the divider leaves it
 Rectangle GamePage :: DrawSidekickRow(Rectangle area, const std::vector<SidekickVisual> &sidekicks, Font labelFont){
     if(sidekicks.empty()) return area;
 
@@ -270,7 +260,6 @@ Rectangle GamePage :: DrawSidekickRow(Rectangle area, const std::vector<Sidekick
     return area;
 }
 
-// End Turn button + "ACTION" label + one dot per action point, centered as a block
 Rectangle GamePage :: DrawActionBar(Rectangle area, Font labelFont, int actionsRemaining, Rectangle &outEndTurnBtn){
     Rectangle inset = { area.x + 4, area.y + 4, area.width - 8, area.height - 8 };
     DrawFramedPanel(inset, NavyPanelBg());
@@ -297,7 +286,6 @@ Rectangle GamePage :: DrawActionBar(Rectangle area, Font labelFont, int actionsR
     float labelY = endTurnBtn.y + endTurnBtn.height + gapAfterBtn;
     DrawTextEx(labelFont, label, { area.x + area.width / 2 - labelSize.x / 2, labelY }, labelFontSize, 1.0f, TextMuted());
 
-    // exactly 'actionsRemaining' dots are drawn - no separate max, no empty/unfilled dots
     float gap = dotRadius * 2.8f;
     float totalWidth = gap * (actionsRemaining > 0 ? actionsRemaining - 1 : 0);
     float startX = area.x + area.width / 2 - totalWidth / 2;
@@ -313,7 +301,6 @@ Rectangle GamePage :: DrawActionBar(Rectangle area, Font labelFont, int actionsR
     return area;
 }
 
-// Maneuver / Attack / Scheme buttons, centered with divider lines above/below
 void GamePage :: DrawManeuverAttackScheme(Rectangle area, Font labelFont, Rectangle &outManeuver, Rectangle &outAttack, Rectangle &outScheme){
     Rectangle inset = { area.x + 4, area.y + 4, area.width - 8, area.height - 8 };
     DrawFramedPanel(inset, NavyPanelBg());
@@ -343,8 +330,6 @@ void GamePage :: Init(const std::string &fontPath){
     deckWindow = std::make_unique<DeckCardWindow>(fontPath, 32);
 }
 
-// handles hand-card clicks (opens CardViewWindow) and deck/discard button
-// clicks (opens DeckCardWindow); skipped while either window is already open
 void GamePage :: Update(int &handCardClicked){
     handCardClicked = -1;
 
@@ -356,18 +341,18 @@ void GamePage :: Update(int &handCardClicked){
 
     Vector2 mouse = GetMousePosition();
     if(IsMouseButtonPressed(MOUSE_LEFT_BUTTON)){
-        if(CheckCollisionPointRec(mouse, leftDeckBtn))          deckWindow->Open(leftDeckCards);
-        else if(CheckCollisionPointRec(mouse, leftDiscardBtn))  deckWindow->Open(leftDiscardCards);
-        else if(CheckCollisionPointRec(mouse, rightDeckBtn))    deckWindow->Open(rightDeckCards);
-        else if(CheckCollisionPointRec(mouse, rightDiscardBtn)) deckWindow->Open(rightDiscardCards);
+        if(CheckCollisionPointRec(mouse, leftDeckBtn))          deckWindow->Open(leftDeckCards, leftDeckLabels, leftDeckTitle);
+        else if(CheckCollisionPointRec(mouse, leftDiscardBtn))  deckWindow->Open(leftDiscardCards, leftDiscardLabels, leftDiscardTitle);
+        else if(CheckCollisionPointRec(mouse, rightDeckBtn))    deckWindow->Open(rightDeckCards, rightDeckLabels, rightDeckTitle);
+        else if(CheckCollisionPointRec(mouse, rightDiscardBtn)) deckWindow->Open(rightDiscardCards, rightDiscardLabels, rightDiscardTitle);
     }
 
     handMenu.Update(CP_CARD_WIDTH * 0.6f, CP_CARD_HEIGHT * 0.6f, handCardClicked);
     if(handCardClicked != -1)
-        cardViewWindow->Open(handMenu.cards[handCardClicked].texture);
+        cardViewWindow->Open(handMenu.cards[handCardClicked].texture, handMenu.cards[handCardClicked].name, handMenu.cards[handCardClicked].statLine);
 }
 
-// top-level composition: lays out every region for one frame
+
 void GamePage :: Draw(Texture2D background, Font titleFont, Font labelFont, Texture2D mapTexture, HeroPanelData &leftHero, HeroPanelData &rightHero, const char *turnLabel, int actionsRemaining){
     int sw = GetScreenWidth();
     int sh = GetScreenHeight();
@@ -379,7 +364,6 @@ void GamePage :: Draw(Texture2D background, Font titleFont, Font labelFont, Text
         DrawRectangle(0, 0, sw, sh, NavyOverlay());
     }
 
-    // top region: hero panels either side, map fills the rest
     float topHeight = sh * 0.68f;
     float heroPanelWidth = sw * 0.14f;
 
@@ -387,7 +371,6 @@ void GamePage :: Draw(Texture2D background, Font titleFont, Font labelFont, Text
     Rectangle rightPanelArea = { sw - heroPanelWidth, 0, heroPanelWidth, topHeight };
     Rectangle mapArea = { heroPanelWidth, 0, sw - heroPanelWidth * 2, topHeight };
 
-    // turn banner: framed ribbon with diamond accents
     float turnFontSize = topHeight * 0.04f;
     Vector2 turnSize = MeasureTextEx(titleFont, turnLabel, turnFontSize, 2.0f);
 
@@ -411,7 +394,6 @@ void GamePage :: Draw(Texture2D background, Font titleFont, Font labelFont, Text
     lastMapRect = DrawMap(mapDrawArea, mapTexture);
     DrawHeroPanel(rightPanelArea, rightHero, titleFont, labelFont, true, rightDeckBtn, rightDiscardBtn);
 
-    // bottom region: buttons | action | hand
     float bottomY = topHeight;
     float bottomHeight = sh - topHeight;
 
@@ -426,7 +408,6 @@ void GamePage :: Draw(Texture2D background, Font titleFont, Font labelFont, Text
     DrawManeuverAttackScheme(buttonsArea, labelFont, maneuverBtn, attackBtn, schemeBtn);
     DrawActionBar(actionArea, labelFont, actionsRemaining, endTurnBtn);
 
-    // hand panel: cards auto-scale down if they'd overflow the panel
     Rectangle handPanel = { handArea.x + 4, handArea.y + 4, handArea.width - 8, handArea.height - 8 };
     DrawFramedPanel(handPanel, NavyPanelBg());
 
@@ -476,8 +457,6 @@ void GamePage :: Draw(Texture2D background, Font titleFont, Font labelFont, Text
     handMenu.Draw(handCardW, handCardH);
 }
 
-// thin phosphor-green ring around one board space, positioned off lastMapRect;
-// call after Draw() so the map rect for this frame is already known
 void GamePage :: HighlightSpace(int spaceIndex){
     if(spaceIndex < 0 || spaceIndex >= GP_SPACE_COUNT) return;
     if(lastMapRect.width <= 0.0f || lastMapRect.height <= 0.0f) return;
@@ -492,7 +471,80 @@ void GamePage :: HighlightSpace(int spaceIndex){
     DrawRing(center, radius - thickness * 2.80f, radius + thickness * 1.3f, 0.0f, 360.0f, 48, PhosphorGreen());
 }
 
-// same ring, applied to every index in 'spaceIndices' (e.g. all reachable spaces)
 void GamePage :: HighlightSpaces(const std::vector<int> &spaceIndices){
     for(int index : spaceIndices) HighlightSpace(index);
+}
+void GamePage :: HighlightSpaces(const std::vector<int> &spaceIndices, Color color){
+    if(lastMapRect.width <= 0.0f || lastMapRect.height <= 0.0f) return;
+    for(int spaceIndex : spaceIndices){
+        if(spaceIndex < 0 || spaceIndex >= GP_SPACE_COUNT) continue;
+        Vector2 norm = kSpaceCenterNorm[spaceIndex];
+        Vector2 center = { lastMapRect.x + norm.x * lastMapRect.width, lastMapRect.y + norm.y * lastMapRect.height };
+        float radius = GP_SPACE_RADIUS_NORM * lastMapRect.width;
+        float thickness = fmax(1.0f, radius * 0.045f);
+        DrawRing(center, radius - thickness * 2.80f, radius + thickness * 2.0f, 0.0f, 360.0f, 48, Fade(color, 0.28f));
+        DrawRing(center, radius - thickness * 2.80f, radius + thickness * 1.3f, 0.0f, 360.0f, 48, color);
+    }
+}
+int GamePage :: SpaceAt(Vector2 point) const{
+    if(lastMapRect.width <= 0.0f || lastMapRect.height <= 0.0f) return -1;
+
+    float radius = GP_SPACE_RADIUS_NORM * lastMapRect.width;
+    float bestDist = radius * 1.4f; 
+    int best = -1;
+
+    for(int i = 0; i < GP_SPACE_COUNT; ++i){
+        Vector2 norm = kSpaceCenterNorm[i];
+        Vector2 center = { lastMapRect.x + norm.x * lastMapRect.width, lastMapRect.y + norm.y * lastMapRect.height };
+        float dx = point.x - center.x, dy = point.y - center.y;
+        float dist = sqrtf(dx * dx + dy * dy);
+        if(dist <= bestDist){
+            bestDist = dist;
+            best = i;
+        }
+    }
+    return best;
+}
+void GamePage :: DrawBoardPieces(const std::vector<BoardPieceVisual> &pieces){
+    if(lastMapRect.width <= 0.0f || lastMapRect.height <= 0.0f) return;
+    float radius = GP_SPACE_RADIUS_NORM * lastMapRect.width;
+
+    for(const auto &p : pieces){
+        if(p.space < 0 || p.space >= GP_SPACE_COUNT) continue;
+        Vector2 norm = kSpaceCenterNorm[p.space];
+        Vector2 center = { lastMapRect.x + norm.x * lastMapRect.width, lastMapRect.y + norm.y * lastMapRect.height };
+
+        if(p.isFogToken){
+            Vector2 fogCenter = { center.x - radius * 0.6f, center.y - radius * 0.6f };
+            float size = radius * 0.8f * p.scale;
+            if(p.texture.id != 0){
+                Rectangle src{ 0, 0, (float)p.texture.width, (float)p.texture.height };
+                Rectangle dst{ fogCenter.x - size / 2, fogCenter.y - size / 2, size, size };
+                DrawCircleV(fogCenter, size * 0.56f, Fade(BLACK, 0.35f));
+                DrawTexturePro(p.texture, src, dst, { 0, 0 }, 0.0f, WHITE);
+            } else {
+                DrawCircleV(fogCenter, size * 0.4f, Fade(SKYBLUE, 0.55f));
+                DrawCircleLines((int)fogCenter.x, (int)fogCenter.y, (int)(size * 0.4f), SKYBLUE);
+            }
+            continue;
+        }
+
+        if(p.isHeroDot){
+            float r = radius * 0.42f * p.scale;
+            DrawCircleV(center, r * 1.2f, Fade(BLACK, 0.45f));
+            DrawCircleV(center, r, p.color);
+            DrawCircleLines((int)center.x, (int)center.y, (int)r, Fade(WHITE, 0.85f));
+        } else {
+            float size = radius * 1.15f * p.scale;
+            if(p.texture.id != 0){
+                Rectangle src{ 0, 0, (float)p.texture.width, (float)p.texture.height };
+                Rectangle dst{ center.x - size / 2, center.y - size / 2, size, size };
+                DrawCircleV(center, size * 0.56f, Fade(BLACK, 0.35f));
+                DrawTexturePro(p.texture, src, dst, { 0, 0 }, 0.0f, WHITE);
+            } else {
+                DrawCircleV(center, size * 0.4f, GRAY);
+                DrawCircleLines((int)center.x, (int)center.y, (int)(size * 0.4f), RAYWHITE);
+            }
+        }
+    }
 }
