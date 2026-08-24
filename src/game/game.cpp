@@ -184,20 +184,37 @@ void Game :: PlaceStartingSidekicks(Player * p , int heroSpace){
     Heroes * hero = p->get_hero();
     auto sidekicks = hero->get_sidekick();
 
+    auto & spaces = board.get_spaces();
+    vector<Zone> heroZones = spaces[heroSpace].get_zone();
+
+    vector<int> candidates;
+    for(size_t i = 0 ; i < spaces.size() ; ++i){
+        if((int)i == heroSpace)
+            continue;
+        bool sharesZone = false;
+        for(Zone z : spaces[i].get_zone())
+            for(Zone hz : heroZones)
+                if(z == hz){ sharesZone = true; break; }
+        if(sharesZone)
+            candidates.push_back((int)i);
+    }
+
+    for(int i = (int)candidates.size() - 1 ; i > 0 ; --i){
+        int j = Rand(i + 1);
+        std :: swap(candidates[i] , candidates[j]);
+    }
+
     if(hero->get_name() == CharacterType :: Dracula){
-        vector<int> spots = (heroSpace == 24) ? vector<int>{21 , 22 , 23} : vector<int>{1 , 5 , 8};
-        for(size_t i = 0 ; i < sidekicks.size() && i < spots.size() ; ++i)
-            board.set_Comrade(sidekicks[i] , spots[i]);
+        for(size_t i = 0 ; i < sidekicks.size() && i < candidates.size() ; ++i)
+            board.set_Comrade(sidekicks[i] , candidates[i]);
     }
     else if(hero->get_name() == CharacterType :: Invman){
-        vector<int> spots = (heroSpace == 24) ? vector<int>{21 , 22 , 23} : vector<int>{1 , 5 , 8};
-        for(size_t i = 0 ; i < sidekicks.size() && i < spots.size() ; ++i)
-            board.set_Token(sidekicks[i] , spots[i]);
+        for(size_t i = 0 ; i < sidekicks.size() && i < candidates.size() ; ++i)
+            board.set_Token(sidekicks[i] , candidates[i]);
     }
     else{
-        int spot = (heroSpace == 4) ? 1 : 21;
-        if(!sidekicks.empty())
-            board.set_Comrade(sidekicks[0] , spot);
+        if(!sidekicks.empty() && !candidates.empty())
+            board.set_Comrade(sidekicks[0] , candidates[0]);
     }
 }
 
@@ -737,9 +754,6 @@ std :: vector<std :: string> Game :: ResolveCombat(int moveDestination, std :: v
         setPerspectiveDefender();
         ctx.effectCard = &combatDefenseCard;
         ctx.result = attackerWon ? CombatResult :: Lose : CombatResult :: Win;
-        // ConFound - Extra: predictedValue doubles as a 1-based index into the
-        // opponent's (here: the attacker's) hand for the discard the defender
-        // named ahead of time; 0 means the opponent declined to discard.
         if(combatDefenseCard.get_CardName() == CardName :: ConFound && predictedValue > 0){
             auto & oppHand = ctx.targetplayer->get_hand_cards();
             int idx = predictedValue - 1;
