@@ -313,3 +313,118 @@ std :: vector<BoardPieceVisual> Front :: BuildBoardPieces(){
     return pieces;
 }
 
+HeroPanelData Front :: BuildHeroPanel(Player *p){
+    HeroPanelData data;
+    Heroes *hero = p->get_hero();
+    data.portrait  = GamePortraitFor(hero->get_name());
+    data.name      = CharacterDisplayName(hero->get_name());
+    data.currentHP = hero->get_HP();
+    data.maxHP     = hero->get_HP_max();
+
+    int sisterIndex = 0;
+    for(Sidekick *sk : hero->get_sidekick()){
+        if(!sk) continue;
+        bool tokenKind = (sk->get_name() == CharacterType :: InvmanToken);
+        if(!tokenKind && !sk->get_islive()) continue;
+
+        SidekickVisual v{};
+        if(sk->get_name() == CharacterType :: Dr_Watson){
+            v.texture = watsonToken;
+        }
+        else if(sk->get_name() == CharacterType :: Sister){
+
+            switch(sisterIndex){
+                case 0:  v.texture = sister1Token; break;
+                case 1:  v.texture = sister2Token; break;
+                default: v.texture = sister3Token; break;
+            }
+            sisterIndex++;
+        }
+        else if(tokenKind){
+            v.texture = fogToken;
+        }
+        v.showLife  = !tokenKind;
+        v.currentHP = tokenKind ? 0 : sk->get_Health();
+        v.maxHP     = tokenKind ? 0 : sk->get_Health_max();
+        data.sidekicks.push_back(v);
+    }
+    return data;
+}
+
+void Front :: PopulateHand(CPHandMenu &menu, Player &p){
+    auto &hand = p.get_hand_cards();
+    CharacterType owner = p.get_hero()->get_name();
+    int n = std :: min((int)hand.size(), CP_MAX_HAND);
+    menu.count = n;
+    for(int i = 0; i < n; ++i){
+        Card &c = hand[i];
+        CPHandCard &slot = menu.cards[i];
+        Texture2D tex = CardTextureFor(c.get_CardName(), owner);
+        slot.cardId    = i;
+        slot.texture   = tex;
+        slot.hasTexture = (tex.id != 0) ? 1 : 0;
+        slot.name      = CardDisplayName(c.get_CardName());
+        slot.statLine  = CardStatLine(c.get_CardType(), c.get_Attack(), c.get_Defense(), c.get_Boost());
+        slot.type      = c.get_CardType();
+        slot.disabled  = false;
+    }
+}
+
+void Front :: PopulateDeckAndDiscard(){
+    Player *p1 = game.get_player(1);
+    Player *p2 = game.get_player(2);
+
+    auto fillDeck = [](Player *p, std :: vector<Texture2D> &texOut, std :: vector<std :: string> &labelOut){
+
+        int n = (int)p->get_hero()->get_deck_cards().size();
+        texOut.assign(n, Texture2D{});
+        labelOut.assign(n, std :: string());
+    };
+    auto fillDiscard = [this](Player *p, std :: vector<Texture2D> &texOut, std :: vector<std :: string> &labelOut){
+
+        auto &pile = p->get_dis_cards();
+        CharacterType owner = p->get_hero()->get_name();
+        texOut.clear();
+        labelOut.clear();
+        for(auto &c : pile){
+            texOut.push_back(CardTextureFor(c.get_CardName(), owner));
+            labelOut.push_back(CardDisplayName(c.get_CardName()));
+        }
+    };
+
+    fillDeck(p1, gamePage.leftDeckCards, gamePage.leftDeckLabels);
+    fillDiscard(p1, gamePage.leftDiscardCards, gamePage.leftDiscardLabels);
+    fillDeck(p2, gamePage.rightDeckCards, gamePage.rightDeckLabels);
+    fillDiscard(p2, gamePage.rightDiscardCards, gamePage.rightDiscardLabels);
+}
+
+std :: string Front :: BuildTurnLabel(){
+    Player *t = game.get_turn();
+    return std :: string(CharacterDisplayName(t->get_hero()->get_name())) + "'s Turn";
+}
+
+std :: vector<int> Front :: OwnFighterSpaces(Player *p){
+    std :: vector<int> out;
+    auto &spaces = game.get_Board()->get_spaces();
+    for(size_t i = 0; i < spaces.size(); ++i){
+        Heroes *h = spaces[i].get_Hero();
+        Sidekick *s = spaces[i].get_comrade();
+        if(h && game.get_owner(h->get_name()) == p) out.push_back((int)i);
+        else if(s && s->get_islive() && game.get_owner(s->get_name()) == p) out.push_back((int)i);
+    }
+    return out;
+}
+
+std :: vector<int> Front :: EnemyFighterSpaces(Player *p){
+    std :: vector<int> out;
+    Player *opp = game.get_opponent(p);
+    auto &spaces = game.get_Board()->get_spaces();
+    for(size_t i = 0; i < spaces.size(); ++i){
+        Heroes *h = spaces[i].get_Hero();
+        Sidekick *s = spaces[i].get_comrade();
+        if(h && game.get_owner(h->get_name()) == opp) out.push_back((int)i);
+        else if(s && s->get_islive() && game.get_owner(s->get_name()) == opp) out.push_back((int)i);
+    }
+    return out;
+}
+
