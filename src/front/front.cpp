@@ -428,3 +428,361 @@ std :: vector<int> Front :: EnemyFighterSpaces(Player *p){
     return out;
 }
 
+std :: vector<Front :: InputStep> Front :: StepsForScheme(CardName name) const{
+    using S = InputStep;
+    switch(name){
+        case CardName :: Administer_Aid:
+        case CardName :: Master_of_Disguise:
+        case CardName :: Mistform:
+        case CardName :: Baptism_of_blood:
+        case CardName :: Ravening_Seduction:
+            return { S :: CurrentSpace, S :: TargetSpace };
+        case CardName :: Confirm_Suspicion:
+            return { S :: Prediction };
+        case CardName :: Eliminate_The_Impossible:
+            return { S :: OpponentCard };
+        case CardName :: Rolling_Fog:
+            return { S :: FogSpace, S :: FogDest };
+        case CardName :: Step_Lightly:
+
+            return { S :: TargetSpace };
+        case CardName :: Vanish:
+            return { S :: TargetSpace };
+        default:
+            return {};
+    }
+}
+
+std :: vector<Front :: InputStep> Front :: StepsForCombat(CardName atk, bool hasDef, CardName def) const{
+    using S = InputStep;
+    std :: vector<S> steps;
+    auto need = [&](S s){
+        if(std :: find(steps.begin(), steps.end(), s) == steps.end())
+            steps.push_back(s);
+    };
+    auto consider = [&](CardName name){
+        switch(name){
+            case CardName :: Dash:
+            case CardName :: The_Game_Is_Afoot:
+                need(S :: MoveDestination); break;
+            case CardName :: Into_Thin_Air:
+                need(S :: SelfMoveDestination); need(S :: FogSpace); need(S :: FogDest); break;
+            case CardName :: Lurking:
+                need(S :: SelfMoveDestination); need(S :: FogSpace); need(S :: FogDest); break;
+            case CardName :: Slip_Away:
+                need(S :: FogSpace); need(S :: FogDest); break;
+            case CardName :: Covert_PreParation:
+                need(S :: FogSpace); need(S :: FogDest);
+                need(S :: SecondFogSpace); need(S :: SecondFogDest); break;
+            case CardName :: ConFound:
+                need(S :: OpponentCard); break;
+            case CardName :: Elementary:
+                need(S :: Prediction); break;
+            case CardName :: Beastform:
+                need(S :: BoostDiscard); break;
+            default: break;
+        }
+    };
+    consider(atk);
+    if(hasDef) consider(def);
+    return steps;
+}
+
+void Front :: BeginSchemeFlow(int handIndex, CardName name){
+    flowKind = FlowKind :: Scheme;
+    flowHandIndex = handIndex;
+    flowCardName = name;
+    flowSteps = StepsForScheme(name);
+    flowStepIndex = 0;
+    flowCurrent = flowTarget = -1;
+    flowFogSpace = flowFogDest = -1;
+    flowSecondFogSpace = flowSecondFogDest = -1;
+    flowGuessValue = 0;
+    flowGuessAttack = true;
+    predictionDraftValue = 0;
+    predictionDraftAttack = true;
+
+    if(flowSteps.empty()){
+        FinishFlow();
+    } else {
+        mode = Mode :: Flow;
+    }
+}
+
+void Front :: BeginCombatFollowupFlow(){
+    flowKind = FlowKind :: CombatFollowup;
+    flowAttackCardName = game.get_CombatAttackCardName();
+    flowHasDefenseCard = game.get_CombatHasDefense();
+    flowDefenseCardName = flowHasDefenseCard ? game.get_CombatDefenseCardName() : CardName{};
+    flowSteps = StepsForCombat(flowAttackCardName, flowHasDefenseCard, flowDefenseCardName);
+    flowStepIndex = 0;
+    flowMoveDestination = flowSelfMoveDestination = -1;
+    flowFogSpace = flowFogDest = -1;
+    flowSecondFogSpace = flowSecondFogDest = -1;
+    flowBoostIndices.clear();
+    flowGuessValue = 0;
+    flowGuessAttack = true;
+    predictionDraftValue = 0;
+    predictionDraftAttack = true;
+
+    if(flowSteps.empty()){
+        FinishFlow();
+    } else {
+        mode = Mode :: Flow;
+    }
+}
+
+void Front :: AdvanceFlow(){
+    flowStepIndex++;
+    if(flowStepIndex >= flowSteps.size())
+        FinishFlow();
+}
+
+void Front :: CancelFlow(){
+    flowKind = FlowKind :: None;
+    flowSteps.clear();
+    flowStepIndex = 0;
+    mode = Mode :: Idle;
+}
+
+void Front :: FinishFlow(){
+    if(flowKind == FlowKind :: Scheme){
+        std :: string err;
+        std :: vector<std :: string> log;
+        Player *turnPlayer = game.get_turn();
+        bool ok = game.PlayScheme(turnPlayer, flowHandIndex, flowCurrent, flowTarget,
+                                   flowGuessValue, flowGuessAttack, err, log,
+                                   flowFogSpace, flowFogDest, flowSecondFogSpace, flowSecondFogDest);
+        if(!ok) ShowToast(err);
+        else if(!log.empty()) ShowToast(log.back());
+    }
+    else if(flowKind == FlowKind :: CombatFollowup){
+        auto log = game.ResolveCombat(flowMoveDestination, flowBoostIndices, flowSelfMoveDestination,
+                                       flowFogSpace, flowFogDest, {}, flowGuessValue, flowGuessAttack,
+                                       flowSecondFogSpace, flowSecondFogDest);
+        showingCombatResult = true;
+        combatPage.showingResult = true;
+        combatPage.resultLog.clear();
+        for(auto &l : log){ combatPage.resultLog += l; combatPage.resultLog += "\n"; }
+    }
+
+    flowKind = FlowKind :: None;
+    flowSteps.clear();
+    flowStepIndex = 0;
+    flowCurrent = flowTarget = -1;
+    flowFogSpace = flowFogDest = -1;
+    flowSecondFogSpace = flowSecondFogDest = -1;
+    flowMoveDestination = flowSelfMoveDestination = -1;
+    flowBoostIndices.clear();
+    flowGuessValue = 0;
+    flowGuessAttack = true;
+    mode = Mode :: Idle;
+}
+
+void Front :: DrawFlowPrompt(const char *question){
+    int sw = GetScreenWidth();
+    float fontSize = 22.0f;
+    Vector2 size = MeasureTextEx(labelFont, question, fontSize, 1.0f);
+    Rectangle box{ sw / 2.0f - size.x / 2 - 24, 16, size.x + 48, size.y + 24 };
+    DrawRectangleRounded(box, 0.25f, 8, Color{ 20, 26, 45, 235 });
+    DrawRectangleRoundedLinesEx(box, 0.25f, 8, 2, Color{ 212, 175, 90, 255 });
+    DrawTextEx(labelFont, question, { box.x + 24, box.y + 12 }, fontSize, 1.0f, RAYWHITE);
+}
+
+void Front :: DrawPredictionPicker(){
+    int sw = GetScreenWidth();
+    float boxW = 460, boxH = 140;
+    Rectangle box{ sw / 2.0f - boxW / 2, 90, boxW, boxH };
+    DrawRectangleRounded(box, 0.08f, 8, Color{ 20, 26, 45, 240 });
+    DrawRectangleRoundedLinesEx(box, 0.08f, 8, 2, Color{ 212, 175, 90, 255 });
+    DrawTextEx(labelFont, "Name a printed value:", { box.x + 20, box.y + 14 }, 20, 1.0f, RAYWHITE);
+
+    Vector2 mouse = GetMousePosition();
+    bool leftClicked = IsMouseButtonPressed(MOUSE_LEFT_BUTTON);
+
+    float cellSize = 44;
+    float startX = box.x + 20;
+    float rowY = box.y + 46;
+    for(int v = 0; v <= 6; v++){
+        Rectangle cell{ startX + v * (cellSize + 8), rowY, cellSize, cellSize };
+        bool selected = (predictionDraftValue == v);
+        bool hovering = CheckCollisionPointRec(mouse, cell);
+        Color fill = selected ? Color{ 212, 175, 90, 255 } : (hovering ? Color{ 60, 70, 100, 255 } : Color{ 35, 46, 78, 255 });
+        DrawRectangleRounded(cell, 0.2f, 6, fill);
+        DrawRectangleRoundedLinesEx(cell, 0.2f, 6, 2, Color{ 198, 161, 91, 255 });
+        const char *label = TextFormat("%d", v);
+        Vector2 ls = MeasureTextEx(labelFont, label, 20, 1.0f);
+        DrawTextEx(labelFont, label, { cell.x + cell.width / 2 - ls.x / 2, cell.y + cell.height / 2 - ls.y / 2 }, 20, 1.0f, selected ? Color{ 20, 24, 38, 255 } : RAYWHITE);
+        if(leftClicked && hovering) predictionDraftValue = v;
+    }
+
+    Rectangle atkBtn{ box.x + 20, rowY + cellSize + 12, 90, 34 };
+    Rectangle defBtn{ atkBtn.x + 100, atkBtn.y, 90, 34 };
+    auto drawToggle = [&](Rectangle r, const char *label, bool active){
+        DrawRectangleRounded(r, 0.2f, 6, active ? Color{ 212, 175, 90, 255 } : Color{ 35, 46, 78, 255 });
+        DrawRectangleRoundedLinesEx(r, 0.2f, 6, 2, Color{ 198, 161, 91, 255 });
+        Vector2 ls = MeasureTextEx(labelFont, label, 18, 1.0f);
+        DrawTextEx(labelFont, label, { r.x + r.width / 2 - ls.x / 2, r.y + r.height / 2 - ls.y / 2 }, 18, 1.0f, active ? Color{ 20, 24, 38, 255 } : RAYWHITE);
+    };
+    drawToggle(atkBtn, "ATTACK", predictionDraftAttack);
+    drawToggle(defBtn, "DEFENSE", !predictionDraftAttack);
+    if(leftClicked && CheckCollisionPointRec(mouse, atkBtn)) predictionDraftAttack = true;
+    if(leftClicked && CheckCollisionPointRec(mouse, defBtn)) predictionDraftAttack = false;
+
+    Rectangle confirmBtn{ box.x + boxW - 130, atkBtn.y, 110, 34 };
+    bool hoverConfirm = CheckCollisionPointRec(mouse, confirmBtn);
+    DrawRectangleRounded(confirmBtn, 0.2f, 6, hoverConfirm ? Color{ 235, 200, 130, 255 } : Color{ 212, 175, 90, 255 });
+    DrawRectangleRoundedLinesEx(confirmBtn, 0.2f, 6, 2, Color{ 198, 161, 91, 255 });
+    Vector2 cs = MeasureTextEx(labelFont, "CONFIRM", 18, 1.0f);
+    DrawTextEx(labelFont, "CONFIRM", { confirmBtn.x + confirmBtn.width / 2 - cs.x / 2, confirmBtn.y + confirmBtn.height / 2 - cs.y / 2 }, 18, 1.0f, Color{ 20, 24, 38, 255 });
+    if(leftClicked && hoverConfirm){
+        flowGuessValue = predictionDraftValue;
+        flowGuessAttack = predictionDraftAttack;
+        AdvanceFlow();
+    }
+}
+
+void Front :: HandleFlowStep(){
+    if(flowStepIndex >= flowSteps.size()){ FinishFlow(); return; }
+    InputStep step = flowSteps[flowStepIndex];
+
+    auto storeAndAdvance = [&](int value){
+        switch(step){
+            case InputStep :: CurrentSpace: flowCurrent = value; break;
+            case InputStep :: TargetSpace: flowTarget = value; break;
+            case InputStep :: FogSpace: flowFogSpace = value; break;
+            case InputStep :: FogDest: flowFogDest = value; break;
+            case InputStep :: SecondFogSpace: flowSecondFogSpace = value; break;
+            case InputStep :: SecondFogDest: flowSecondFogDest = value; break;
+            case InputStep :: MoveDestination: flowMoveDestination = value; break;
+            case InputStep :: SelfMoveDestination: flowSelfMoveDestination = value; break;
+            default: break;
+        }
+        AdvanceFlow();
+    };
+
+    switch(step){
+        case InputStep :: CurrentSpace:
+            DrawFlowPrompt("Select the fighter to move/act with (or Skip)");
+            break;
+        case InputStep :: TargetSpace:
+            DrawFlowPrompt("Select the target space (or Skip)");
+            break;
+        case InputStep :: FogSpace:
+            DrawFlowPrompt("Select a fog token to move (or Skip)");
+            break;
+        case InputStep :: FogDest:
+            DrawFlowPrompt("Select where that fog token goes (or Skip)");
+            break;
+        case InputStep :: SecondFogSpace:
+            DrawFlowPrompt("Opponent: select a different fog token (or Skip)");
+            break;
+        case InputStep :: SecondFogDest:
+            DrawFlowPrompt("Opponent: select where it goes (or Skip)");
+            break;
+        case InputStep :: MoveDestination:
+            DrawFlowPrompt("Select where to move after combat (or Skip)");
+            break;
+        case InputStep :: SelfMoveDestination:
+            DrawFlowPrompt("Select your fighter's new space (or Skip)");
+            break;
+
+        case InputStep :: Prediction:
+            DrawPredictionPicker();
+            return;
+
+        case InputStep :: OpponentCard: {
+            DeckCardWindow *deckWin = gamePage.GetDeckCardWindow();
+            if(!deckWin->IsOpen()){
+                Player *turnPlayer = game.get_turn();
+                bool attackCardIsConfound = (flowKind == FlowKind :: CombatFollowup && flowAttackCardName == CardName :: ConFound);
+
+                Player *shownHandOwner;
+                if(flowKind == FlowKind :: Scheme)
+                    shownHandOwner = game.get_opponent(turnPlayer);
+                else
+                    shownHandOwner = attackCardIsConfound ? combatAttackerPlayer : combatDefenderPlayer;
+
+                auto &hand = shownHandOwner->get_hand_cards();
+                CharacterType handOwnerType = shownHandOwner->get_hero()->get_name();
+                std :: vector<Texture2D> texs;
+                std :: vector<std :: string> labels;
+                for(auto &c : hand){
+                    texs.push_back(CardTextureFor(c.get_CardName(), handOwnerType));
+                    labels.push_back(CardDisplayName(c.get_CardName()));
+                }
+
+                bool allowDecline = (flowKind == FlowKind :: CombatFollowup) &&
+                                     (flowAttackCardName == CardName :: ConFound ||
+                                      (flowHasDefenseCard && flowDefenseCardName == CardName :: ConFound));
+                size_t declineIndex = hand.size();
+                if(allowDecline){
+                    texs.push_back(Texture2D{});
+                    labels.push_back("Decline (do not discard)");
+                }
+
+                std :: string title = allowDecline ? "Opponent's Hand - choose or decline" : "Opponent's Hand - choose one";
+                deckWin->Open(texs, labels, title, true);
+                deckWin->onCardClicked = [this, declineIndex](size_t idx){
+                    flowGuessValue = ((int)idx == (int)declineIndex) ? 0 : (int)idx + 1;
+                    gamePage.GetDeckCardWindow()->Close();
+
+                    if(flowKind == FlowKind :: CombatFollowup && flowGuessValue == 0){
+
+                        flowSteps.insert(flowSteps.begin() + flowStepIndex + 1,
+                                          { InputStep :: FogSpace, InputStep :: FogDest });
+                    }
+                    AdvanceFlow();
+                };
+            }
+            return;
+        }
+
+        case InputStep :: BoostDiscard: {
+            DeckCardWindow *deckWin = gamePage.GetDeckCardWindow();
+            if(!deckWin->IsOpen()){
+                auto &hand = combatAttackerPlayer->get_hand_cards();
+                CharacterType handOwnerType = combatAttackerPlayer->get_hero()->get_name();
+                std :: vector<Texture2D> texs;
+                std :: vector<std :: string> labels;
+                for(auto &c : hand){
+                    texs.push_back(CardTextureFor(c.get_CardName(), handOwnerType));
+                    labels.push_back(CardDisplayName(c.get_CardName()));
+                }
+                deckWin->Open(texs, labels, "Discard cards for +1 Attack each (X to confirm)", true);
+                deckWin->onCardClicked = [this](size_t idx){
+                    auto it = std :: find(flowBoostIndices.begin(), flowBoostIndices.end(), (int)idx);
+                    if(it == flowBoostIndices.end()) flowBoostIndices.push_back((int)idx);
+                    else flowBoostIndices.erase(it);
+                };
+                return;
+            }
+            if(!deckWin->IsOpen())
+                AdvanceFlow();
+            return;
+        }
+
+        default:
+            break;
+    }
+
+    Vector2 mouse = GetMousePosition();
+    Rectangle skipBtn{ (float)GetScreenWidth() / 2 - 70, 90, 140, 40 };
+    bool hoveringSkip = CheckCollisionPointRec(mouse, skipBtn);
+    Color skipCol = hoveringSkip ? Color{ 200, 90, 80, 255 } : Color{ 90, 40, 40, 255 };
+    DrawRectangleRounded(skipBtn, 0.3f, 6, skipCol);
+    DrawRectangleRoundedLinesEx(skipBtn, 0.3f, 6, 2, RAYWHITE);
+    Vector2 skipTextSize = MeasureTextEx(labelFont, "SKIP", 20, 1.0f);
+    DrawTextEx(labelFont, "SKIP", { skipBtn.x + skipBtn.width / 2 - skipTextSize.x / 2, skipBtn.y + 10 }, 20, 1.0f, RAYWHITE);
+
+    if(IsMouseButtonPressed(MOUSE_LEFT_BUTTON)){
+        if(hoveringSkip){
+            storeAndAdvance(-1);
+        } else {
+            int space = gamePage.SpaceAt(mouse);
+            if(space >= 0)
+                storeAndAdvance(space);
+        }
+    }
+}
+
