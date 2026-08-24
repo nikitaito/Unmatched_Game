@@ -786,3 +786,182 @@ void Front :: HandleFlowStep(){
     }
 }
 
+void Front :: HandleIdleClicks(){
+    Player *turnPlayer = game.get_turn();
+    Vector2 mouse = GetMousePosition();
+
+    if(mode == Mode :: Idle){
+        if(CheckCollisionPointRec(mouse, gamePage.GetManeuverBtn())){
+            std :: string err;
+            if(!game.Maneuver(turnPlayer, err)){ ShowToast(err); return; }
+            mode = Mode :: ManeuverPickFighter;
+            return;
+        }
+        if(CheckCollisionPointRec(mouse, gamePage.GetAttackBtn())){
+            if(turnPlayer->get_aciton() <= 0){ ShowToast("No actions remaining this turn."); return; }
+            mode = Mode :: AttackPickAttacker;
+            return;
+        }
+        if(CheckCollisionPointRec(mouse, gamePage.GetSchemeBtn())){
+            if(turnPlayer->get_aciton() <= 0){ ShowToast("No actions remaining this turn."); return; }
+            mode = Mode :: SchemePickCard;
+            return;
+        }
+        if(CheckCollisionPointRec(mouse, gamePage.GetEndTurnBtn())){
+            if(!game.CanEndTurn(turnPlayer)){
+                if(turnPlayer->get_hand_cards().size() > 7) mode = Mode :: HandOverflow;
+                else ShowToast("Use both actions before ending your turn.");
+                return;
+            }
+            game.EndTurn();
+            return;
+        }
+        if(turnPlayer->get_hero()->get_name() == CharacterType :: Dracula){
+            int space = gamePage.SpaceAt(mouse);
+            int dSpace = game.get_Board()->find_space_of_hero(turnPlayer->get_hero());
+            if(space >= 0 && space == dSpace){
+                mode = Mode :: BloodHarvestPickTarget;
+                return;
+            }
+        }
+        return;
+    }
+
+    if(mode == Mode :: ManeuverPickFighter){
+        int space = gamePage.SpaceAt(mouse);
+        auto own = OwnFighterSpaces(turnPlayer);
+        if(space >= 0 && std :: find(own.begin(), own.end(), space) != own.end()){
+            selectedFighterSpace = space;
+            auto &spaces = game.get_Board()->get_spaces();
+            Heroes *h = spaces[space].get_Hero();
+            Sidekick *s = spaces[space].get_comrade();
+            CharacterType t = h ? h->get_name() : s->get_name();
+            int moveLimit = h ? h->get_Movement() : s->get_Movement();
+
+            if(t == CharacterType :: Invman){
+                Player *opp = game.get_opponent(turnPlayer);
+                std :: vector<CharacterType> enemyTypes;
+                enemyTypes.push_back(opp->get_hero()->get_name());
+                for(auto *sk : opp->get_hero()->get_sidekick())
+                    if(sk && sk->get_islive() && sk->occupies_space()) enemyTypes.push_back(sk->get_name());
+                maneuverReachable = game.get_Board()->reachable_spaces_with_fog_jump(space, enemyTypes, true, moveLimit);
+            } else {
+                maneuverReachable = game.get_Board()->reachable_spaces(space, t, true, moveLimit);
+            }
+            mode = Mode :: ManeuverPickDestination;
+        } else {
+            mode = Mode :: Idle;
+        }
+        return;
+    }
+
+    if(mode == Mode :: ManeuverPickDestination){
+        int space = gamePage.SpaceAt(mouse);
+        if(space >= 0 && std :: find(maneuverReachable.begin(), maneuverReachable.end(), space) != maneuverReachable.end()){
+            std :: string err;
+            if(!game.MoveFighter(turnPlayer, selectedFighterSpace, space, err)) ShowToast(err);
+        }
+        mode = Mode :: Idle;
+        selectedFighterSpace = -1;
+        maneuverReachable.clear();
+        return;
+    }
+
+    if(mode == Mode :: AttackPickAttacker){
+        int space = gamePage.SpaceAt(mouse);
+        auto own = OwnFighterSpaces(turnPlayer);
+        if(space >= 0 && std :: find(own.begin(), own.end(), space) != own.end()){
+            selectedFighterSpace = space;
+            mode = Mode :: AttackPickTarget;
+        } else {
+            mode = Mode :: Idle;
+        }
+        return;
+    }
+
+    if(mode == Mode :: AttackPickTarget){
+        int space = gamePage.SpaceAt(mouse);
+        auto enemies = EnemyFighterSpaces(turnPlayer);
+        if(space >= 0 && std :: find(enemies.begin(), enemies.end(), space) != enemies.end()){
+            std :: string err;
+            if(!game.DeclareAttack(turnPlayer, selectedFighterSpace, space, err)){
+                ShowToast(err);
+            } else {
+                combatAttackerPlayer = turnPlayer;
+                combatDefenderPlayer = game.get_opponent(turnPlayer);
+                combatAttackerSpaceRef = selectedFighterSpace;
+                combatDefenderSpaceRef = space;
+            }
+        }
+        mode = Mode :: Idle;
+        selectedFighterSpace = -1;
+        return;
+    }
+
+    if(mode == Mode :: BloodHarvestPickTarget){
+        int space = gamePage.SpaceAt(mouse);
+        if(space >= 0){
+            std :: string err;
+            if(!game.BloodHarvest(turnPlayer, space, err)) ShowToast(err);
+        }
+        mode = Mode :: Idle;
+        return;
+    }
+}
+
+void Front :: HandleCombatClicks(CombatStage stage){
+    if(showingCombatResult){
+        if(combatPage.choosePressed){
+            showingCombatResult = false;
+            combatPage.showingResult = false;
+            combatAttackerPlayer = nullptr;
+            combatDefenderPlayer = nullptr;
+            combatAttackerSpaceRef = combatDefenderSpaceRef = -1;
+        }
+        return;
+    }
+
+    if(stage == CombatStage :: AwaitAttackCard){
+        if(combatPage.attackCardClicked != -1){
+            std :: string err;
+            if(!game.PlayAttackCard(combatPage.attackCardClicked, err)) ShowToast(err);
+        }
+    }
+    else if(stage == CombatStage :: AwaitDefenseCard){
+        if(combatPage.defenceCardClicked != -1){
+            std :: string err;
+            if(!game.PlayDefenseCard(combatPage.defenceCardClicked, err)) ShowToast(err);
+            else if(game.get_CombatStage() == CombatStage :: Ready) BeginCombatFollowupFlow();
+        }
+        else if(combatPage.skipPressed){
+            game.SkipDefense();
+            if(game.get_CombatStage() == CombatStage :: Ready) BeginCombatFollowupFlow();
+        }
+    }
+    else if(stage == CombatStage :: Ready){
+
+        if(combatPage.choosePressed && mode != Mode :: Flow)
+            BeginCombatFollowupFlow();
+    }
+}
+
+void Front :: UpdateHandOverflow(){
+    Player *turnPlayer = game.get_turn();
+    if(turnPlayer->get_hand_cards().size() <= 7){
+        mode = Mode :: Idle;
+        return;
+    }
+
+    int discardIndex = -1;
+    gamePage.Update(discardIndex);
+    if(discardIndex >= 0 && discardIndex < (int)turnPlayer->get_hand_cards().size()){
+        gamePage.GetCardViewWindow()->Close();
+        std :: string err;
+        game.DiscardExcess(turnPlayer, discardIndex, err);
+        if(turnPlayer->get_hand_cards().size() <= 7){
+            game.EndTurn();
+            mode = Mode :: Idle;
+        }
+    }
+}
+
