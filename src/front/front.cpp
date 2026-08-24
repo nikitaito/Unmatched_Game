@@ -219,3 +219,97 @@ void Front :: Run(){
     }
 }
 
+void Front :: StartMatch(){
+    if(gameStarted)
+        return;
+    gameStarted = true;
+
+    int pos1 = (rand() % 2 == 0) ? 4 : 24;
+    int pos2 = (pos1 == 4) ? 24 : 4;
+    game.choose(character1, character2, pos1, pos2);
+    game.inital_hand_cards();
+
+    combatPage.Init(Rectangle{ 0, 0, (float)GetScreenWidth(), (float)GetScreenHeight() });
+    combatPage.backgroundImage = combatBackground;
+    combatPage.centerIcon = swordIcon;
+}
+
+Texture2D Front :: PortraitFor(CharacterType t){
+    switch(t){
+        case CharacterType :: Dracula:        return draculaPortrait;
+        case CharacterType :: Invman:         return invManPortrait;
+        case CharacterType :: SherlockHolmes: return holmesPortrait;
+        default: return Texture2D{};
+    }
+}
+
+Texture2D Front :: GamePortraitFor(CharacterType t){
+    switch(t){
+        case CharacterType :: Dracula:        return draculaPortrait;
+        case CharacterType :: Invman:         return invManGamePortrait;
+        case CharacterType :: SherlockHolmes: return holmesPortrait;
+        default: return Texture2D{};
+    }
+}
+
+Color Front :: HeroColorFor(CharacterType t){
+    switch(t){
+        case CharacterType :: SherlockHolmes: return Color{ 235, 200, 60, 255 };
+        case CharacterType :: Invman:         return Color{ 70, 140, 235, 255 };
+        case CharacterType :: Dracula:        return Color{ 200, 40, 45, 255 };
+        default: return RAYWHITE;
+    }
+}
+
+std :: vector<BoardPieceVisual> Front :: BuildBoardPieces(){
+    std :: vector<BoardPieceVisual> pieces;
+    auto &spaces = game.get_Board()->get_spaces();
+
+    auto sisterTextureFor = [&](Sidekick *sk, Heroes *owner) -> Texture2D {
+        auto list = owner->get_sidekick();
+        for(size_t i = 0; i < list.size(); ++i){
+            if(list[i] == sk)
+                return (i == 0) ? sister1Token : (i == 1) ? sister2Token : sister3Token;
+        }
+        return Texture2D{};
+    };
+
+    for(size_t i = 0; i < spaces.size(); ++i){
+        int space = (int)i;
+
+        if(Heroes *hero = spaces[i].get_Hero()){
+            BoardPieceVisual v;
+            v.space = space;
+            v.isHeroDot = true;
+            v.color = HeroColorFor(hero->get_name());
+            pieces.push_back(v);
+        }
+
+        if(Sidekick *comrade = spaces[i].get_comrade()){
+            if(comrade->get_islive()){
+                Player *owner = game.get_owner(comrade->get_name());
+                Heroes *ownerHero = owner ? owner->get_hero() : nullptr;
+
+                BoardPieceVisual v;
+                v.space = space;
+                v.isHeroDot = false;
+                if(comrade->get_name() == CharacterType :: Dr_Watson)
+                    v.texture = watsonToken;
+                else if(comrade->get_name() == CharacterType :: Sister && ownerHero)
+                    v.texture = sisterTextureFor(comrade, ownerHero);
+                pieces.push_back(v);
+            }
+        }
+
+        if(spaces[i].get_token()){
+            BoardPieceVisual v;
+            v.space = space;
+            v.isFogToken = true;
+            v.texture = fogToken;
+            pieces.push_back(v);
+        }
+    }
+
+    return pieces;
+}
+
