@@ -965,3 +965,131 @@ void Front :: UpdateHandOverflow(){
     }
 }
 
+void Front :: UpdateAndDrawGame(){
+    Player *turnPlayer = game.get_turn();
+    Player *p1 = game.get_player(1);
+    Player *p2 = game.get_player(2);
+
+    HeroPanelData leftHero  = BuildHeroPanel(p1);
+    HeroPanelData rightHero = BuildHeroPanel(p2);
+
+    PopulateHand(gamePage.handMenu, *turnPlayer);
+    PopulateDeckAndDiscard();
+
+    std :: string turnLabel = BuildTurnLabel();
+    CombatStage stage = game.get_CombatStage();
+    bool inCombatUI = (stage != CombatStage :: None) || showingCombatResult;
+
+    CardViewWindow *cardView = gamePage.GetCardViewWindow();
+    DeckCardWindow *deckWin  = gamePage.GetDeckCardWindow();
+    bool windowsOpen = cardView->IsOpen() || deckWin->IsOpen();
+
+    if(inCombatUI){
+        combatPage.stage = stage;
+        combatPage.showingResult = showingCombatResult;
+
+        if(combatAttackerPlayer && combatDefenderPlayer){
+            auto &spaces = game.get_Board()->get_spaces();
+            auto nameAt = [&](int space) -> std :: string{
+                if(space < 0 || space >= (int)spaces.size()) return "";
+                if(Heroes *h = spaces[space].get_Hero()) return CharacterDisplayName(h->get_name());
+                if(Sidekick *s = spaces[space].get_comrade()) return CharacterDisplayName(s->get_name());
+                return "";
+            };
+            combatPage.attackerLabel = nameAt(combatAttackerSpaceRef) + " attacks";
+            combatPage.defenderLabel = nameAt(combatDefenderSpaceRef) + " defends";
+        }
+
+        if(!showingCombatResult){
+            if(stage == CombatStage :: AwaitAttackCard && combatAttackerPlayer)
+                PopulateHand(combatPage.attackHand, *combatAttackerPlayer);
+            if(stage == CombatStage :: AwaitDefenseCard && combatDefenderPlayer)
+                PopulateHand(combatPage.defenceHand, *combatDefenderPlayer);
+        }
+    }
+
+    int handCardClicked = -1;
+
+    if(windowsOpen){
+        cardView->Update();
+        deckWin->Update();
+    }
+    else if(mode != Mode :: Flow && mode != Mode :: HandOverflow){
+        if(!inCombatUI) gamePage.Update(handCardClicked);
+        else            combatPage.Update();
+    }
+
+    EnsureSceneTexture();
+    BeginTextureMode(sceneTexture);
+        gamePage.Draw(background, titleFont, labelFont, mapTexture, leftHero, rightHero,
+                       turnLabel.c_str(), turnPlayer->get_aciton());
+        gamePage.DrawBoardPieces(BuildBoardPieces());
+        if(inCombatUI)
+            combatPage.Draw();
+    EndTextureMode();
+
+    DrawTexturePro(sceneTexture.texture,
+        Rectangle{ 0, 0, (float)sceneTexture.texture.width, -(float)sceneTexture.texture.height },
+        Rectangle{ 0, 0, (float)GetScreenWidth(), (float)GetScreenHeight() },
+        Vector2{ 0, 0 }, 0.0f, WHITE);
+
+    if(!inCombatUI){
+        if(mode == Mode :: ManeuverPickFighter || mode == Mode :: AttackPickAttacker){
+            gamePage.HighlightSpaces(OwnFighterSpaces(turnPlayer), GOLD);
+        }
+        else if(mode == Mode :: ManeuverPickDestination){
+            gamePage.HighlightSpaces(maneuverReachable, GREEN);
+        }
+        else if(mode == Mode :: AttackPickTarget){
+            gamePage.HighlightSpaces(EnemyFighterSpaces(turnPlayer), RED);
+        }
+        else if(mode == Mode :: BloodHarvestPickTarget){
+            std :: vector<int> targets;
+            int dSpace = game.get_Board()->find_space_of_hero(turnPlayer->get_hero());
+            auto &spaces = game.get_Board()->get_spaces();
+            for(size_t i = 0; i < spaces.size(); ++i){
+                if((int)i == dSpace) continue;
+                if(!game.get_Board()->AdjacentSpaces(dSpace, (int)i)) continue;
+                if(spaces[i].get_Hero() || spaces[i].get_comrade()) targets.push_back((int)i);
+            }
+            gamePage.HighlightSpaces(targets, GOLD);
+        }
+        else if(mode == Mode :: Idle && turnPlayer->get_hero()->get_name() == CharacterType :: Dracula){
+            DrawTextEx(labelFont, "Tip: click Dracula on the map to use Blood Harvest",
+                       { 20, (float)GetScreenHeight() - 30 }, 16, 1.0f, Fade(RAYWHITE, 0.7f));
+        }
+    }
+
+    if(mode == Mode :: Flow){
+        HandleFlowStep();
+    }
+    else if(mode == Mode :: HandOverflow){
+        DrawFlowPrompt("Discard down to 7 cards: click a card in your hand");
+        UpdateHandOverflow();
+    }
+    else if(!windowsOpen){
+        if(inCombatUI){
+            HandleCombatClicks(stage);
+        }
+        else if(handCardClicked != -1){
+            if(mode == Mode :: SchemePickCard){
+                Card &c = turnPlayer->get_hand_cards()[handCardClicked];
+                if(c.get_CardType() != CardType :: EVENT){
+                    ShowToast("That is not a Scheme card.");
+                } else {
+                    cardView->Close();
+                    BeginSchemeFlow(handCardClicked, c.get_CardName());
+                }
+            }
+
+        }
+        else if(IsMouseButtonPressed(MOUSE_LEFT_BUTTON)){
+            HandleIdleClicks();
+        }
+    }
+
+    DrawToast();
+
+    if(cardView->IsOpen()) cardView->Draw(sceneTexture);
+    if(deckWin->IsOpen())  deckWin->Draw(sceneTexture);
+}
