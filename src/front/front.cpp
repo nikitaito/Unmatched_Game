@@ -151,3 +151,71 @@ void Front :: EnsureSceneTexture(){
     }
 }
 
+void Front :: ShowToast(const std :: string &msg){
+    toastMessage = msg;
+    toastTimer = 3.0f;
+}
+
+void Front :: DrawToast(){
+    if(toastTimer <= 0.0f || toastMessage.empty())
+        return;
+
+    int sw = GetScreenWidth();
+    float fontSize = 20.0f;
+    Vector2 size = MeasureTextEx(labelFont, toastMessage.c_str(), fontSize, 1.0f);
+    Rectangle box{ sw / 2.0f - size.x / 2 - 20, 16, size.x + 40, size.y + 20 };
+
+    float alpha = (toastTimer < 0.5f) ? (toastTimer / 0.5f) : 1.0f;
+    DrawRectangleRounded(box, 0.3f, 8, Fade(Color{ 40, 18, 18, 235 }, alpha));
+    DrawRectangleRoundedLinesEx(box, 0.3f, 8, 2, Fade(Color{ 200, 90, 80, 255 }, alpha));
+    DrawTextEx(labelFont, toastMessage.c_str(), { box.x + 20, box.y + 10 }, fontSize, 1.0f, Fade(RAYWHITE, alpha));
+}
+
+void Front :: Run(){
+    while(!WindowShouldClose() && currentPage != Page :: Exit){
+        if(currentPage != priorPage){
+            if(currentPage == Page :: Age)    agePage.Reset();
+            if(currentPage == Page :: Choose) choosePage.Reset();
+            priorPage = currentPage;
+        }
+
+        BeginDrawing();
+
+        switch(currentPage){
+            case Page :: Menu:
+                menuPage.make_Page(currentPage, background, titleFont, subtitleFont, buttonFont);
+                break;
+
+            case Page :: Age:
+                agePage.Make_Page(currentPage, background, titleFont, buttonFont, age1, age2);
+                break;
+
+            case Page :: Help:
+                currentPage = Page :: Menu;
+                break;
+
+            case Page :: Choose:
+                choosePage.Make_Page(currentPage, background, titleFont, labelFont,
+                                      draculaPortrait, invManPortrait, holmesPortrait,
+                                      age1, age2, character1, character2);
+                break;
+
+            case Page :: Game:
+                StartMatch();
+                UpdateAndDrawGame();
+                break;
+
+            default:
+                currentPage = Page :: Exit;
+                break;
+        }
+
+        if(toastTimer > 0.0f){
+            toastTimer -= GetFrameTime();
+            DrawToast();
+        }
+
+        EndDrawing();
+    }
+}
+
