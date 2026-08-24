@@ -98,3 +98,57 @@ const char * CharacterDisplayName(CharacterType type){
     }
     return "";
 }
+
+const char * CardImagePath(CardName name, CharacterType owner){
+    switch(name){
+        // ---- Dracula ----
+        case CardName::Feedingfrenzy:          return "../assets/cards/dracula/feeding-frenzy.png";
+        case CardName::Mistform:               return "../assets/cards/dracula/mistform.png";
+        case CardName::Ambush:                 return "../assets/cards/dracula/ambush.png";
+        case CardName::Baptism_of_blood:       return "../assets/cards/dracula/baptism-of-blood.png";
+        case CardName::Beastform:              return "../assets/cards/dracula/beastform.png";
+        case CardName::Dash:                   return "../assets/cards/dracula/dash.png";
+        case CardName::Exploit:                return "../assets/cards/dracula/exploit.png";
+        case CardName::Look_into_my_eyes:      return "../assets/cards/dracula/look-into-my-eyes.png";
+        case CardName::Prey_upon:              return "../assets/cards/dracula/prey-upon.png";
+        case CardName::Ravening_Seduction:     return "../assets/cards/dracula/ravening-seduction.png";
+        case CardName::Thirst_for_sustenance:  return "../assets/cards/dracula/thirst-for-sustenance.png";
+
+        // Feint is played by both Dracula's and Holmes's decks with different art.
+        case CardName::Feint:
+            return (owner == CharacterType::Dracula)
+                ? "../assets/cards/dracula/feint.png"
+                : "../assets/cards/holms/feint.png";
+
+        // ---- Sherlock Holmes ----
+        case CardName::Administer_Aid:                 return "../assets/cards/holms/administer-aid.png";
+        case CardName::Confirm_Suspicion:              return "../assets/cards/holms/confirm-suspicion.png";
+        case CardName::Counterpunch:                   return "../assets/cards/holms/counterpunch.png";
+        case CardName::Deduce_Strategy:                return "../assets/cards/holms/deduce-strategy.png";
+        case CardName::Education_Never_Ends:           return "../assets/cards/holms/education-never-ends.png";
+        case CardName::Elementary:                     return "../assets/cards/holms/elementary.png";
+        case CardName::Eliminate_The_Impossible:       return "../assets/cards/holms/eliminate-the-impossible.png";
+        case CardName::Fixed_Point_in_a_Changing_Age:  return "../assets/cards/holms/fixed-point-in-a-changing-age.png";
+        case CardName::Master_of_Disguise:             return "../assets/cards/holms/master-of-disguise.png";
+        case CardName::The_Game_Is_Afoot:              return "../assets/cards/holms/the-game-is-afoot.png";
+        case CardName::Service_Revolver:               return "../assets/cards/holms/service-revolver.png";
+        case CardName::Study_Methods:                  return "../assets/cards/holms/study-methods.png";
+
+        // ---- Invisible Man ----
+        case CardName::Coded_Notes:            return "../assets/cards/InvisibleMan/coded-notes.png";
+        case CardName::ConFound:               return "../assets/cards/InvisibleMan/confound.png";
+        case CardName::Covert_PreParation:     return "../assets/cards/InvisibleMan/covert-preparation.png";
+        case CardName::Deaming_of_Revenge:     return "../assets/cards/InvisibleMan/dreaming-of-revenge.png";
+        case CardName::Emerge_from_Mist:       return "../assets/cards/InvisibleMan/emerge-from-mist.png";
+        case CardName::Impossible_to_See:      return "../assets/cards/InvisibleMan/impossible-to-see.png";
+        case CardName::Into_Thin_Air:          return "../assets/cards/InvisibleMan/into-thin-air.png";
+        case CardName::Lurking:                return "../assets/cards/InvisibleMan/lurking.png";
+        case CardName::Reign_of_Terror:        return "../assets/cards/InvisibleMan/reign-of-terror.png";
+        case CardName::Rolling_Fog:            return "../assets/cards/InvisibleMan/rolling-fog.png";
+        case CardName::Slip_Away:              return "../assets/cards/InvisibleMan/slip-away.png";
+        case CardName::Step_Lightly:           return "../assets/cards/InvisibleMan/step-lightly.png";
+        case CardName::Vanish:                 return "../assets/cards/InvisibleMan/vanish.png";
+    }
+    return "";
+}
+
