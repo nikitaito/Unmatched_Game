@@ -23,11 +23,11 @@ Front :: ~Front(){
 
 void Front :: LoadAssets(){
     background = LoadTexture("../assets/background.png");
-    mapTexture = LoadTexture("../assets/board_map.png");
+    mapTexture = LoadTexture("../assets/map.png");
 
     draculaPortrait = LoadTexture("../assets/dracula/Dracula_wallpaper.png");
-    invManPortrait  = LoadTexture("../assets/invisibleMan/invArt.png");
-    holmesPortrait  = LoadTexture("../assets/sherlock/holmsArt.png");
+    invManPortrait  = LoadTexture("../assets/invisibleMan/inv_wallpaper.png");
+    holmesPortrait  = LoadTexture("../assets/sherlock/sherlock_wallpaper.png");
 
     invManGamePortrait = LoadTexture("../assets/invisibleMan/inv_wallpaper.png");
 
