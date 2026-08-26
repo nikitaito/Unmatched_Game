@@ -40,6 +40,6 @@ Makefile
 *.user
 
 # system files
-.DS_Store
+*.DS_Store
 include/.DS_Store
 src/.DS_Store
