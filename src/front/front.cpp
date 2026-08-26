@@ -232,6 +232,9 @@ void Front :: StartMatch(){
     combatPage.Init(Rectangle{ 0, 0, (float)GetScreenWidth(), (float)GetScreenHeight() });
     combatPage.backgroundImage = combatBackground;
     combatPage.centerIcon = swordIcon;
+    combatPage.font = buttonFont;
+    combatPage.titleFont = subtitleFont;
+    combatPage.labelFont = labelFont;
 }
 
 Texture2D Front :: PortraitFor(CharacterType t){
@@ -374,11 +377,15 @@ void Front :: PopulateDeckAndDiscard(){
     Player *p1 = game.get_player(1);
     Player *p2 = game.get_player(2);
 
-    auto fillDeck = [](Player *p, std :: vector<Texture2D> &texOut, std :: vector<std :: string> &labelOut){
-
-        int n = (int)p->get_hero()->get_deck_cards().size();
-        texOut.assign(n, Texture2D{});
-        labelOut.assign(n, std :: string());
+    auto fillDeck = [this](Player *p, std :: vector<Texture2D> &texOut, std :: vector<std :: string> &labelOut){
+        auto &deck = p->get_hero()->get_deck_cards();
+        CharacterType owner = p->get_hero()->get_name();
+        texOut.clear();
+        labelOut.clear();
+        for(auto &c : deck){
+            texOut.push_back(CardTextureFor(c.get_CardName(), owner));
+            labelOut.push_back(CardDisplayName(c.get_CardName()));
+        }
     };
     auto fillDiscard = [this](Player *p, std :: vector<Texture2D> &texOut, std :: vector<std :: string> &labelOut){
 
