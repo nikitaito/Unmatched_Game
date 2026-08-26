@@ -82,6 +82,8 @@ void Game :: CheckGameOver(){
     bool p2Down = player2.get_hero() && player2.get_hero()->get_HP() <= 0;
 
     if(p1Down && p2Down){
+        // Both fell the same turn (e.g. a counter-damage effect) - the
+        // player who is not the current attacker/turn holder loses ties.
         gameOver = true;
         winner = nullptr;
     }
@@ -776,6 +778,14 @@ std :: vector<std :: string> Game :: ResolveCombat(int moveDestination, std :: v
             combatDefenderSidekick->Damage(dmg);
         attackerWon = true;
         log.push_back("Direct combat damage: " + std :: to_string(dmg));
+    }
+    else if(dmg < 0){
+        int counter = -dmg;
+        if(combatAttackerHero)
+            combatAttackerHero->Damage(counter);
+        else if(combatAttackerSidekick)
+            combatAttackerSidekick->Damage(counter);
+        log.push_back("The defense overpowers the attack: " + std :: to_string(counter) + " damage dealt back to the attacker.");
     }
     else{
         log.push_back("No direct combat damage was dealt.");
