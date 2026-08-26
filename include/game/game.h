@@ -30,6 +30,10 @@ class Game
 
         bool bloodHarvestUsedThisTurn = false;
 
+        bool gameOver = false;
+        Player * winner = nullptr;
+        void CheckGameOver();
+
         void PlaceStartingSidekicks(Player * , int heroSpace);
         Usertype UsertypeOf(CharacterType) const;
         void RemoveDefeatedSidekicks();
@@ -80,6 +84,9 @@ class Game
         bool CanEndTurn(Player *) const;
         bool DiscardExcess(Player * , int handIndex , std :: string & err);
         void EndTurn();
+
+        bool IsGameOver() const;
+        Player * GetWinner() const;
 
 };
 

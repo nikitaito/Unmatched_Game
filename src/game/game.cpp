@@ -74,6 +74,35 @@ void Game :: RemoveDefeatedSidekicks(){
     }
 }
 
+void Game :: CheckGameOver(){
+    if(gameOver)
+        return;
+
+    bool p1Down = player1.get_hero() && player1.get_hero()->get_HP() <= 0;
+    bool p2Down = player2.get_hero() && player2.get_hero()->get_HP() <= 0;
+
+    if(p1Down && p2Down){
+        gameOver = true;
+        winner = nullptr;
+    }
+    else if(p1Down){
+        gameOver = true;
+        winner = &player2;
+    }
+    else if(p2Down){
+        gameOver = true;
+        winner = &player1;
+    }
+}
+
+bool Game :: IsGameOver() const{
+    return gameOver;
+}
+
+Player * Game :: GetWinner() const{
+    return winner;
+}
+
 void Game :: DrawCard(Player * player , int x){
     for(int i = 0 ; i < x ; i++){
         auto & top = player->get_hero()->get_top_of_deck();
@@ -91,6 +120,7 @@ void Game :: DrawCard(Player * player , int x){
             }
             player->get_hero()->Damage(2);
             RemoveDefeatedSidekicks();
+            CheckGameOver();
         }
         else{
 
@@ -688,8 +718,10 @@ std :: vector<std :: string> Game :: ResolveCombat(int moveDestination, std :: v
     {
         auto & atkHand = combatAttackerPlayer->get_hand_cards();
         for(int idx : boostDiscardIndices){
-            if(idx >= 0 && idx < static_cast<int>(atkHand.size()))
+            if(idx >= 0 && idx < static_cast<int>(atkHand.size())){
                 ctx.remove.push_back(atkHand[idx].get_CardName());
+                ctx.removeBoosts.push_back(atkHand[idx].get_Boost());
+            }
         }
     }
 
@@ -796,6 +828,7 @@ std :: vector<std :: string> Game :: ResolveCombat(int moveDestination, std :: v
     combatHasDefense = false;
 
     RemoveDefeatedSidekicks();
+    CheckGameOver();
 
     return log;
 }
@@ -841,6 +874,7 @@ bool Game :: BloodHarvest(Player * p , int targetSpace , std :: string & err){
     DrawCard(p , 1);
     bloodHarvestUsedThisTurn = true;
     RemoveDefeatedSidekicks();
+    CheckGameOver();
     return true;
 }
 
