@@ -16,6 +16,10 @@ vector <int> Space :: get_Hidden_way() const{
     return Hidden_way;
 }
 
+bool Space :: is_hidden_space() const{
+    return !Hidden_way.empty();
+}
+
 Heroes* Space :: get_Hero() const {
     return hero;
 }

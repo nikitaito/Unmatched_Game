@@ -39,6 +39,7 @@ class Space
         int get_id() const;
         std :: vector<int> get_neighbor() const;
         std :: vector<int> get_Hidden_way() const;
+        bool is_hidden_space() const; // true if this space has hidden-way (catacomb) connections
         std :: vector<Zone> get_zone() const;
         Heroes* get_Hero() const;
         Sidekick* get_comrade() const;
