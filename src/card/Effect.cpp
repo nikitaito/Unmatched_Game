@@ -146,6 +146,49 @@ void DamageEffect :: execute(Context & ctx){
     else if(ctx.targetsidekick)
         ctx.targetsidekick->Damage(amount);
 }
+/////////////////////// 
+void ReviveSisterEffect :: execute(Context & ctx){
+    if(!ctx.game || !ctx.ownhero)
+        return;
+
+    Board * board = ctx.game->get_Board();
+    if(!board)
+        return;
+
+    // Find a defeated Sister (0 HP) that isn't currently occupying a space.
+    Sidekick * defeatedSister = nullptr;
+    for(Sidekick * sk : ctx.ownhero->get_sidekick()){
+        if(sk && !sk->get_islive() && board->find_space_of_comrade(sk) < 0){
+            defeatedSister = sk;
+            break;
+        }
+    }
+
+    if(!defeatedSister){
+        ctx.log.push_back("Baptism of Blood: no defeated Sister is available to return.");
+        return;
+    }
+
+    int draculaSpace = board->find_space_of_hero(ctx.ownhero);
+    int dest = ctx.target_space;
+
+    bool destValid = draculaSpace >= 0 && board->valid_space(dest) &&
+                      board->SameZone(draculaSpace, dest);
+    if(destValid){
+        const auto & spaces = board->get_spaces();
+        if(!spaces[dest].empty())
+            destValid = false;
+    }
+
+    if(!destValid){
+        ctx.log.push_back("Baptism of Blood: no legal space in Dracula's zone to return the Sister to.");
+        return;
+    }
+
+    defeatedSister->Heal(defeatedSister->get_Health_max());
+    board->set_Comrade(defeatedSister, dest);
+    ctx.log.push_back("Baptism of Blood: a defeated Sister returns to the board.");
+}
 //////////////////////
 DamageIfAdjacent :: DamageIfAdjacent(int d , CharacterType ch) : damage(d) , chtype(ch){}
 

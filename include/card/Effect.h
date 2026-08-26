@@ -33,7 +33,7 @@ struct  Context
     Card* effectCard = nullptr;
 
     std :: vector<CardName> remove ;
-    std :: vector<int> removeBoosts ; 
+    std :: vector<int> removeBoosts ; // Boost value of each card in `remove`, same index order (used by Discard(false))
 
     /// move information
     int current_space = -1;
@@ -156,6 +156,12 @@ class DamageEffect : public Effect
         int amount;
     public : 
         DamageEffect(int);
+        virtual void execute(Context &) override;
+};
+
+class ReviveSisterEffect : public Effect
+{
+    public:
         virtual void execute(Context &) override;
 };
 
