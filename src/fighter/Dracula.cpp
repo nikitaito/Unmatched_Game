@@ -14,11 +14,6 @@ vector<Sidekick *> Dracula::get_sisters()
   return sidekick;
 }
 
-// void Dracula::DrawnCard()
-// {
-//   cards.hand.push_back(cards.deck.front());
-//   cards.hand.erase(cards.hand.begin());
-// }
 
 void Dracula :: initial_deck() {
 
@@ -31,8 +26,8 @@ void Dracula :: initial_deck() {
   cards.deck.push_back(Card(CardName::Ambush, CardTiming::During, CardType :: ATTACK, Usertype :: ANY , 2, 0, 3 , Make_Effect({new Boost_attack(CharacterType :: Dracula , false)})));
   cards.deck.push_back(Card(CardName::Ambush, CardTiming::During, CardType :: ATTACK, Usertype :: ANY , 2, 0, 3 , Make_Effect({new Boost_attack(CharacterType :: Dracula , false)})));
 
-  cards.deck.push_back(Card(CardName::Baptism_of_blood, CardTiming::Immediate, CardType :: EVENT , Usertype :: DRACULA , 0, 0, 2 , Make_Effect({new HealEffect(2) , new ReplaceEffect(1)})));
-  cards.deck.push_back(Card(CardName::Baptism_of_blood, CardTiming::Immediate, CardType :: EVENT , Usertype :: DRACULA , 0, 0, 2 , Make_Effect({new HealEffect(2) , new ReplaceEffect(1)})));
+  cards.deck.push_back(Card(CardName::Baptism_of_blood, CardTiming::Immediate, CardType :: EVENT , Usertype :: DRACULA , 0, 0, 2 , Make_Effect({new HealEffect(2) , new ReviveSisterEffect()})));
+  cards.deck.push_back(Card(CardName::Baptism_of_blood, CardTiming::Immediate, CardType :: EVENT , Usertype :: DRACULA , 0, 0, 2 , Make_Effect({new HealEffect(2) , new ReviveSisterEffect()})));
 
   cards.deck.push_back(Card(CardName::Beastform, CardTiming::During, CardType :: ATTACK, Usertype :: DRACULA , 6, 0, 4 , Make_Effect({new Discard(false)})));
   cards.deck.push_back(Card(CardName::Beastform, CardTiming::During, CardType :: ATTACK, Usertype :: DRACULA , 6, 0, 4 , Make_Effect({new Discard(false)})));
