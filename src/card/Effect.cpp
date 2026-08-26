@@ -60,9 +60,10 @@ void Discard :: execute(Context & ctx){
             ctx.targetplayer->remove_card(it);
     }
     else{
-        for (auto & it  : ctx.remove){
-            ctx.attackCard->set_Attack(ctx.attackCard->get_Attack() + 1);
-            ctx.ownplayer->remove_card(it);
+        for (size_t i = 0; i < ctx.remove.size(); ++i){
+            int boost = (i < ctx.removeBoosts.size()) ? ctx.removeBoosts[i] : 1;
+            ctx.attackCard->set_Attack(ctx.attackCard->get_Attack() + boost);
+            ctx.ownplayer->remove_card(ctx.remove[i]);
         }
     }
 }

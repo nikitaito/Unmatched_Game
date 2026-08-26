@@ -33,6 +33,7 @@ struct  Context
     Card* effectCard = nullptr;
 
     std :: vector<CardName> remove ;
+    std :: vector<int> removeBoosts ; 
 
     /// move information
     int current_space = -1;
