@@ -14,7 +14,7 @@ Board :: Board(){
     spaces.push_back(Space(4 , {1,5,8} , {} , {Zone::LightBlue , Zone::Brown} ));
     spaces.push_back(Space(5 , {4,6,7} , {} , {Zone::Brown} ));
     spaces.push_back(Space(6 , {5,7,28} , {} , {Zone::Brown} ));
-    spaces.push_back(Space(7 , {5,28} , {} , {Zone::Brown} ));
+    spaces.push_back(Space(7 , {5,6,28} , {} , {Zone::Brown} ));
     spaces.push_back(Space(8 , {3,4,9} , {} , {Zone::LightBlue , Zone::DarkBlue} ));
     spaces.push_back(Space(9 , {8,10} , {} , {Zone::DarkBlue} ));
     spaces.push_back(Space(10 , {2,9,11} , {} , {Zone::DarkBlue} ));
@@ -134,7 +134,7 @@ int Board :: number_of_sisters_in_this_zone(Space * space){
     return i;
 }
 
-bool Board :: dfs(int current , int target , std::vector<bool>& visited , CharacterType forbidden , bool allowhiddenway , int cost ) const{
+bool Board :: dfs(int current , int target , std::vector<bool>& visited , CharacterType forbidden , bool allowhiddenway , int cost , int origin ) const{
     if (current == target)
         return true;
     
@@ -153,11 +153,11 @@ bool Board :: dfs(int current , int target , std::vector<bool>& visited , Charac
         else if(spaces[next].get_comrade() && spaces[next].get_comrade()->get_name() == forbidden)
             continue;
 
-        if(dfs(next , target , visited , forbidden , allowhiddenway , cost - 1))
+        if(dfs(next , target , visited , forbidden , allowhiddenway , cost - 1 , origin))
             return true;
     }
 
-    if (allowhiddenway)
+    if (allowhiddenway && current == origin && space.is_hidden_space())
     {
         for (int next : space.get_Hidden_way())
         {
@@ -169,7 +169,7 @@ bool Board :: dfs(int current , int target , std::vector<bool>& visited , Charac
             else if(spaces[next].get_comrade() && spaces[next].get_comrade()->get_name() == forbidden)
                 continue;
 
-            if (dfs(next, target, visited, forbidden, allowhiddenway , cost - 1))
+            if (dfs(next, target, visited, forbidden, allowhiddenway , cost - 1 , origin))
                 return true;
         }
     }
@@ -182,7 +182,7 @@ bool Board :: is_way(int current , int target , CharacterType forbidden , bool a
         return false;
     
     std :: vector<bool> visited (SPACE_COUNT , false);
-    return dfs(current , target , visited , forbidden , allowhiddenway , cost);
+    return dfs(current , target , visited , forbidden , allowhiddenway , cost , current);
 
 }
 
@@ -191,10 +191,10 @@ bool Board :: is_way_for_token(int current , int target , CharacterType forbidde
         return false;
 
     std :: vector<bool> visited (SPACE_COUNT , false);
-    return dfs(current , target , visited , forbidden , allowhiddenway , cost);
+    return dfs(current , target , visited , forbidden , allowhiddenway , cost , current);
 }
 
-bool Board :: dfs_fog(int current , int target , std :: vector<bool> & visited , const std :: vector<CharacterType> & enemyTypes , bool allowhiddenway , int cost) const{
+bool Board :: dfs_fog(int current , int target , std :: vector<bool> & visited , const std :: vector<CharacterType> & enemyTypes , bool allowhiddenway , int cost , int origin) const{
     if(current == target)
         return true;
 
@@ -219,17 +219,17 @@ bool Board :: dfs_fog(int current , int target , std :: vector<bool> & visited ,
             continue;
         if(blockedByEnemy(spaces[next]))
             continue;
-        if(dfs_fog(next , target , visited , enemyTypes , allowhiddenway , cost - 1))
+        if(dfs_fog(next , target , visited , enemyTypes , allowhiddenway , cost - 1 , origin))
             return true;
     }
 
-    if(allowhiddenway){
+    if(allowhiddenway && current == origin && space.is_hidden_space()){
         for(int next : space.get_Hidden_way()){
             if(visited[next] == true)
                 continue;
             if(blockedByEnemy(spaces[next]))
                 continue;
-            if(dfs_fog(next , target , visited , enemyTypes , allowhiddenway , cost - 1))
+            if(dfs_fog(next , target , visited , enemyTypes , allowhiddenway , cost - 1 , origin))
                 return true;
         }
     }
@@ -245,7 +245,7 @@ bool Board :: dfs_fog(int current , int target , std :: vector<bool> & visited ,
             if(blockedByEnemy(other))
                 continue;
 
-            if(dfs_fog(next , target , visited , enemyTypes , allowhiddenway , cost - 1))
+            if(dfs_fog(next , target , visited , enemyTypes , allowhiddenway , cost - 1 , origin))
                 return true;
         }
     }
@@ -259,7 +259,7 @@ bool Board :: is_way_with_fog_jump(int current , int target , const std :: vecto
         return false;
 
     std :: vector<bool> visited (SPACE_COUNT , false);
-    return dfs_fog(current , target , visited , enemyTypes , allowhiddenway , cost);
+    return dfs_fog(current , target , visited , enemyTypes , allowhiddenway , cost , current);
 }
 
 void Board :: Move(int current , int target){
