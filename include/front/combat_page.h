@@ -13,6 +13,7 @@
 class CombatPage {
     private:
         void DrawLabel(const char *text, Vector2 pos, float size, Color color) const;
+        void DrawLabelWithFont(const Font &f, const char *text, Vector2 pos, float size, Color color) const;
         
     public:
         Rectangle area{};
@@ -27,6 +28,8 @@ class CombatPage {
         Rectangle chooseButton{};
 
         Font font = GetFontDefault();
+        Font titleFont = GetFontDefault();
+        Font labelFont = GetFontDefault();
 
         Texture2D centerIcon{};
         float centerIconSize = 70.0f;

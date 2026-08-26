@@ -75,6 +75,10 @@ void CombatPage :: DrawLabel(const char *text, Vector2 pos, float size, Color co
     DrawTextEx(font, text, pos, size, 1.0f, color);
 }
 
+void CombatPage :: DrawLabelWithFont(const Font &f, const char *text, Vector2 pos, float size, Color color) const{
+    DrawTextEx(f, text, pos, size, 1.0f, color);
+}
+
 void CombatPage :: Draw() const{
     float halfW = area.width / 2.0f;
     float halfH = area.height / 2.0f;
@@ -103,13 +107,13 @@ void CombatPage :: Draw() const{
     DrawLine((int)(area.x + halfW), (int)area.y, (int)(area.x + halfW), (int)(area.y + area.height), CPColors::PanelBorder);
     DrawLine((int)area.x, (int)(area.y + halfH), (int)(area.x + area.width), (int)(area.y + halfH), CPColors::PanelBorder);
 
-    const char *title = "Combat";
-    float titleFontSize = 34;
-    float titleSpacing = 2.0f;
-    Vector2 titleSize = MeasureTextEx(font, title, titleFontSize, titleSpacing);
+    const char *title = "COMBAT";
+    float titleFontSize = 40;
+    float titleSpacing = 3.0f;
+    Vector2 titleSize = MeasureTextEx(titleFont, title, titleFontSize, titleSpacing);
     Vector2 titlePos{ area.x + area.width / 2 - titleSize.x / 2, area.y + 14 };
-    DrawTextEx(font, title, Vector2{ titlePos.x + 2, titlePos.y + 2 }, titleFontSize, titleSpacing, Fade(BLACK, 0.5f));
-    DrawTextEx(font, title, titlePos, titleFontSize, titleSpacing, CPColors::Gold);
+    DrawTextEx(titleFont, title, Vector2{ titlePos.x + 2, titlePos.y + 2 }, titleFontSize, titleSpacing, Fade(BLACK, 0.5f));
+    DrawTextEx(titleFont, title, titlePos, titleFontSize, titleSpacing, CPColors::Gold);
     DrawLineEx(Vector2{ area.x + area.width / 2 - titleSize.x / 2 - 20, titlePos.y + titleSize.y + 8 },
                Vector2{ area.x + area.width / 2 + titleSize.x / 2 + 20, titlePos.y + titleSize.y + 8 },
                1.5f, Fade(CPColors::Gold, 0.7f));
@@ -118,7 +122,7 @@ void CombatPage :: Draw() const{
         Rectangle logBox{ area.x + area.width * 0.15f, titlePos.y + titleSize.y + 40, area.width * 0.7f, area.height * 0.55f };
         DrawRectangleRounded(logBox, 0.04f, 8, CPColors::PanelFill);
         DrawRectangleRoundedLinesEx(logBox, 0.04f, 8, 2, CPColors::PanelBorder);
-        DrawLabel(resultLog.c_str(), Vector2{ logBox.x + 24, logBox.y + 20 }, 20, CPColors::TextLight);
+        DrawLabelWithFont(labelFont, resultLog.c_str(), Vector2{ logBox.x + 24, logBox.y + 20 }, 20, CPColors::TextLight);
 
         Color chooseCol     = chooseHovered ? CPColors::ButtonHoverFill : CPColors::ButtonFill;
         Color chooseTextCol = chooseHovered ? CPColors::TextOnGold : CPColors::TextLight;
@@ -133,11 +137,11 @@ void CombatPage :: Draw() const{
     Rectangle atkHeader{ area.x + halfW + 20, area.y + 20, halfW - 40, 40 };
     DrawRectangleRounded(defHeader, 0.2f, 6, CPColors::ButtonFill);
     DrawRectangleRoundedLinesEx(defHeader, 0.2f, 6, 2, CPColors::PanelBorder);
-    DrawLabel(defenderLabel.empty() ? "Defence" : defenderLabel.c_str(), Vector2{ defHeader.x + 14, defHeader.y + 10 }, 20, CPColors::Gold);
+    DrawLabelWithFont(labelFont, defenderLabel.empty() ? "Defence" : defenderLabel.c_str(), Vector2{ defHeader.x + 14, defHeader.y + 10 }, 20, CPColors::Gold);
 
     DrawRectangleRounded(atkHeader, 0.2f, 6, CPColors::ButtonFill);
     DrawRectangleRoundedLinesEx(atkHeader, 0.2f, 6, 2, CPColors::PanelBorder);
-    DrawLabel(attackerLabel.empty() ? "Attack" : attackerLabel.c_str(), Vector2{ atkHeader.x + 14, atkHeader.y + 10 }, 20, CPColors::Gold);
+    DrawLabelWithFont(labelFont, attackerLabel.empty() ? "Attack" : attackerLabel.c_str(), Vector2{ atkHeader.x + 14, atkHeader.y + 10 }, 20, CPColors::Gold);
 
     DrawRectangleRounded(defenceSlot, 0.05f, 6, CPColors::SlotFill);
     DrawRectangleRoundedLinesEx(defenceSlot, 0.05f, 6, 2, CPColors::PanelBorder);
@@ -157,19 +161,19 @@ void CombatPage :: Draw() const{
         (stage == CombatStage::AwaitAttackCard) ? "Attacker: choose an Attack or Versatile card" :
         (stage == CombatStage::AwaitDefenseCard) ? "Defender: choose a Defense card, or Skip" :
         (stage == CombatStage::Ready)            ? "Both cards are set - press RESOLVE" : "";
-    Vector2 statusSize = MeasureTextEx(font, statusText, 20, 1.0f);
-    DrawLabel(statusText, Vector2{ area.x + halfW - statusSize.x / 2, area.y + halfH * 0.5f - statusSize.y - 24 }, 20, CPColors::TextLight);
+    Vector2 statusSize = MeasureTextEx(labelFont, statusText, 20, 1.0f);
+    DrawLabelWithFont(labelFont, statusText, Vector2{ area.x + halfW - statusSize.x / 2, area.y + halfH * 0.5f - statusSize.y - 24 }, 20, CPColors::TextLight);
 
     bool defenceActive = (stage == CombatStage::AwaitDefenseCard);
     bool attackActive  = (stage == CombatStage::AwaitAttackCard);
 
     Rectangle defenceHandTextBg{ area.x + 12, area.y + halfH + 12, 190, 32 };
     DrawRectangleRounded(defenceHandTextBg, 0.3f, 6, CPColors::TextBackdrop);
-    DrawLabel(defenceActive ? "Your hand" : "Waiting...", Vector2{ area.x + 20, area.y + halfH + 20 }, 20, CPColors::TextLight);
+    DrawLabelWithFont(labelFont, defenceActive ? "Your hand" : "Waiting...", Vector2{ area.x + 20, area.y + halfH + 20 }, 20, CPColors::TextLight);
 
     Rectangle attackHandTextBg{ area.x + halfW + 12, area.y + halfH + 12, 190, 32 };
     DrawRectangleRounded(attackHandTextBg, 0.3f, 6, CPColors::TextBackdrop);
-    DrawLabel(attackActive ? "Your hand" : "Waiting...", Vector2{ area.x + halfW + 20, area.y + halfH + 20 }, 20, CPColors::TextLight);
+    DrawLabelWithFont(labelFont, attackActive ? "Your hand" : "Waiting...", Vector2{ area.x + halfW + 20, area.y + halfH + 20 }, 20, CPColors::TextLight);
 
     Color skipCol     = !defenceActive ? Fade(CPColors::ButtonFill, 0.4f) : (skipHovered ? CPColors::ButtonHoverFill : CPColors::ButtonFill);
     Color skipTextCol = !defenceActive ? Fade(CPColors::TextLight, 0.4f) : (skipHovered ? CPColors::TextOnGold : CPColors::TextLight);
