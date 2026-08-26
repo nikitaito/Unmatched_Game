@@ -441,9 +441,10 @@ std :: vector<Front :: InputStep> Front :: StepsForScheme(CardName name) const{
         case CardName :: Administer_Aid:
         case CardName :: Master_of_Disguise:
         case CardName :: Mistform:
-        case CardName :: Baptism_of_blood:
         case CardName :: Ravening_Seduction:
             return { S :: CurrentSpace, S :: TargetSpace };
+        case CardName :: Baptism_of_blood:
+            return { S :: TargetSpace };
         case CardName :: Confirm_Suspicion:
             return { S :: Prediction };
         case CardName :: Eliminate_The_Impossible:
@@ -673,7 +674,10 @@ void Front :: HandleFlowStep(){
             DrawFlowPrompt("Select the fighter to move/act with (or Skip)");
             break;
         case InputStep :: TargetSpace:
-            DrawFlowPrompt("Select the target space (or Skip)");
+            if(flowKind == FlowKind :: Scheme && flowCardName == CardName :: Baptism_of_blood)
+                DrawFlowPrompt("Select an empty space in Dracula's zone for the Sister to return to (or Skip)");
+            else
+                DrawFlowPrompt("Select the target space (or Skip)");
             break;
         case InputStep :: FogSpace:
             DrawFlowPrompt("Select a fog token to move (or Skip)");
@@ -708,7 +712,11 @@ void Front :: HandleFlowStep(){
                 if(flowKind == FlowKind :: Scheme)
                     shownHandOwner = game.get_opponent(turnPlayer);
                 else
-                    shownHandOwner = attackCardIsConfound ? combatAttackerPlayer : combatDefenderPlayer;
+                    // Confound targets the hand of whoever DIDN'T play it: if the
+                    // attacker played Confound, the defender's hand is shown (and
+                    // vice versa) so the discarded card actually matches what the
+                    // engine removes in Game::ResolveCombat.
+                    shownHandOwner = attackCardIsConfound ? combatDefenderPlayer : combatAttackerPlayer;
 
                 auto &hand = shownHandOwner->get_hand_cards();
                 CharacterType handOwnerType = shownHandOwner->get_hero()->get_name();
@@ -987,6 +995,14 @@ void Front :: UpdateAndDrawGame(){
     CombatStage stage = game.get_CombatStage();
     bool inCombatUI = (stage != CombatStage :: None) || showingCombatResult;
 
+    // While resolving a post-combat follow-up (e.g. choosing where to move, which
+    // fog token to shift, etc.) the player needs to see and click on the actual
+    // game board. Keep tracking combat state (inCombatUI) for hand/label bookkeeping,
+    // but don't let the combat overlay be drawn/updated on top of the board during
+    // that follow-up input; it reappears automatically once the result is ready.
+    bool combatFollowupNeedsBoard = (mode == Mode :: Flow && flowKind == FlowKind :: CombatFollowup);
+    bool showCombatOverlay = inCombatUI && !combatFollowupNeedsBoard;
+
     CardViewWindow *cardView = gamePage.GetCardViewWindow();
     DeckCardWindow *deckWin  = gamePage.GetDeckCardWindow();
     bool windowsOpen = cardView->IsOpen() || deckWin->IsOpen();
@@ -1031,7 +1047,7 @@ void Front :: UpdateAndDrawGame(){
         gamePage.Draw(background, titleFont, labelFont, mapTexture, leftHero, rightHero,
                        turnLabel.c_str(), turnPlayer->get_aciton());
         gamePage.DrawBoardPieces(BuildBoardPieces());
-        if(inCombatUI)
+        if(showCombatOverlay)
             combatPage.Draw();
     EndTextureMode();
 
