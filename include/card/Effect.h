@@ -51,6 +51,7 @@ struct  Context
     int second_fog_token_destination = -1;
 
     std :: vector<int> codedNotesReturnOrder;
+    int codedNotesActuallyDrawn = -1;
 
     int guessedValue = 0;
     bool guessAttack = true;      
