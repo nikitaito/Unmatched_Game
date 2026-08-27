@@ -30,7 +30,7 @@ class Game
 
         bool bloodHarvestUsedThisTurn = false;
 
-        int lastCodedNotesDraw = -1;
+        int lastCodedNotesDraw = -1; // set after ResolveCombat if Coded Notes drew cards this resolution
 
         bool gameOver = false;
         Player * winner = nullptr;
@@ -83,6 +83,9 @@ class Game
 
         int GetLastCodedNotesDraw() const;
         bool ApplyCodedNotesReturn(Player * , int pos0 , int pos1 , std :: string & err);
+
+        bool NeedsVanishPlacement() const;
+        bool ApplyVanishPlacement(Player * , int space , std :: string & err);
 
         bool BloodHarvest(Player * , int targetSpace , std :: string & err);
 

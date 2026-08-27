@@ -443,6 +443,7 @@ bool Game :: PlayScheme(Player * p , int handIndex , int current_space , int tar
         err = "No actions remaining this turn.";
         return false;
     }
+    bool wasFirstActionThisTurn = (p->get_aciton() >= 2);
 
     auto & hand = p->get_hand_cards();
     if(handIndex < 0 || handIndex >= static_cast<int>(hand.size())){
@@ -550,8 +551,12 @@ bool Game :: PlayScheme(Player * p , int handIndex , int current_space , int tar
     }
 
     log = ctx.log;
+    bool wasVanish = (played.get_CardName() == CardName :: Vanish);
     p->discard_card(std :: move(played));
-    DecreaseAction(p);
+    if(wasVanish && wasFirstActionThisTurn)
+        p->decrease_action(p->get_aciton());
+    else
+        DecreaseAction(p);
     RemoveDefeatedSidekicks();
     return true;
 }
@@ -950,6 +955,30 @@ bool Game :: get_CombatHasDefense() const{
 
 CardName Game :: get_CombatDefenseCardName() const { 
     return combatDefenseCard.get_CardName(); 
+}
+
+bool Game :: NeedsVanishPlacement() const{
+    return turn && turn->get_PendingVanish();
+}
+
+bool Game :: ApplyVanishPlacement(Player * p , int space , std :: string & err){
+    if(!p || !p->get_PendingVanish()){
+        err = "There is no pending placement.";
+        return false;
+    }
+    if(!board.valid_space(space)){
+        err = "Invalid space.";
+        return false;
+    }
+    auto & spaces = board.get_spaces();
+    if(!spaces[space].empty()){
+        err = "That space is occupied.";
+        return false;
+    }
+
+    board.set_Hero(p->get_hero() , space);
+    p->set_PendingVanish(false);
+    return true;
 }
 
 int Game :: GetLastCodedNotesDraw() const{
