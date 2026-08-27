@@ -454,7 +454,7 @@ std :: vector<Front :: InputStep> Front :: StepsForScheme(CardName name) const{
             return { S :: FogSpace, S :: FogDest };
         case CardName :: Step_Lightly:
             return { S :: TargetSpace, S :: FogSpace, S :: FogDest };
-        case CardName :: Vanish:
+        case CardName :: Reign_of_Terror:
             return { S :: TargetSpace };
         default:
             return {};
@@ -642,6 +642,8 @@ void Front :: HandlePostCombatCodedNotes(){
         Player *p = pendingCodedNotesPlayer;
         int windowSize = pendingCodedNotesDrawn;
 
+        // If the player closed without picking exactly 2, fall back to the
+        // first two drawn cards so the rule (return exactly 2) is still honored.
         int pos0 = codedNotesPicks.size() > 0 ? codedNotesPicks[0] : 0;
         int pos1 = codedNotesPicks.size() > 1 ? codedNotesPicks[1] : (windowSize > 1 ? 1 : 0);
 
@@ -653,6 +655,25 @@ void Front :: HandlePostCombatCodedNotes(){
         pendingCodedNotesDrawn = -1;
         codedNotesPicks.clear();
         mode = Mode :: Idle;
+    }
+}
+
+void Front :: HandlePlaceVanishedHero(){
+    if(!game.NeedsVanishPlacement()){
+        mode = Mode :: Idle;
+        return;
+    }
+
+    if(IsMouseButtonPressed(MOUSE_LEFT_BUTTON)){
+        Vector2 mouse = GetMousePosition();
+        int space = gamePage.SpaceAt(mouse);
+        if(space >= 0){
+            std :: string err;
+            if(game.ApplyVanishPlacement(game.get_turn(), space, err))
+                mode = Mode :: Idle;
+            else
+                ShowToast(err);
+        }
     }
 }
 
@@ -747,12 +768,19 @@ void Front :: HandleFlowStep(){
                 DrawFlowPrompt("Select an empty space in Dracula's zone for the Sister to return to (or Skip)");
             else if(flowKind == FlowKind :: Scheme && flowCardName == CardName :: Master_of_Disguise)
                 DrawFlowPrompt("Select the space containing the opponent's hero (or Skip)");
+            else if(flowKind == FlowKind :: Scheme && flowCardName == CardName :: Reign_of_Terror)
+                DrawFlowPrompt("If you are on a fog token, select one opposing fighter to damage (or Skip)");
             else
                 DrawFlowPrompt("Select the target space (or Skip)");
             break;
         case InputStep :: FogSpace:
             if(flowKind == FlowKind :: Scheme && flowCardName == CardName :: Step_Lightly)
                 DrawFlowPrompt("Opponent: select a fog token to move up to 2 spaces (or Skip)");
+            else if(flowKind == FlowKind :: CombatFollowup && flowDefenseCardName == CardName :: Lurking)
+                DrawFlowPrompt("Or: select a fog token to move up to 3 spaces instead (or Skip)");
+            else if(flowKind == FlowKind :: CombatFollowup && flowGuessValue == 0 &&
+                    (flowAttackCardName == CardName :: ConFound || flowDefenseCardName == CardName :: ConFound))
+                DrawFlowPrompt("Your opponent declined - select a fog token to move anywhere (or Skip)");
             else
                 DrawFlowPrompt("Select a fog token to move (or Skip)");
             break;
@@ -763,10 +791,18 @@ void Front :: HandleFlowStep(){
                 DrawFlowPrompt("Select where that fog token goes (or Skip)");
             break;
         case InputStep :: SecondFogSpace:
-            DrawFlowPrompt("Opponent: select a different fog token (or Skip)");
+            if(flowKind == FlowKind :: CombatFollowup && flowGuessValue == 0 &&
+               (flowAttackCardName == CardName :: ConFound || flowDefenseCardName == CardName :: ConFound))
+                DrawFlowPrompt("Optionally select a second fog token to move anywhere (or Skip)");
+            else
+                DrawFlowPrompt("Opponent: select a different fog token (or Skip)");
             break;
         case InputStep :: SecondFogDest:
-            DrawFlowPrompt("Opponent: select where it goes (or Skip)");
+            if(flowKind == FlowKind :: CombatFollowup && flowGuessValue == 0 &&
+               (flowAttackCardName == CardName :: ConFound || flowDefenseCardName == CardName :: ConFound))
+                DrawFlowPrompt("Select where it goes (or Skip)");
+            else
+                DrawFlowPrompt("Opponent: select where it goes (or Skip)");
             break;
         case InputStep :: MoveDestination:
             if(flowKind == FlowKind :: CombatFollowup && flowAttackCardName == CardName :: Thirst_for_sustenance)
@@ -775,7 +811,10 @@ void Front :: HandleFlowStep(){
                 DrawFlowPrompt("Select where to move after combat (or Skip)");
             break;
         case InputStep :: SelfMoveDestination:
-            DrawFlowPrompt("Select your fighter's new space (or Skip)");
+            if(flowKind == FlowKind :: CombatFollowup && flowDefenseCardName == CardName :: Lurking)
+                DrawFlowPrompt("Choose ONE: select a space with a fog token to move onto (or Skip to move a fog token instead)");
+            else
+                DrawFlowPrompt("Select your fighter's new space (or Skip)");
             break;
 
         case InputStep :: Prediction:
@@ -792,7 +831,10 @@ void Front :: HandleFlowStep(){
                 if(flowKind == FlowKind :: Scheme)
                     shownHandOwner = game.get_opponent(turnPlayer);
                 else
-
+                    // Confound targets the hand of whoever DIDN'T play it: if the
+                    // attacker played Confound, the defender's hand is shown (and
+                    // vice versa) so the discarded card actually matches what the
+                    // engine removes in Game::ResolveCombat.
                     shownHandOwner = attackCardIsConfound ? combatDefenderPlayer : combatAttackerPlayer;
 
                 auto &hand = shownHandOwner->get_hand_cards();
@@ -822,7 +864,8 @@ void Front :: HandleFlowStep(){
                     if(flowKind == FlowKind :: CombatFollowup && flowGuessValue == 0){
 
                         flowSteps.insert(flowSteps.begin() + flowStepIndex + 1,
-                                          { InputStep :: FogSpace, InputStep :: FogDest });
+                                          { InputStep :: FogSpace, InputStep :: FogDest,
+                                            InputStep :: SecondFogSpace, InputStep :: SecondFogDest });
                     }
                     AdvanceFlow();
                 };
@@ -906,6 +949,7 @@ void Front :: HandleIdleClicks(){
                 return;
             }
             game.EndTurn();
+            if(game.NeedsVanishPlacement()) mode = Mode :: PlaceVanishedHero;
             return;
         }
         if(turnPlayer->get_hero()->get_name() == CharacterType :: Dracula){
@@ -1055,7 +1099,7 @@ void Front :: UpdateHandOverflow(){
         game.DiscardExcess(turnPlayer, discardIndex, err);
         if(turnPlayer->get_hand_cards().size() <= 7){
             game.EndTurn();
-            mode = Mode :: Idle;
+            mode = game.NeedsVanishPlacement() ? Mode :: PlaceVanishedHero : Mode :: Idle;
         }
     }
 }
@@ -1117,7 +1161,7 @@ void Front :: UpdateAndDrawGame(){
         cardView->Update();
         deckWin->Update();
     }
-    else if(mode != Mode :: Flow && mode != Mode :: HandOverflow && mode != Mode :: PostCombatCodedNotes){
+    else if(mode != Mode :: Flow && mode != Mode :: HandOverflow && mode != Mode :: PostCombatCodedNotes && mode != Mode :: PlaceVanishedHero){
         if(!inCombatUI) gamePage.Update(handCardClicked);
         else            combatPage.Update();
     }
@@ -1161,6 +1205,15 @@ void Front :: UpdateAndDrawGame(){
             DrawTextEx(labelFont, "Tip: click Dracula on the map to use Blood Harvest",
                        { 20, (float)GetScreenHeight() - 30 }, 16, 1.0f, Fade(RAYWHITE, 0.7f));
         }
+        else if(mode == Mode :: PlaceVanishedHero){
+            std :: vector<int> emptySpaces;
+            auto &spaces = game.get_Board()->get_spaces();
+            for(size_t i = 0; i < spaces.size(); ++i){
+                if(spaces[i].empty())
+                    emptySpaces.push_back((int)i);
+            }
+            gamePage.HighlightSpaces(emptySpaces, GREEN);
+        }
     }
 
     if(mode == Mode :: Flow){
@@ -1172,6 +1225,10 @@ void Front :: UpdateAndDrawGame(){
     }
     else if(mode == Mode :: PostCombatCodedNotes){
         HandlePostCombatCodedNotes();
+    }
+    else if(mode == Mode :: PlaceVanishedHero){
+        DrawFlowPrompt("The Invisible Man reappears - click any empty space");
+        HandlePlaceVanishedHero();
     }
     else if(!windowsOpen){
         if(inCombatUI){

@@ -79,6 +79,7 @@ class Front
             Flow,
             HandOverflow,
             PostCombatCodedNotes,
+            PlaceVanishedHero,
             GameOver
         };
         Mode mode = Mode::Idle;
@@ -130,6 +131,7 @@ class Front
         std::vector<int> codedNotesPicks;
         void BeginCodedNotesChoice();
         void HandlePostCombatCodedNotes();
+        void HandlePlaceVanishedHero();
 
         void UpdateAndDrawGame();
         RenderTexture2D sceneTexture{};
