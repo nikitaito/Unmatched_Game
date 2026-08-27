@@ -30,6 +30,8 @@ class Game
 
         bool bloodHarvestUsedThisTurn = false;
 
+        int lastCodedNotesDraw = -1; // set after ResolveCombat if Coded Notes drew cards this resolution
+
         bool gameOver = false;
         Player * winner = nullptr;
         void CheckGameOver();
@@ -78,6 +80,9 @@ class Game
         CardName get_CombatAttackCardName() const;
         bool get_CombatHasDefense() const ;
         CardName get_CombatDefenseCardName() const ;
+
+        int GetLastCodedNotesDraw() const;
+        bool ApplyCodedNotesReturn(Player * , int pos0 , int pos1 , std :: string & err);
 
         bool BloodHarvest(Player * , int targetSpace , std :: string & err);
 

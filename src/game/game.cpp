@@ -469,7 +469,28 @@ bool Game :: PlayScheme(Player * p , int handIndex , int current_space , int tar
             return false;
         }
     }
+
+    int holmesSpaceForDisguise = -1;
+    if(c.get_CardName() == CardName :: Master_of_Disguise){
+        // "Choose an opponent. Holmes swaps spaces with their hero." - the
+        // swap source is always Holmes's own current space, not a free pick,
+        // and the destination must actually hold the opponent's hero.
+        holmesSpaceForDisguise = board.find_space_of_hero(p->get_hero());
+        auto & spaces = board.get_spaces();
+        Heroes * targetHero = board.valid_space(target_space) ? spaces[target_space].get_Hero() : nullptr;
+        if(holmesSpaceForDisguise < 0){
+            err = "Holmes is not on the board.";
+            return false;
+        }
+        if(!targetHero || targetHero != opponent->get_hero()){
+            err = "You must choose the space containing the opponent's hero.";
+            return false;
+        }
+    }
+
     Card played = p->take_hand_card(handIndex);
+    if(c.get_CardName() == CardName :: Master_of_Disguise)
+        current_space = holmesSpaceForDisguise;
 
     Heroes * moverHero = nullptr;
     Sidekick * moverSidekick = nullptr;
@@ -706,8 +727,6 @@ std :: vector<std :: string> Game :: ResolveCombat(int moveDestination, std :: v
     ctx.game = this;
     ctx.attackCard = &combatAttackCard;
     ctx.defenseCard = combatHasDefense ? &combatDefenseCard : nullptr;
-    ctx.current_space = combatAttackerSpace;
-    ctx.target_space = combatDefenderSpace;
     ctx.move_override_target = moveDestination;
     ctx.self_move_destination = selfMoveDestination;
     ctx.fog_token_space = fogTokenSpace;
@@ -717,6 +736,7 @@ std :: vector<std :: string> Game :: ResolveCombat(int moveDestination, std :: v
     ctx.codedNotesReturnOrder = codedNotesReturnOrder;
     ctx.guessedValue = predictedValue;
     ctx.guessAttack = predictAttack;
+    lastCodedNotesDraw = -1;
     {
         auto & atkHand = combatAttackerPlayer->get_hand_cards();
         for(int idx : boostDiscardIndices){
@@ -727,6 +747,10 @@ std :: vector<std :: string> Game :: ResolveCombat(int moveDestination, std :: v
         }
     }
 
+    // current_space/target_space always mean "the space of whoever's card is
+    // about to execute" / "the space of their opponent" - set on every
+    // perspective switch so a DEFENSE (or BOTH-type) card played by the
+    // defender doesn't accidentally read the attacker's position as "its own".
     auto setPerspectiveAttacker = [&](){
         ctx.ownplayer = combatAttackerPlayer;
         ctx.targetplayer = combatDefenderPlayer;
@@ -735,6 +759,8 @@ std :: vector<std :: string> Game :: ResolveCombat(int moveDestination, std :: v
         ctx.targethero = combatDefenderPlayer->get_hero();
         ctx.targetsidekick = combatDefenderSidekick;
         ctx.chtype = combatAttackerHero ? combatAttackerHero->get_name() : combatAttackerSidekick->get_name();
+        ctx.current_space = combatAttackerSpace;
+        ctx.target_space = combatDefenderSpace;
     };
     auto setPerspectiveDefender = [&](){
         ctx.ownplayer = combatDefenderPlayer;
@@ -744,6 +770,8 @@ std :: vector<std :: string> Game :: ResolveCombat(int moveDestination, std :: v
         ctx.targethero = combatAttackerPlayer->get_hero();
         ctx.targetsidekick = combatAttackerSidekick;
         ctx.chtype = combatDefenderHero ? combatDefenderHero->get_name() : combatDefenderSidekick->get_name();
+        ctx.current_space = combatDefenderSpace;
+        ctx.target_space = combatAttackerSpace;
     };
 
     auto resolveWindow = [&](CardTiming timing){
@@ -821,6 +849,8 @@ std :: vector<std :: string> Game :: ResolveCombat(int moveDestination, std :: v
 
     for(auto & s : ctx.log)
         log.push_back(s);
+
+    lastCodedNotesDraw = ctx.codedNotesActuallyDrawn;
 
     combatAttackerPlayer->discard_card(std :: move(combatAttackCard));
     if(combatHasDefense)
@@ -920,4 +950,52 @@ bool Game :: get_CombatHasDefense() const{
 
 CardName Game :: get_CombatDefenseCardName() const { 
     return combatDefenseCard.get_CardName(); 
+}
+
+int Game :: GetLastCodedNotesDraw() const{
+    return lastCodedNotesDraw;
+}
+
+bool Game :: ApplyCodedNotesReturn(Player * p , int pos0 , int pos1 , std :: string & err){
+    if(!p){
+        err = "No player supplied.";
+        return false;
+    }
+    if(lastCodedNotesDraw < 2){
+        err = "There is no pending Coded Notes choice.";
+        return false;
+    }
+
+    auto & hand = p->get_hand_cards();
+    int total = static_cast<int>(hand.size());
+    int windowSize = lastCodedNotesDraw;
+    if(windowSize > total){
+        err = "Hand no longer has the drawn cards.";
+        return false;
+    }
+    int beforeDraw = total - windowSize;
+
+    if(pos0 < 0 || pos1 < 0 || pos0 == pos1 || pos0 >= windowSize || pos1 >= windowSize){
+        err = "Invalid choice.";
+        return false;
+    }
+
+    int idx0 = beforeDraw + pos0;
+    int idx1 = beforeDraw + pos1;
+
+    // Take the higher hand index first so removing it doesn't shift the lower
+    // index out from under us; slots[0] must stay the one that goes on top.
+    std :: vector<Card> slots(2);
+    if(idx0 > idx1){
+        slots[0] = p->take_hand_card(idx0);
+        slots[1] = p->take_hand_card(idx1);
+    }
+    else{
+        slots[1] = p->take_hand_card(idx1);
+        slots[0] = p->take_hand_card(idx0);
+    }
+
+    p->get_hero()->add_to_top_of_deck(std :: move(slots));
+    lastCodedNotesDraw = -1;
+    return true;
 }
