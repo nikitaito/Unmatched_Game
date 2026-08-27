@@ -6,31 +6,51 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
-
-find_package(ftxui REQUIRED)
+find_package(raylib REQUIRED)
+find_package(nlohmann_json REQUIRED)
 
 add_executable(MyProject
-    src/front.cpp
-    src/ftxuimain.cpp
-    src/board.cpp
-    src/Card.cpp 
-    src/Dr_Watson.cpp 
-    src/Dracula.cpp
-    src/game.cpp 
-    src/Heroes.cpp 
-    src/Player.cpp 
-    src/SherlockHolmes.cpp
-    src/Sidekick.cpp 
-    src/Sisters.cpp 
-    src/space.cpp
-    src/Effect.cpp
-    
+    src/main.cpp
+
+    # board
+    src/board/board.cpp
+    src/board/space.cpp
+
+    # cards
+    src/card/Card.cpp
+    src/card/Effect.cpp
+    src/card/CardText.cpp
+
+    # game
+    src/game/game.cpp
+    src/game/Player.cpp
+    src/game/SaveLoad.cpp
+
+    # fighters
+    src/fighter/Heroes.cpp
+    src/fighter/Sidekick.cpp
+    src/fighter/Dracula.cpp
+    src/fighter/Sisters.cpp
+    src/fighter/SherlockHolmes.cpp
+    src/fighter/Dr_Watson.cpp
+    src/fighter/Invisibleman.cpp
+    src/fighter/InvisibleManToken.cpp
+
+    # front end
+    src/front/front.cpp
+    src/front/main_menu.cpp
+    src/front/age_page.cpp
+    src/front/choose.cpp
+    src/front/game_page.cpp
+    src/front/combat_page.cpp
+    src/front/handmenu.cpp
+    src/front/CardViewWindow.cpp
+    src/front/DeckCardWindow.cpp
 )
 
-target_include_directories(MyProject PRIVATE include)
+target_include_directories(MyProject PRIVATE include include/front)
 
 target_link_libraries(MyProject PRIVATE
-    ftxui::screen
-    ftxui::dom
-    ftxui::component
+    raylib
+    nlohmann_json::nlohmann_json
 )
