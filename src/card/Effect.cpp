@@ -61,7 +61,7 @@ void Discard :: execute(Context & ctx){
     }
     else{
         for (size_t i = 0; i < ctx.remove.size(); ++i){
-            ctx.attackCard->set_Attack(ctx.attackCard->get_Attack() + 1);
+            ctx.attackCard->set_Attack(1);
             ctx.ownplayer->remove_card(ctx.remove[i]);
         }
     }
@@ -103,7 +103,7 @@ void Boost_deffence :: execute(Context & ctx){
         return;
 
     int boost = ctx.attackCard->get_Boost();
-    ctx.defenseCard->set_Defence(ctx.defenseCard->get_Defense() + boost);
+    ctx.defenseCard->set_Defence(boost);
 }
 /////////////////////////
 Move :: Move(int x) : cost(x){}
@@ -254,7 +254,6 @@ void DamageIfAdjacent :: execute(Context & ctx){
             ctx.mover_sidekick->Damage(i);
     }
     else if(chtype == CharacterType :: Invman){
-        // Reign of Terror: if the Invisible Man is on a fog token space, damage every enemy fighter.
         if(!ctx.targetplayer)
             return;
 
@@ -264,19 +263,29 @@ void DamageIfAdjacent :: execute(Context & ctx){
             return;
 
         const auto & spaces = board->get_spaces();
-        if(spaces[self_space].get_token() == nullptr)
+        if(spaces[self_space].get_token() == nullptr){
+            ctx.log.push_back("Reign of Terror: Invisible Man is not on a fog token.");
             return;
+        }
 
-        Heroes * enemyHero = ctx.targetplayer->get_hero();
-        if(!enemyHero)
+        if(ctx.target_space < 0 || ctx.target_space >= static_cast<int>(spaces.size())){
+            ctx.log.push_back("Reign of Terror: no target chosen.");
             return;
+        }
 
-        if(enemyHero->get_HP() > 0)
-            enemyHero->Damage(damage);
+        Heroes * h = spaces[ctx.target_space].get_Hero();
+        Sidekick * s = spaces[ctx.target_space].get_comrade();
 
-        for(Sidekick * sk : enemyHero->get_sidekick()){
-            if(sk && sk->get_islive())
-                sk->Damage(damage);
+        if(h && ctx.game->get_owner(h->get_name()) == ctx.targetplayer){
+            h->Damage(damage);
+            ctx.log.push_back("Reign of Terror deals " + std :: to_string(damage) + " damage.");
+        }
+        else if(s && s->get_islive() && ctx.game->get_owner(s->get_name()) == ctx.targetplayer){
+            s->Damage(damage);
+            ctx.log.push_back("Reign of Terror deals " + std :: to_string(damage) + " damage.");
+        }
+        else{
+            ctx.log.push_back("Reign of Terror: that space does not hold an opposing fighter.");
         }
     }
 
@@ -442,6 +451,12 @@ void MoveFogTokenEffect :: execute(Context & ctx){
     if(!ctx.game)
         return;
 
+    // Lurking: "choose 1 effect" - if the move-self-onto-fog option was also
+    // filled in, don't also apply this one.
+    if(ctx.effectCard && ctx.effectCard->get_CardName() == CardName :: Lurking &&
+       ctx.self_move_destination >= 0)
+        return;
+
     if(ctx.fog_token_space < 0 || ctx.fog_token_destination < 0 || ctx.fog_token_space == ctx.fog_token_destination)
         return;
 
@@ -496,6 +511,10 @@ void GainActionEffect :: execute(Context & ctx){
 //////////////////////
 void MoveToFogTokenSpaceEffect :: execute(Context & ctx){
     if(!ctx.ownhero || !ctx.game)
+        return;
+
+    if(ctx.effectCard && ctx.effectCard->get_CardName() == CardName :: Lurking &&
+       ctx.fog_token_space >= 0 && ctx.fog_token_destination >= 0)
         return;
 
     if(ctx.self_move_destination < 0)
@@ -595,6 +614,16 @@ void ConfoundEffect :: execute(Context & ctx){
             ctx.log.push_back("No legal destination for that fog token.");
         }
     }
+
+    if(ctx.second_fog_token_space >= 0 && ctx.second_fog_token_destination >= 0 && ctx.second_fog_token_space != ctx.second_fog_token_destination){
+        try{
+            ctx.game->Move_FogToken(ctx.second_fog_token_space , ctx.second_fog_token_destination , ctx.game->get_Board()->get_space_count());
+            ctx.log.push_back("Another fog token moves to a new location.");
+        }
+        catch(const std :: exception &){
+            ctx.log.push_back("No legal destination for that second fog token.");
+        }
+    }
 }
 //////////////////////
 void CovertPreparationEffect :: execute(Context & ctx){
@@ -655,23 +684,19 @@ void StepLightlyEffect :: execute(Context & ctx){
 }
 //////////////////////
 void VanishEffect :: execute(Context & ctx){
-    if(!ctx.ownhero || !ctx.game)
+    if(!ctx.ownhero || !ctx.game || !ctx.ownplayer)
         return;
 
     ctx.ownhero->Heal(1);
 
     Board * board = ctx.game->get_Board();
     int self_space = board->find_space_of_hero(ctx.ownhero);
-    if(self_space < 0 || ctx.target_space < 0 || self_space == ctx.target_space)
+    if(self_space < 0)
         return;
 
-    try{
-        ctx.game->Teleport(self_space , ctx.target_space);
-        ctx.log.push_back("The Invisible Man reappears elsewhere.");
-    }
-    catch(const std :: exception &){
-        ctx.log.push_back("That space was occupied - the Invisible Man could not reappear there.");
-    }
+    board->RemoveHeroFromBoard(self_space);
+    ctx.ownplayer->set_PendingVanish(true);
+    ctx.log.push_back("The Invisible Man vanishes - place him anywhere at the start of your next turn.");
 }
 //////////////////////
 
