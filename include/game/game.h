@@ -3,6 +3,7 @@
 #include "Player.h"
 #include "board/board.h"
 #include "exption_control.h"
+#include "game/SaveLoad.h"
 #include <string>
 #include <vector>
 
@@ -95,6 +96,14 @@ class Game
 
         bool IsGameOver() const;
         Player * GetWinner() const;
+
+        CardSaveData ExportCard(Card & c);
+        std :: vector<CardSaveData> ExportCardList(std :: vector<Card> & cards);
+        Card RebuildCard(std :: vector<Card> & pool, const CardSaveData & saved);
+        void ImportPlayer(Player * p, const PlayerSaveData & saved, Board & board);
+        PlayerSaveData ExportPlayer(Player * p, Board & board);
+        GameSaveData ExportState();
+        void ImportState(const GameSaveData & data);
 
 };
 

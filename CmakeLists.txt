@@ -6,11 +6,8 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
-# ftxui was removed: nothing in this project (src/ or include/) references it -
-# only raylib is actually used for the front end. Requiring it would just
-# make the build fail on any machine that doesn't happen to have it installed,
-# for no benefit. Re-add it here if you start using it for something.
 find_package(raylib REQUIRED)
+find_package(nlohmann_json REQUIRED)
 
 add_executable(MyProject
     src/main.cpp
@@ -27,6 +24,7 @@ add_executable(MyProject
     # game
     src/game/game.cpp
     src/game/Player.cpp
+    src/game/SaveLoad.cpp
 
     # fighters
     src/fighter/Heroes.cpp
@@ -54,4 +52,5 @@ target_include_directories(MyProject PRIVATE include include/front)
 
 target_link_libraries(MyProject PRIVATE
     raylib
+    nlohmann_json::nlohmann_json
 )

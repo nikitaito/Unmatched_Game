@@ -260,12 +260,14 @@ Rectangle GamePage :: DrawSidekickRow(Rectangle area, const std::vector<Sidekick
     return area;
 }
 
-Rectangle GamePage :: DrawActionBar(Rectangle area, Font labelFont, int actionsRemaining, Rectangle &outEndTurnBtn){
+Rectangle GamePage :: DrawActionBar(Rectangle area, Font labelFont, int actionsRemaining, Rectangle &outEndTurnBtn, Rectangle &outSaveBtn){
     Rectangle inset = { area.x + 4, area.y + 4, area.width - 8, area.height - 8 };
     DrawFramedPanel(inset, NavyPanelBg());
 
     float btnW = area.width * 0.8f;
     float btnH = area.height * 0.17f;
+    float saveBtnH = btnH * 0.72f;
+    float gapAfterSave = area.height * 0.045f;
 
     const char *label = "ACTION";
     float labelFontSize = area.width * 0.15f;
@@ -275,11 +277,16 @@ Rectangle GamePage :: DrawActionBar(Rectangle area, Font labelFont, int actionsR
     float gapAfterBtn = area.height * 0.09f;
     float gapAfterLabel = 14.0f;
 
-    float blockH = btnH + gapAfterBtn + labelSize.y + gapAfterLabel + dotRadius * 2.0f;
+    float blockH = saveBtnH + gapAfterSave + btnH + gapAfterBtn + labelSize.y + gapAfterLabel + dotRadius * 2.0f;
     float startY = area.y + (area.height - blockH) / 2.0f;
-    if(startY < area.y + area.height * 0.05f) startY = area.y + area.height * 0.05f;
+    float minTop = inset.y + inset.height * 0.04f;
+    if(startY < minTop) startY = minTop;
 
-    Rectangle endTurnBtn = { area.x + area.width / 2 - btnW / 2, startY, btnW, btnH };
+    Rectangle saveBtn = { area.x + area.width / 2 - btnW / 2, startY, btnW, saveBtnH };
+    DrawThemedButton(saveBtn, "SAVE", labelFont, saveBtnH * 0.4f, false);
+    outSaveBtn = saveBtn;
+
+    Rectangle endTurnBtn = { area.x + area.width / 2 - btnW / 2, saveBtn.y + saveBtn.height + gapAfterSave, btnW, btnH };
     DrawThemedButton(endTurnBtn, "END TURN", labelFont, btnH * 0.45f, true);
     outEndTurnBtn = endTurnBtn;
 
@@ -406,7 +413,7 @@ void GamePage :: Draw(Texture2D background, Font titleFont, Font labelFont, Text
     Rectangle handArea = { buttonsWidth + actionBarWidth, bottomY, handWidth, bottomHeight };
 
     DrawManeuverAttackScheme(buttonsArea, labelFont, maneuverBtn, attackBtn, schemeBtn);
-    DrawActionBar(actionArea, labelFont, actionsRemaining, endTurnBtn);
+    DrawActionBar(actionArea, labelFont, actionsRemaining, endTurnBtn, saveBtn);
 
     Rectangle handPanel = { handArea.x + 4, handArea.y + 4, handArea.width - 8, handArea.height - 8 };
     DrawFramedPanel(handPanel, NavyPanelBg());
