@@ -61,8 +61,7 @@ void Discard :: execute(Context & ctx){
     }
     else{
         for (size_t i = 0; i < ctx.remove.size(); ++i){
-            int boost = (i < ctx.removeBoosts.size()) ? ctx.removeBoosts[i] : 1;
-            ctx.attackCard->set_Attack(ctx.attackCard->get_Attack() + boost);
+            ctx.attackCard->set_Attack(ctx.attackCard->get_Attack() + 1);
             ctx.ownplayer->remove_card(ctx.remove[i]);
         }
     }
@@ -104,7 +103,7 @@ void Boost_deffence :: execute(Context & ctx){
         return;
 
     int boost = ctx.attackCard->get_Boost();
-    ctx.defenseCard->set_Defence(boost);
+    ctx.defenseCard->set_Defence(ctx.defenseCard->get_Defense() + boost);
 }
 /////////////////////////
 Move :: Move(int x) : cost(x){}
@@ -130,8 +129,18 @@ void ReplaceEffect :: execute(Context & ctx){
         ctx.game->IncreaseAction(ctx.ownplayer);
     }
     else if(mode == 3){
-        if(ctx.result == CombatResult :: Win)
-            ctx.game->Teleport(ctx.current_space , ctx.target_space);
+        if(ctx.result == CombatResult :: Win){
+            Board * board = ctx.game->get_Board();
+            int dest = ctx.move_override_target;
+            if(board && dest >= 0 && board->valid_space(dest) &&
+               board->AdjacentSpaces(ctx.target_space, dest) &&
+               board->get_spaces()[dest].empty()){
+                ctx.game->Teleport(ctx.current_space , dest);
+            }
+            else{
+                ctx.log.push_back("Thirst for Sustenance: no legal adjacent space was chosen.");
+            }
+        }
     }
     else if(mode == 4){
         ctx.game->Teleport(ctx.current_space , ctx.target_space);
@@ -307,8 +316,9 @@ void ConfirmSuspicionEffect :: execute(Context & ctx){
 
     if(found){
         ctx.targetplayer->remove_card(foundName);
-        if(ctx.targethero)
-            ctx.targethero->Damage(foundBoost);
+        Heroes * oppHero = ctx.targetplayer->get_hero();
+        if(oppHero)
+            oppHero->Damage(foundBoost);
         ctx.log.push_back("Matching card discarded.");
     }
     else{
@@ -549,41 +559,19 @@ void CodedNotesEffect :: execute(Context & ctx){
     ctx.game->DrawCard(ctx.ownplayer , 3);
 
     int actuallyDrawn = static_cast<int>(hand.size()) - beforeDraw;
+    ctx.codedNotesActuallyDrawn = actuallyDrawn;
+
     if(actuallyDrawn <= 0){
         ctx.log.push_back("Coded Notes: no cards left to draw.");
         return;
     }
 
-    if(ctx.codedNotesReturnOrder.size() != 2){
-        ctx.log.push_back("Coded Notes: no valid choice supplied, drawn cards stay in hand.");
+    if(actuallyDrawn < 2){
+        ctx.log.push_back("Coded Notes: drew " + std :: to_string(actuallyDrawn) + " card(s).");
         return;
     }
 
-    int pos0 = ctx.codedNotesReturnOrder[0];
-    int pos1 = ctx.codedNotesReturnOrder[1];
-
-    if(pos0 < 0 || pos1 < 0 || pos0 == pos1 || pos0 >= actuallyDrawn || pos1 >= actuallyDrawn){
-        ctx.log.push_back("Coded Notes: invalid choice, drawn cards stay in hand.");
-        return;
-    }
-
-    int idx0 = beforeDraw + pos0;
-    int idx1 = beforeDraw + pos1;
-
-    // Take the higher hand index first so removing it doesn't shift the lower
-    // index out from under us; slots[0] must stay the one that goes on top.
-    std :: vector<Card> slots(2);
-    if(idx0 > idx1){
-        slots[0] = ctx.ownplayer->take_hand_card(idx0);
-        slots[1] = ctx.ownplayer->take_hand_card(idx1);
-    }
-    else{
-        slots[1] = ctx.ownplayer->take_hand_card(idx1);
-        slots[0] = ctx.ownplayer->take_hand_card(idx0);
-    }
-
-    ctx.ownhero->add_to_top_of_deck(std :: move(slots));
-    ctx.log.push_back("Coded Notes: 2 cards placed on top of the deck.");
+    ctx.log.push_back("Coded Notes: drew " + std :: to_string(actuallyDrawn) + " cards - choose 2 to return to the top of the deck.");
 }
 //////////////////
 void ConfoundEffect :: execute(Context & ctx){
@@ -626,12 +614,17 @@ void CovertPreparationEffect :: execute(Context & ctx){
     }
 
     if(ctx.second_fog_token_space >= 0 && ctx.second_fog_token_destination >= 0 && ctx.second_fog_token_space != ctx.second_fog_token_destination){
-        try{
-            ctx.game->Move_FogToken(ctx.second_fog_token_space , ctx.second_fog_token_destination , 2);
-            ctx.log.push_back("Your opponent shifts another fog token up to 2 spaces.");
+        if(ctx.second_fog_token_space == ctx.fog_token_destination){
+            ctx.log.push_back("Your opponent must move a different fog token.");
         }
-        catch(const std :: exception &){
-            ctx.log.push_back("Your opponent had no legal move for that fog token.");
+        else{
+            try{
+                ctx.game->Move_FogToken(ctx.second_fog_token_space , ctx.second_fog_token_destination , 2);
+                ctx.log.push_back("Your opponent shifts another fog token up to 2 spaces.");
+            }
+            catch(const std :: exception &){
+                ctx.log.push_back("Your opponent had no legal move for that fog token.");
+            }
         }
     }
 }
@@ -657,16 +650,6 @@ void StepLightlyEffect :: execute(Context & ctx){
         else if(s){
             s->Damage(damage);
             ctx.log.push_back("Dealt " + std :: to_string(damage) + " damage to an adjacent fighter.");
-        }
-    }
-
-    if(ctx.self_move_destination >= 0 && ctx.move_override_target >= 0 && ctx.self_move_destination != ctx.move_override_target){
-        try{
-            ctx.game->Move_FogToken(ctx.self_move_destination , ctx.move_override_target , 2);
-            ctx.log.push_back("Your opponent shifts a fog token up to 2 spaces.");
-        }
-        catch(const std :: exception &){
-            ctx.log.push_back("Your opponent had no legal move for that fog token.");
         }
     }
 }
