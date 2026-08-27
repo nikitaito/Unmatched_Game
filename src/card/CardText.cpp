@@ -35,7 +35,7 @@ const char * CardDisplayName(CardName name){
         case CardName::Emerge_from_Mist:                 return "Emerging from the Fog";
         case CardName::Impossible_to_See:                  return "Invisible";
         case CardName::Into_Thin_Air:                        return "Vanishing into Thin Air";
-        case CardName::Lurking:                                return "Ambush";
+        case CardName::Lurking:                                return "Lurking";
         case CardName::Reign_of_Terror:                          return "Reign of Terror";
         case CardName::Rolling_Fog:                                return "Rolling Fog";
         case CardName::Slip_Away:                                    return "Glide into the Distance";
