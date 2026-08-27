@@ -30,7 +30,7 @@ class Game
 
         bool bloodHarvestUsedThisTurn = false;
 
-        int lastCodedNotesDraw = -1; // set after ResolveCombat if Coded Notes drew cards this resolution
+        int lastCodedNotesDraw = -1;
 
         bool gameOver = false;
         Player * winner = nullptr;
