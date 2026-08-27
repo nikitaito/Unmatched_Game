@@ -42,6 +42,7 @@ class Board
         bool SameZone(int , int) const;
         bool valid_space(int) const;
         void Swap(int , int);
+        void RemoveHeroFromBoard(int);
 
 
 

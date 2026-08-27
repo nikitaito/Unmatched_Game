@@ -73,6 +73,12 @@ void Board :: reset_space(int situation){
     spaces[situation].reset();
 }
 
+void Board :: RemoveHeroFromBoard(int situation){
+    if(situation < 0 || situation >= static_cast<int>(spaces.size()))
+        return;
+    spaces[situation].clear_hero();
+}
+
 Space * Board :: search_hero(Heroes * hero){
     Space * search_hero = nullptr;
     for (auto & it : spaces){
