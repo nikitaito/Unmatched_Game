@@ -25,6 +25,7 @@ class Player
         // int age;
 
         int action = 2;
+        bool pendingVanish = false;
 
     public:
         // Player(std :: string , int);
@@ -46,6 +47,8 @@ class Player
         void increase_action(int x);
         void decrease_action(int x);
         void reset_action();
+        bool get_PendingVanish() const;
+        void set_PendingVanish(bool);
         
 };
 

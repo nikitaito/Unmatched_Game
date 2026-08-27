@@ -85,3 +85,11 @@ void Player :: reset_action(){
     action = 2;
 }
 
+bool Player :: get_PendingVanish() const{
+    return pendingVanish;
+}
+
+void Player :: set_PendingVanish(bool b){
+    pendingVanish = b;
+}
+
