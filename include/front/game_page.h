@@ -39,12 +39,13 @@ class GamePage {
         Rectangle DrawHeroPanel(Rectangle area, const HeroPanelData &data, Font nameFont, Font labelFont, bool mirrored, Rectangle &outDeckBtn, Rectangle &outDiscardBtn);
         Rectangle DrawSidekickRow(Rectangle area, const std::vector<SidekickVisual> &sidekicks, Font labelFont);
         void DrawLifeBadge(Vector2 center, int currentHP, float radius);
-        Rectangle DrawActionBar(Rectangle area, Font labelFont, int actionsRemaining, Rectangle &outEndTurnBtn);
+        Rectangle DrawActionBar(Rectangle area, Font labelFont, int actionsRemaining, Rectangle &outEndTurnBtn, Rectangle &outSaveBtn);
         void DrawManeuverAttackScheme(Rectangle area, Font labelFont, Rectangle &outManeuver, Rectangle &outAttack, Rectangle &outScheme);
 
         Rectangle lastMapRect{};    
         Rectangle leftDeckBtn{}, leftDiscardBtn{}, rightDeckBtn{}, rightDiscardBtn{};
         Rectangle maneuverBtn{}, attackBtn{}, schemeBtn{}, endTurnBtn{};
+        Rectangle saveBtn{};
 
         std::unique_ptr<CardViewWindow> cardViewWindow; 
         std::unique_ptr<DeckCardWindow> deckWindow;     
@@ -74,6 +75,7 @@ class GamePage {
         Rectangle GetAttackBtn() const { return attackBtn; }
         Rectangle GetSchemeBtn() const { return schemeBtn; }
         Rectangle GetEndTurnBtn() const { return endTurnBtn; }
+        Rectangle GetSaveBtn() const { return saveBtn; }
 
         CardViewWindow* GetCardViewWindow() const { return cardViewWindow.get(); } 
         DeckCardWindow* GetDeckCardWindow() const { return deckWindow.get(); }

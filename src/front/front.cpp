@@ -205,6 +205,10 @@ void Front :: Run(){
                 UpdateAndDrawGame();
                 break;
 
+            case Page :: Load:
+                LoadGame();
+                break;
+
             default:
                 currentPage = Page :: Exit;
                 break;
@@ -235,6 +239,71 @@ void Front :: StartMatch(){
     combatPage.font = buttonFont;
     combatPage.titleFont = subtitleFont;
     combatPage.labelFont = labelFont;
+}
+
+static const char * const SAVE_FILE_PATH = "data.json";
+
+bool Front :: SaveGame(){
+    if(!gameStarted){
+        ShowToast("There is no game in progress to save.");
+        return false;
+    }
+
+    bool midCombat = (game.get_CombatStage() != CombatStage :: None) || showingCombatResult;
+    bool midInputFlow = (mode != Mode :: Idle);
+    if(midCombat || midInputFlow){
+        ShowToast("Finish the current action before saving.");
+        return false;
+    }
+
+    GameSaveData data = game.ExportState();
+    if(!WriteGameSaveJson(data, SAVE_FILE_PATH)){
+        ShowToast("Could not write the save file.");
+        return false;
+    }
+
+    currentPage = Page :: Exit;
+    return true;
+}
+
+bool Front :: LoadGame(){
+    GameSaveData data;
+    if(!ReadGameSaveJson(SAVE_FILE_PATH, data)){
+        ShowToast("No saved game was found.");
+        currentPage = Page :: Menu;
+        return false;
+    }
+
+    try{
+        game.ImportState(data);
+    }
+    catch(const std :: exception &){
+        ShowToast("The save file is corrupted and could not be loaded.");
+        currentPage = Page :: Menu;
+        return false;
+    }
+
+    character1 = game.get_player(1)->get_hero()->get_name();
+    character2 = game.get_player(2)->get_hero()->get_name();
+
+    gameStarted = true;
+    mode = Mode :: Idle;
+    showingCombatResult = false;
+    selectedFighterSpace = -1;
+    maneuverReachable.clear();
+    pendingCodedNotesPlayer = nullptr;
+    pendingCodedNotesDrawn = -1;
+    codedNotesPicks.clear();
+
+    combatPage.Init(Rectangle{ 0, 0, (float)GetScreenWidth(), (float)GetScreenHeight() });
+    combatPage.backgroundImage = combatBackground;
+    combatPage.centerIcon = swordIcon;
+    combatPage.font = buttonFont;
+    combatPage.titleFont = subtitleFont;
+    combatPage.labelFont = labelFont;
+
+    currentPage = Page :: Game;
+    return true;
 }
 
 Texture2D Front :: PortraitFor(CharacterType t){
@@ -883,6 +952,10 @@ void Front :: HandleIdleClicks(){
     Vector2 mouse = GetMousePosition();
 
     if(mode == Mode :: Idle){
+        if(CheckCollisionPointRec(mouse, gamePage.GetSaveBtn())){
+            SaveGame();
+            return;
+        }
         if(CheckCollisionPointRec(mouse, gamePage.GetManeuverBtn())){
             std :: string err;
             if(!game.Maneuver(turnPlayer, err)){ ShowToast(err); return; }

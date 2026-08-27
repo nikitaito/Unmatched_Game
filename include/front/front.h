@@ -22,6 +22,9 @@ class Front
 
         void Run();
 
+        bool SaveGame();
+        bool LoadGame();
+
     private:
 
         Texture2D background{};

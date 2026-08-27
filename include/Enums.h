@@ -113,7 +113,8 @@ enum class Page {
     Exit,
     Choose,
     Game,
-    End
+    End,
+    Load
 };
 
 enum class Action_State{

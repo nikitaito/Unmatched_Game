@@ -109,7 +109,7 @@ void Main_Menu :: make_Page(Page & current_page, Texture2D & background,Font & t
             current_page = Page :: Age;
         }
         else if(is_clicked(loadRect , mousePos)){
-            current_page = Page :: Help;
+            current_page = Page :: Load;
         }
         else if(is_clicked (exitRect , mousePos)){
             current_page = Page :: Exit;
