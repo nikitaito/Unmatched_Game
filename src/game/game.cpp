@@ -999,3 +999,162 @@ bool Game :: ApplyCodedNotesReturn(Player * p , int pos0 , int pos1 , std :: str
     lastCodedNotesDraw = -1;
     return true;
 }
+
+CardSaveData Game :: ExportCard(Card & c){
+    CardSaveData cs;
+    cs.name = c.get_CardName();
+    cs.attack = c.get_Attack();
+    cs.defense = c.get_Defense();
+    cs.boost = c.get_Boost();
+    cs.applyEffects = c.get_ApplyEffects();
+    cs.valueLocked = c.get_ValueLocked();
+    return cs;
+}
+
+std :: vector<CardSaveData> Game :: ExportCardList(std :: vector<Card> & cards){
+    std :: vector<CardSaveData> out;
+    out.reserve(cards.size());
+    for(auto & c : cards)
+        out.push_back(ExportCard(c));
+    return out;
+}
+
+PlayerSaveData Game :: ExportPlayer(Player * p, Board & board){
+    PlayerSaveData pd;
+    pd.name = p->get_name();
+    pd.action = p->get_aciton();
+
+    Heroes * hero = p->get_hero();
+    HeroSaveData hd;
+    hd.type = hero->get_name();
+    hd.health = hero->get_HP();
+    hd.startTurnSpace = hero->get_StartTurnSpace();
+    hd.boardSpace = board.find_space_of_hero(hero);
+    hd.deck = ExportCardList(hero->get_deck_cards());
+    hd.topOfDeck = ExportCardList(hero->get_top_of_deck());
+
+    bool usesFogTokens = (hero->get_name() == CharacterType :: Invman);
+    for(Sidekick * sk : hero->get_sidekick()){
+        SidekickSaveData sd;
+        sd.type = sk->get_name();
+        sd.health = sk->get_Health();
+        sd.startTurnSpace = sk->get_StartTurnSpace();
+        sd.boardSpace = usesFogTokens ? board.find_space_of_token(sk) : board.find_space_of_comrade(sk);
+        hd.sidekicks.push_back(sd);
+    }
+
+    pd.hero = hd;
+    pd.hand = ExportCardList(p->get_hand_cards());
+    pd.discard = ExportCardList(p->get_dis_cards());
+    return pd;
+}
+
+Card Game :: RebuildCard(std :: vector<Card> & pool, const CardSaveData & saved){
+    for(size_t i = 0; i < pool.size(); ++i){
+        if(pool[i].get_CardName() != saved.name)
+            continue;
+
+        Card c = std :: move(pool[i]);
+        pool.erase(pool.begin() + i);
+
+        c.set_Attack(saved.attack - c.get_Attack());
+        c.set_Defence(saved.defense - c.get_Defense());
+        c.set_Boost(saved.boost - c.get_Boost());
+        c.set_ApplyEffects(saved.applyEffects);
+        if(saved.valueLocked)
+            c.LockValue();
+
+        return c;
+    }
+    throw std :: runtime_error("Save file references a card that does not belong to this hero.");
+}
+
+void Game :: ImportPlayer(Player * p, const PlayerSaveData & saved, Board & board){
+    p->set_name(saved.name);
+    p->assign_Characters(saved.hero.type);
+
+    p->reset_action();
+    int delta = saved.action - p->get_aciton();
+    if(delta > 0)      p->increase_action(delta);
+    else if(delta < 0) p->decrease_action(-delta);
+
+    Heroes * hero = p->get_hero();
+
+    std :: vector<Card> pool = std :: move(hero->get_deck_cards());
+    size_t savedTotal = saved.hero.deck.size() + saved.hero.topOfDeck.size() + saved.hand.size() + saved.discard.size();
+    if(savedTotal != pool.size()){
+        hero->get_deck_cards() = std :: move(pool);
+        throw std :: runtime_error("Save file card count does not match this hero's deck.");
+    }
+
+    hero->get_deck_cards().clear();
+    hero->get_top_of_deck().clear();
+    p->get_hand_cards().clear();
+    p->get_dis_cards().clear();
+
+    for(const auto & cs : saved.hero.deck)
+        hero->get_deck_cards().push_back(RebuildCard(pool, cs));
+    for(const auto & cs : saved.hero.topOfDeck)
+        hero->get_top_of_deck().push_back(RebuildCard(pool, cs));
+    for(const auto & cs : saved.hand)
+        p->add_card(RebuildCard(pool, cs));
+    for(const auto & cs : saved.discard)
+        p->discard_card(RebuildCard(pool, cs));
+
+    hero->set_Health(saved.hero.health);
+    hero->set_StartTurnSpace(saved.hero.startTurnSpace);
+    if(saved.hero.boardSpace >= 0)
+        board.set_Hero(hero, saved.hero.boardSpace);
+
+    bool usesFogTokens = (hero->get_name() == CharacterType :: Invman);
+    auto sidekicks = hero->get_sidekick();
+    for(size_t i = 0; i < sidekicks.size() && i < saved.hero.sidekicks.size(); ++i){
+        Sidekick * sk = sidekicks[i];
+        const SidekickSaveData & sd = saved.hero.sidekicks[i];
+
+        sk->Heal(sk->get_Health_max());                 
+        sk->Damage(sk->get_Health_max() - sd.health);    
+        sk->set_StartTurnSpace(sd.startTurnSpace);
+
+        if(sd.boardSpace >= 0){
+            if(usesFogTokens) board.set_Token(sk, sd.boardSpace);
+            else              board.set_Comrade(sk, sd.boardSpace);
+        }
+    }
+}
+
+GameSaveData Game :: ExportState(){
+    GameSaveData data;
+    data.player1 = ExportPlayer(&player1, board);
+    data.player2 = ExportPlayer(&player2, board);
+    data.player1Turn = (turn == &player1);
+    data.bloodHarvestUsedThisTurn = bloodHarvestUsedThisTurn;
+    data.gameOver = gameOver;
+    data.winner = (winner == nullptr) ? 0 : (winner == &player1 ? 1 : 2);
+    return data;
+}
+
+void Game :: ImportState(const GameSaveData & data){
+    combatStage = CombatStage :: None;
+    combatAttackerPlayer = nullptr;
+    combatDefenderPlayer = nullptr;
+    combatAttackerHero = nullptr;
+    combatAttackerSidekick = nullptr;
+    combatDefenderHero = nullptr;
+    combatDefenderSidekick = nullptr;
+    combatAttackerSpace = -1;
+    combatDefenderSpace = -1;
+    combatHasDefense = false;
+    lastCodedNotesDraw = -1;
+
+    for(int i = 0; i < board.get_space_count(); ++i)
+        board.reset_space(i);
+
+    ImportPlayer(&player1, data.player1, board);
+    ImportPlayer(&player2, data.player2, board);
+
+    turn = data.player1Turn ? &player1 : &player2;
+    bloodHarvestUsedThisTurn = data.bloodHarvestUsedThisTurn;
+    gameOver = data.gameOver;
+    winner = (data.winner == 1) ? &player1 : (data.winner == 2) ? &player2 : nullptr;
+}
