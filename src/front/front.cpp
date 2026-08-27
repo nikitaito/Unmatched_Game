@@ -439,10 +439,11 @@ std :: vector<Front :: InputStep> Front :: StepsForScheme(CardName name) const{
     using S = InputStep;
     switch(name){
         case CardName :: Administer_Aid:
-        case CardName :: Master_of_Disguise:
         case CardName :: Mistform:
         case CardName :: Ravening_Seduction:
             return { S :: CurrentSpace, S :: TargetSpace };
+        case CardName :: Master_of_Disguise:
+            return { S :: TargetSpace };
         case CardName :: Baptism_of_blood:
             return { S :: TargetSpace };
         case CardName :: Confirm_Suspicion:
@@ -452,8 +453,7 @@ std :: vector<Front :: InputStep> Front :: StepsForScheme(CardName name) const{
         case CardName :: Rolling_Fog:
             return { S :: FogSpace, S :: FogDest };
         case CardName :: Step_Lightly:
-
-            return { S :: TargetSpace };
+            return { S :: TargetSpace, S :: FogSpace, S :: FogDest };
         case CardName :: Vanish:
             return { S :: TargetSpace };
         default:
@@ -472,6 +472,7 @@ std :: vector<Front :: InputStep> Front :: StepsForCombat(CardName atk, bool has
         switch(name){
             case CardName :: Dash:
             case CardName :: The_Game_Is_Afoot:
+            case CardName :: Thirst_for_sustenance:
                 need(S :: MoveDestination); break;
             case CardName :: Into_Thin_Air:
                 need(S :: SelfMoveDestination); need(S :: FogSpace); need(S :: FogDest); break;
@@ -572,6 +573,12 @@ void Front :: FinishFlow(){
         combatPage.showingResult = true;
         combatPage.resultLog.clear();
         for(auto &l : log){ combatPage.resultLog += l; combatPage.resultLog += "\n"; }
+
+        int drawn = game.GetLastCodedNotesDraw();
+        if(drawn >= 2){
+            pendingCodedNotesPlayer = combatDefenderPlayer;
+            pendingCodedNotesDrawn = drawn;
+        }
     }
 
     flowKind = FlowKind :: None;
@@ -585,6 +592,68 @@ void Front :: FinishFlow(){
     flowGuessValue = 0;
     flowGuessAttack = true;
     mode = Mode :: Idle;
+}
+
+void Front :: BeginCodedNotesChoice(){
+    mode = Mode :: PostCombatCodedNotes;
+    codedNotesPicks.clear();
+}
+
+void Front :: HandlePostCombatCodedNotes(){
+    if(!pendingCodedNotesPlayer || pendingCodedNotesDrawn < 2){
+        pendingCodedNotesPlayer = nullptr;
+        pendingCodedNotesDrawn = -1;
+        codedNotesPicks.clear();
+        mode = Mode :: Idle;
+        return;
+    }
+
+    DeckCardWindow *deckWin = gamePage.GetDeckCardWindow();
+    if(!deckWin->IsOpen()){
+        auto &hand = pendingCodedNotesPlayer->get_hand_cards();
+        int total = static_cast<int>(hand.size());
+        int windowSize = pendingCodedNotesDrawn;
+        int beforeDraw = total - windowSize;
+        if(beforeDraw < 0) beforeDraw = 0;
+
+        CharacterType handOwnerType = pendingCodedNotesPlayer->get_hero()->get_name();
+        std :: vector<Texture2D> texs;
+        std :: vector<std :: string> labels;
+        for(int i = beforeDraw; i < total; ++i){
+            texs.push_back(CardTextureFor(hand[i].get_CardName(), handOwnerType));
+            labels.push_back(CardDisplayName(hand[i].get_CardName()));
+        }
+
+        deckWin->Open(texs, labels, "Coded Notes: click 2 cards, in order, to place on top of the deck (X to confirm)", true);
+        deckWin->onCardClicked = [this](size_t idx){
+            auto it = std :: find(codedNotesPicks.begin(), codedNotesPicks.end(), (int)idx);
+            if(it == codedNotesPicks.end()){
+                if(codedNotesPicks.size() < 2)
+                    codedNotesPicks.push_back((int)idx);
+            }
+            else{
+                codedNotesPicks.erase(it);
+            }
+        };
+        return;
+    }
+
+    if(!deckWin->IsOpen()){
+        Player *p = pendingCodedNotesPlayer;
+        int windowSize = pendingCodedNotesDrawn;
+
+        int pos0 = codedNotesPicks.size() > 0 ? codedNotesPicks[0] : 0;
+        int pos1 = codedNotesPicks.size() > 1 ? codedNotesPicks[1] : (windowSize > 1 ? 1 : 0);
+
+        std :: string err;
+        if(!game.ApplyCodedNotesReturn(p, pos0, pos1, err))
+            ShowToast(err);
+
+        pendingCodedNotesPlayer = nullptr;
+        pendingCodedNotesDrawn = -1;
+        codedNotesPicks.clear();
+        mode = Mode :: Idle;
+    }
 }
 
 void Front :: DrawFlowPrompt(const char *question){
@@ -676,14 +745,22 @@ void Front :: HandleFlowStep(){
         case InputStep :: TargetSpace:
             if(flowKind == FlowKind :: Scheme && flowCardName == CardName :: Baptism_of_blood)
                 DrawFlowPrompt("Select an empty space in Dracula's zone for the Sister to return to (or Skip)");
+            else if(flowKind == FlowKind :: Scheme && flowCardName == CardName :: Master_of_Disguise)
+                DrawFlowPrompt("Select the space containing the opponent's hero (or Skip)");
             else
                 DrawFlowPrompt("Select the target space (or Skip)");
             break;
         case InputStep :: FogSpace:
-            DrawFlowPrompt("Select a fog token to move (or Skip)");
+            if(flowKind == FlowKind :: Scheme && flowCardName == CardName :: Step_Lightly)
+                DrawFlowPrompt("Opponent: select a fog token to move up to 2 spaces (or Skip)");
+            else
+                DrawFlowPrompt("Select a fog token to move (or Skip)");
             break;
         case InputStep :: FogDest:
-            DrawFlowPrompt("Select where that fog token goes (or Skip)");
+            if(flowKind == FlowKind :: Scheme && flowCardName == CardName :: Step_Lightly)
+                DrawFlowPrompt("Opponent: select where that fog token goes (or Skip)");
+            else
+                DrawFlowPrompt("Select where that fog token goes (or Skip)");
             break;
         case InputStep :: SecondFogSpace:
             DrawFlowPrompt("Opponent: select a different fog token (or Skip)");
@@ -692,7 +769,10 @@ void Front :: HandleFlowStep(){
             DrawFlowPrompt("Opponent: select where it goes (or Skip)");
             break;
         case InputStep :: MoveDestination:
-            DrawFlowPrompt("Select where to move after combat (or Skip)");
+            if(flowKind == FlowKind :: CombatFollowup && flowAttackCardName == CardName :: Thirst_for_sustenance)
+                DrawFlowPrompt("If you win, select an empty space adjacent to the opponent (or Skip)");
+            else
+                DrawFlowPrompt("Select where to move after combat (or Skip)");
             break;
         case InputStep :: SelfMoveDestination:
             DrawFlowPrompt("Select your fighter's new space (or Skip)");
@@ -712,10 +792,7 @@ void Front :: HandleFlowStep(){
                 if(flowKind == FlowKind :: Scheme)
                     shownHandOwner = game.get_opponent(turnPlayer);
                 else
-                    // Confound targets the hand of whoever DIDN'T play it: if the
-                    // attacker played Confound, the defender's hand is shown (and
-                    // vice versa) so the discarded card actually matches what the
-                    // engine removes in Game::ResolveCombat.
+
                     shownHandOwner = attackCardIsConfound ? combatDefenderPlayer : combatAttackerPlayer;
 
                 auto &hand = shownHandOwner->get_hand_cards();
@@ -932,6 +1009,9 @@ void Front :: HandleCombatClicks(CombatStage stage){
             combatAttackerPlayer = nullptr;
             combatDefenderPlayer = nullptr;
             combatAttackerSpaceRef = combatDefenderSpaceRef = -1;
+
+            if(pendingCodedNotesDrawn >= 2 && pendingCodedNotesPlayer)
+                BeginCodedNotesChoice();
         }
         return;
     }
@@ -1037,7 +1117,7 @@ void Front :: UpdateAndDrawGame(){
         cardView->Update();
         deckWin->Update();
     }
-    else if(mode != Mode :: Flow && mode != Mode :: HandOverflow){
+    else if(mode != Mode :: Flow && mode != Mode :: HandOverflow && mode != Mode :: PostCombatCodedNotes){
         if(!inCombatUI) gamePage.Update(handCardClicked);
         else            combatPage.Update();
     }
@@ -1089,6 +1169,9 @@ void Front :: UpdateAndDrawGame(){
     else if(mode == Mode :: HandOverflow){
         DrawFlowPrompt("Discard down to 7 cards: click a card in your hand");
         UpdateHandOverflow();
+    }
+    else if(mode == Mode :: PostCombatCodedNotes){
+        HandlePostCombatCodedNotes();
     }
     else if(!windowsOpen){
         if(inCombatUI){

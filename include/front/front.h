@@ -78,6 +78,7 @@ class Front
             SchemePickCard,
             Flow,
             HandOverflow,
+            PostCombatCodedNotes,
             GameOver
         };
         Mode mode = Mode::Idle;
@@ -123,6 +124,12 @@ class Front
         Player *combatDefenderPlayer = nullptr;
         int combatAttackerSpaceRef = -1, combatDefenderSpaceRef = -1;
         bool showingCombatResult = false;
+
+        Player *pendingCodedNotesPlayer = nullptr;
+        int pendingCodedNotesDrawn = -1;
+        std::vector<int> codedNotesPicks;
+        void BeginCodedNotesChoice();
+        void HandlePostCombatCodedNotes();
 
         void UpdateAndDrawGame();
         RenderTexture2D sceneTexture{};
