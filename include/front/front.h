@@ -9,6 +9,7 @@
 #include "front/choose.h"
 #include "front/game_page.h"
 #include "front/combat_page.h"
+#include "front/end_page.h"
 
 #include <string>
 #include <vector>
@@ -58,6 +59,7 @@ class Front
         ChoosePage choosePage;
         GamePage   gamePage;
         CombatPage combatPage;
+        EndPage    endPage;
 
         int age1 = 0, age2 = 0;
         CharacterType character1{}, character2{};
@@ -65,6 +67,7 @@ class Front
         Game game;
         bool gameStarted = false;
         void StartMatch();
+        void ComputeEndPageText(std::string &resultLine, std::string &detailLine) const;
 
         std::string toastMessage;
         float toastTimer = 0.0f;
@@ -132,6 +135,7 @@ class Front
         Player *pendingCodedNotesPlayer = nullptr;
         int pendingCodedNotesDrawn = -1;
         std::vector<int> codedNotesPicks;
+        bool codedNotesWindowOpened = false;
         void BeginCodedNotesChoice();
         void HandlePostCombatCodedNotes();
         void HandlePlaceVanishedHero();

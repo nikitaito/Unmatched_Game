@@ -205,6 +205,14 @@ void Front :: Run(){
                 UpdateAndDrawGame();
                 break;
 
+            case Page :: End: {
+                std::string resultLine, detailLine;
+                ComputeEndPageText(resultLine, detailLine);
+                endPage.Make_Page(currentPage, background, titleFont, subtitleFont, buttonFont,
+                                   resultLine, detailLine);
+                break;
+            }
+
             case Page :: Load:
                 LoadGame();
                 break;
@@ -666,6 +674,7 @@ void Front :: FinishFlow(){
 void Front :: BeginCodedNotesChoice(){
     mode = Mode :: PostCombatCodedNotes;
     codedNotesPicks.clear();
+    codedNotesWindowOpened = false;
 }
 
 void Front :: HandlePostCombatCodedNotes(){
@@ -673,12 +682,13 @@ void Front :: HandlePostCombatCodedNotes(){
         pendingCodedNotesPlayer = nullptr;
         pendingCodedNotesDrawn = -1;
         codedNotesPicks.clear();
+        codedNotesWindowOpened = false;
         mode = Mode :: Idle;
         return;
     }
 
     DeckCardWindow *deckWin = gamePage.GetDeckCardWindow();
-    if(!deckWin->IsOpen()){
+    if(!codedNotesWindowOpened){
         auto &hand = pendingCodedNotesPlayer->get_hand_cards();
         int total = static_cast<int>(hand.size());
         int windowSize = pendingCodedNotesDrawn;
@@ -704,6 +714,7 @@ void Front :: HandlePostCombatCodedNotes(){
                 codedNotesPicks.erase(it);
             }
         };
+        codedNotesWindowOpened = true;
         return;
     }
 
@@ -723,6 +734,7 @@ void Front :: HandlePostCombatCodedNotes(){
         pendingCodedNotesPlayer = nullptr;
         pendingCodedNotesDrawn = -1;
         codedNotesPicks.clear();
+        codedNotesWindowOpened = false;
         mode = Mode :: Idle;
     }
 }
@@ -1177,7 +1189,33 @@ void Front :: UpdateHandOverflow(){
     }
 }
 
+void Front :: ComputeEndPageText(std::string &resultLine, std::string &detailLine) const{
+    Player *winner = game.GetWinner();
+    if(!winner){
+        resultLine = "IT'S A TIE";
+        detailLine = "Both heroes fell at the same time";
+        return;
+    }
+
+    resultLine = winner->get_name() + " WINS";
+
+    Heroes *hero = winner->get_hero();
+    if(hero)
+        detailLine = std::string(CharacterDisplayName(hero->get_name())) + " stands victorious";
+    else
+        detailLine = "";
+}
+
 void Front :: UpdateAndDrawGame(){
+    if(game.IsGameOver()){
+        currentPage = Page :: End;
+        std::string resultLine, detailLine;
+        ComputeEndPageText(resultLine, detailLine);
+        endPage.Make_Page(currentPage, background, titleFont, subtitleFont, buttonFont,
+                           resultLine, detailLine);
+        return;
+    }
+
     Player *turnPlayer = game.get_turn();
     Player *p1 = game.get_player(1);
     Player *p2 = game.get_player(2);
