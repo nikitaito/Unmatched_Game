@@ -46,6 +46,7 @@ add_executable(MyProject
     src/front/handmenu.cpp
     src/front/CardViewWindow.cpp
     src/front/DeckCardWindow.cpp
+    src/front/end_page.cpp
 )
 
 target_include_directories(MyProject PRIVATE include include/front)
